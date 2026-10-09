@@ -152,7 +152,22 @@ export function executeCommand(original,command,actor,clock=new Date().toISOStri
  }
  case 'EXPENSE_CANCEL':{const e=pick(s,'expenses',p.id);requireValue(e.status!=='CANCELLED','Gasto ya anulado.');const why=reason();if(e.production_cost_id){const pc=pick(s,'productionCosts',e.production_cost_id);const pr=pick(s,'productions',pc.production_id);requireValue(pr.status!=='CLOSED','Use rectificación de producción cerrada.');pc.is_current=false;}e.status='CANCELLED';e.reason=why;e.cancelled_at=clock;e.cancelled_by=actor.id;result=e.id;break;}
  case 'INVENTORY_ADJUST':{const product=pick(s,'products',p.product_id);const q=positiveInt(p.quantity);const w=scaled(p.weight_kg,3);requireValue(w>0,'Peso debe ser mayor que cero.');const sign=p.direction==='OUT'?-1:1;if(sign<0){const a=stock(s,product.id);requireValue(a.quantity>=q&&a.weight_kg>=w,'Stock insuficiente para ajuste.');}result=movement({item_type:'PRODUCT',item_id:product.id,movement_type:sign>0?'ADJUSTMENT_IN':'ADJUSTMENT_OUT',quantity:sign*q,weight_kg:sign*w,source_type:'ADJUSTMENT',source_id:uid(),notes:reason(),date:date(p.date)}).id;break;}
- case 'CONFIG_SAVE':{const old=structuredClone(s.config);s.config={...s.config,company_name:text(p.company_name,'Empresa'),default_nucleus_cost:scaled(p.default_nucleus_cost),default_packaging_cost:scaled(p.default_packaging_cost)};if(p.expense_categories){requireValue(p.expense_categories.length>0,'Agregue categorías.');s.config.expense_categories=[...new Set(p.expense_categories.map(x=>text(x,'Categoría')))];}correction('CONFIG','company',old,s.config,'Actualización de configuración');break;}
+ case 'CONFIG_SAVE':{
+  const old=structuredClone(s.config);
+  const categories=p.expense_categories??s.config.expense_categories;
+  requireValue(Array.isArray(categories)&&categories.length>0,'Agregue categorías.');
+  const expense_categories=[...new Set(categories.map(x=>text(x,'Categoría')))];
+  const condition=p.default_payment_condition??s.config.default_payment_condition??'CREDIT';
+  const method=p.default_payment_method??s.config.default_payment_method??'';
+  const category=p.default_expense_category??(expense_categories.includes(s.config.default_expense_category)?s.config.default_expense_category:expense_categories[0]);
+  requireValue(['CASH','CREDIT'].includes(condition),'Condición de pago inválida.');
+  requireValue(['','CASH','TRANSFER','CHECK'].includes(method),'Método de pago predeterminado inválido.');
+  requireValue(expense_categories.includes(category),'La categoría predeterminada debe pertenecer a las categorías de gastos.');
+  const contact={};for(const key of ['tax_id','address','phone','contact_email']){if(p[key]!==undefined){requireValue(typeof p[key]==='string'&&p[key].length<=2000,'Datos de empresa inválidos.');contact[key]=p[key].trim();}}
+  if(contact.contact_email)requireValue(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.contact_email),'Correo de contacto inválido.');
+  s.config={...s.config,...contact,company_name:text(p.company_name,'Empresa'),default_nucleus_cost:scaled(p.default_nucleus_cost),default_packaging_cost:scaled(p.default_packaging_cost),expense_categories,default_payment_condition:condition,default_payment_method:method,default_expense_category:category};
+  correction('CONFIG','company',old,s.config,'Actualización de configuración');break;
+ }
  case 'USER_SAVE':{requireValue(['ADMIN','OPERATOR','VIEWER'].includes(p.role),'Rol inválido.');const old=s.users.find(x=>x.id===p.id);const v={id:text(p.id,'ID autenticado'),name:text(p.name,'Nombre'),role:p.role,is_active:p.is_active!==false,updated_at:clock};if(old){requireValue(!(old.role==='ADMIN'&&(!v.is_active||v.role!=='ADMIN')&&s.users.filter(x=>x.role==='ADMIN'&&x.is_active).length===1),'Debe conservar al menos un administrador activo.');correction('USER',old.id,structuredClone(old),v,'Actualización de permisos');Object.assign(old,v);}else add('users',v);result=v.id;break;}
  default:fail('Operación desconocida.');
  }

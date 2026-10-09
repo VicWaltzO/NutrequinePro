@@ -8,6 +8,10 @@ La versión alojada requiere autenticación de ChatGPT y conserva el acceso priv
 
 Los accesos frecuentes están en Ventas, Producción, Cobranza y Gastos. Los códigos abren el detalle con las acciones disponibles. El stock insuficiente se resuelve con venta futura, lote planificado o corrección de cantidades. La entrega total es una acción separada. No hay entregas parciales ni vencimientos de deuda.
 
+El menú operativo sigue el orden Resumen, Ventas, Cobranza, Gastos, Producción, Inventario, Balance y Clientes. Clientes reúne el directorio y las sedes de entrega, con búsqueda por contacto o relación. El catálogo comercial se administra desde Configuración → Productos. Los enlaces anteriores `#sites` y `#products` siguen abriendo sus contenidos.
+
+Configuración permite registrar RUC, dirección, teléfono y correo de la empresa, además de la condición y el método de pago predeterminados y la categoría habitual de gastos. Estos valores solo se aplican a formularios nuevos; las operaciones existentes conservan sus condiciones y cantidades. Los cambios de empresa requieren ADMIN y quedan auditados. Apariencia conserva una preferencia clara u oscura en el navegador de cada usuario.
+
 ## Desarrollo local (Node 22.13+)
 
 ```powershell

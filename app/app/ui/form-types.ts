@@ -13,5 +13,5 @@ export interface SimpleFields {
   category?:string;default_sale_price?:NumericInput;standard_bag_weight_kg?:NumericInput;bags_per_nucleus?:NumericInput;commercial_weight_per_nucleus_kg?:NumericInput;is_sellable?:boolean;current_price_per_kg?:NumericInput;
   date?:string;description?:string;amount?:NumericInput;production_id?:string|null;sale_id?:string|null;site_id?:string|null;ingredient_id?:string|null;
   product_id?:string;quantity?:NumericInput;weight_kg?:NumericInput;direction?:string;reason?:string;
-  company_name?:string;default_nucleus_cost?:NumericInput;default_packaging_cost?:NumericInput;categories_text?:string;role?:string;
+  company_name?:string;default_nucleus_cost?:NumericInput;default_packaging_cost?:NumericInput;categories_text?:string;role?:string;contact_email?:string;default_payment_condition?:string;default_payment_method?:string;default_expense_category?:string;
 }

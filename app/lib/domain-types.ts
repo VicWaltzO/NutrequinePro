@@ -26,7 +26,7 @@ export interface CorrectionField extends Entity { correction_id: string; field_n
 export interface Expense extends Entity { date: string; category: string; description: string; amount: number; production_id: string | null; sale_id: string | null; site_id: string | null; ingredient_id: string | null; production_cost_id: string | null; notes?: string; status: string; reason?: string }
 export interface InventoryMovement extends Entity { date: string; item_type: string; item_id: string; movement_type: string; quantity: number; weight_kg: number; source_type: string; source_id: string; notes?: string }
 export interface Audit extends Entity { action: string; entity_id: string | null; payload: unknown; actor_name: string; actor_role: string; request_id?: string }
-export interface CompanyConfig { company_name: string; currency: string; timezone: string; default_nucleus_cost: number; default_packaging_cost: number; expense_categories: string[] }
+export interface CompanyConfig { company_name: string; currency: string; timezone: string; default_nucleus_cost: number; default_packaging_cost: number; expense_categories: string[]; tax_id?: string; address?: string; phone?: string; contact_email?: string; default_payment_condition?: 'CASH' | 'CREDIT'; default_payment_method?: '' | 'CASH' | 'TRANSFER' | 'CHECK'; default_expense_category?: string }
 export interface Tables {
   users: User[]; customers: Customer[]; sites: Site[]; customerSites: CustomerSite[];
   products: Product[]; ingredients: Ingredient[]; formulas: Formula[]; formulaIngredients: FormulaIngredient[];
