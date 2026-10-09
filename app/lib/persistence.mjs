@@ -1,4 +1,4 @@
-import { TABLES, SQL_NAMES, RELATIONS } from "./domain.mjs";
+import { TABLES, SQL_NAMES, RELATIONS } from "./state-schema.mjs";
 export function writePlan(before, after, guard = crypto.randomUUID()) {
   const plan = [];
   if (before)
