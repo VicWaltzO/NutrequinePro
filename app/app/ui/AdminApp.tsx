@@ -1,67 +1,1322 @@
-'use client';
-import { useEffect,useRef,useState,useSyncExternalStore } from 'react';
-import Image from 'next/image';
-import { errorMessage, recordId } from '../../lib/domain-types';
-import type { AppState, User, Sale, EditorRecord } from '../../lib/domain-types';
-import { readTheme, subscribeTheme, changeTheme, readView, subscribeView } from '../../lib/browser-preferences.mjs';
-import { createCommandRequest } from '../../lib/command-request.mjs';
-type Modal={type:string;record?:EditorRecord;kind?:string};
-type Searchable={id:string;code?:string;name?:string;description?:string;reason?:string;reference?:string;item_type?:string;item_id?:string;customer_id?:string|null;site_id?:string|null;sale_date?:string;production_date?:string;payment_date?:string;return_date?:string;date?:string;created_at?:string};
-import { LayoutDashboard,ShoppingBag,Wallet,Users,Package,Factory,Layers,Receipt,ChartNoAxesCombined,Settings,Search,Plus,ChevronRight,RefreshCw,Menu,X,ArrowUpRight,Sun,Moon,LogOut } from 'lucide-react';
-import { saleSummary,productionSummary,balanceSummary,stock,normalize,customerSummary } from '../../lib/domain.mjs';
-import { Badge,Table,Empty,ProductImage,Metrics,Input,Select,money,kg,num,day,stamp,label,find } from './shared';
-import { SaleForm,PaymentForm,ReturnForm } from './SaleForms';
-import type { FormProps } from './SaleForms';
-import { ProductionForm,ReconcileForm,FormulaForm,ProductionCorrectionForm } from './ProductionForms';
-import SimpleForm from './SimpleForm';
-import Details from './Details';
-import CustomerDirectory from './CustomerDirectory';
-import Configuration from './Configuration';
-import AuthenticatedId from './AuthenticatedId';
-const nav=[['dashboard','Resumen',LayoutDashboard],['sales','Ventas',ShoppingBag],['collections','Cobranza',Wallet],['expenses','Gastos',Receipt],['productions','Producción',Factory],['inventory','Inventario',Layers],['balance','Balance',ChartNoAxesCombined],['customers','Clientes',Users],['config','Configuración',Settings]] as const;
-const titles:Record<string,string>={sale:'Nueva venta',production:'Registrar producción',payment:'Registrar pago',credit:'Aplicar saldo a favor',return:'Registrar devolución',reconcile:'Costos y conciliación','production-quantities':'Rectificar producción',formula:'Editar fórmula · nueva versión','customer-delete':'Eliminar cliente',customer:'Cliente',site:'Sede',product:'Producto',ingredient:'Insumo',expense:'Registrar gasto',adjust:'Ajuste de inventario',config:'Configuración de empresa',user:'Usuario',reason:'Operación administrativa','sale-detail':'Detalle de venta','production-detail':'Detalle de producción','payment-detail':'Detalle de pago','customer-detail':'Cuenta del cliente'};
-class StateRequestError extends Error{constructor(message:string,readonly authenticatedId?:string){super(message);}}
-async function fetchState(){const response=await fetch('/api/state',{cache:'no-store'});const body=await response.json() as {state:AppState;actor:User;error?:string;authenticated_id?:string};if(!response.ok)throw new StateRequestError(body.error??'No se pudieron cargar los datos.',response.status===403?body.authenticated_id:undefined);return body;}
-export default function AdminApp(){
- const [authenticatedId,setAuthenticatedId]=useState<string|null>(null);
- const [s,setS]=useState<AppState|null>(null),[actor,setActor]=useState<User|null>(null),[q,setQ]=useState(''),[filter,setFilter]=useState(''),[client,setClient]=useState(''),[site,setSite]=useState(''),[from,setFrom]=useState(''),[to,setTo]=useState(''),[modal,setModal]=useState<Modal|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[toast,setToast]=useState(''),[menu,setMenu]=useState(false);const dialog=useRef<HTMLDialogElement>(null);const [requests]=useState(createCommandRequest);
- const theme=useSyncExternalStore(subscribeTheme,readTheme,()=> 'light' as const);const hash=useSyncExternalStore(subscribeView,readView,()=> 'dashboard');const route=hash.split('/')[0];const view=route==='sites'?'customers':route==='products'?'config':nav.some(x=>x[0]===route)?route:'dashboard';const tab=route==='sites'?'sites':route==='products'?'products':hash.split('/')[1]??'all';
- useEffect(()=>{document.documentElement.dataset.theme=theme;},[theme]);
- const toggleTheme=()=>changeTheme(theme==='dark'?'light':'dark');
- const reload=async()=>{try{const j=await fetchState();setS(j.state);setActor(j.actor);setError('');setAuthenticatedId(null);}catch(e){setError(errorMessage(e,'No se pudieron cargar los datos.'));setAuthenticatedId(e instanceof StateRequestError?e.authenticatedId??null:null);}};
- useEffect(()=>{let active=true;fetchState().then(j=>{if(active){setS(j.state);setActor(j.actor);setError('');setAuthenticatedId(null);}}).catch(e=>{if(active){setError(errorMessage(e,'No se pudieron cargar los datos.'));setAuthenticatedId(e instanceof StateRequestError?e.authenticatedId??null:null);}});return ()=>{active=false;};},[]);
- useEffect(()=>{if(modal&&!dialog.current?.open)dialog.current?.showModal();if(!modal&&dialog.current?.open)dialog.current.close();},[modal]);
- useEffect(()=>{if(toast){const t=setTimeout(()=>setToast(''),5000);return ()=>clearTimeout(t);}},[toast]);
- const go=(v:string,nextTab='all')=>{location.hash=nextTab==='all'?v:`${v}/${nextTab}`;setQ('');setFilter('');setClient('');setSite('');setFrom('');setTo('');setMenu(false);};
- const open=(type:string,record?:EditorRecord,kind?:string)=>{setError('');requests.reset();setModal({type,record,kind});};
- const close=()=>{if(!busy){setModal(null);setError('');requests.reset();}};
- const run=async(type:string,p:object):Promise<string|true|null>=>{if(busy)return null;const {_keep_open,...payload}=p as {_keep_open?:boolean};const fingerprint=JSON.stringify({type,payload});const requestId=requests.begin(fingerprint);if(!requestId)return null;setBusy(true);setError('');try{const r=await fetch('/api/command',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,payload,request_id:requestId})}),j=await r.json() as {state:AppState;result:string|null;error?:string};if(!r.ok)throw Error(j.error);setS(j.state);requests.reset();setToast('Operación registrada.');if(!_keep_open){if(type.startsWith('SALE_')&&j.result)setModal({type:'sale-detail',record:{id:j.result}});else if(type.startsWith('PRODUCTION_')&&j.result)setModal({type:'production-detail',record:{id:j.result}});else if(['PAYMENT_CREATE','PAYMENT_APPLY_CREDIT'].includes(type)&&j.result)setModal({type:'payment-detail',record:{id:j.result}});else setModal(null);}return j.result??true;}catch(e){setError(errorMessage(e,'No se pudo guardar. Vuelva a intentar.'));return null;}finally{requests.finish();setBusy(false);}};
- if(!s||!actor)return <div className="loading"><Image width={150} height={150} unoptimized src="/brand/logo.jpg" alt="Nutrequine Pro"/><h1>Nutrequine Pro</h1>{error?<><p role="alert">{error}</p>{authenticatedId&&<AuthenticatedId id={authenticatedId}/>}<button onClick={reload}>Volver a intentar</button><a href="/signout-with-chatgpt?return_to=%2F" target="_top">Salir de la cuenta actual</a></>:<p>Cargando operaciones…</p>}</div>;
- const admin=actor.role==='ADMIN',write=actor.role!=='VIEWER';const b=balanceSummary(s,from,to||'9999');
- const match=(x:Searchable)=>{const d=x.sale_date??x.production_date??x.payment_date??x.return_date??x.date??x.created_at?.slice(0,10)??'';return (!q||normalize([x.code,x.name,x.description,x.reason,x.reference,find(s,x.item_type==='INGREDIENT'?'ingredients':'products',x.item_id)?.name,find(s,'customers',x.customer_id)?.name,find(s,'sites',x.site_id)?.name].join(' ')).includes(normalize(q)))&&(!from||!d||d>=from)&&(!to||!d||d<=to)&&(!client||x.customer_id===client)&&(!site||x.site_id===site);};
- const sales=s.sales.filter((x)=>match(x)&&(!filter||[x.commercial_status,x.fulfillment_status,saleSummary(s,x).financial_status].includes(filter))&&(tab==='all'||tab==='future'&&x.fulfillment_status==='PENDING'&&!['DRAFT','CANCELLED'].includes(x.commercial_status)||tab==='draft'&&x.commercial_status==='DRAFT'||tab==='cancelled'&&x.commercial_status==='CANCELLED')).slice().reverse();
- const pending=s.sales.filter((x)=>!['DRAFT','CANCELLED'].includes(x.commercial_status)&&saleSummary(s,x).balance>0&&match(x)&&(!filter||saleSummary(s,x).financial_status===filter));
- const productions=s.productions.filter((x)=>match(x)&&(!filter||x.status===filter)&&(tab!=='draft'||x.status==='DRAFT')).slice().reverse();
- const productCards=<div className="product-grid">{s.products.map((p)=>{const a=stock(s,p.id);return <article className="product-card" key={p.id}><ProductImage image={p.image} name={p.name}/><div><span className="eyebrow">{p.is_sellable?'COMERCIAL':'CONSUMO INTERNO'}</span><h3>{p.name}</h3><strong>{num(a.quantity)} <span>sacos</span></strong><p>{kg(a.weight_kg)} kg físicos</p><small>{num(a.committed)} sacos comprometidos</small></div></article>;})}</div>;
- const saleTable=(rows:Sale[])=>rows.length?<Table heads={['Venta / fecha','Cliente','Sede','Total','Pagado','Saldo','Finanzas','Entrega']}>{rows.map(x=>{const a=saleSummary(s,x);return <tr key={x.id}><td><button className="row-link" onClick={()=>open('sale-detail',x)}>{x.code}</button><small>{x.sale_date}</small></td><td>{find(s,'customers',x.customer_id)?.name}</td><td>{find(s,'sites',x.site_id)?.name}</td><td>{money(a.total)}</td><td>{money(a.paid)}</td><td className="strong">{money(a.balance)}</td><td><Badge value={x.commercial_status==='CANCELLED'?'CANCELLED':x.commercial_status==='DRAFT'?'DRAFT':a.financial_status}/></td><td><Badge value={x.fulfillment_status}/></td></tr>;})}</Table>:<Empty text="No hay ventas en esta vista." action={write&&<button onClick={()=>open('sale')}>Registrar venta</button>}/>;
- const tabs=(options:[string,string][])=> <div className="tabs">{options.map(([k,l])=><button key={k} className={tab===k?'selected':''} onClick={()=>{location.hash=k==='all'?view:`${view}/${k}`;setFilter('');}}>{l}</button>)}</div>;
- const filters=<div className="filters"><div className="search"><Search size={17}/><input aria-label="Buscar registros" placeholder="Buscar nombre, código o referencia…" value={q} onChange={e=>setQ(e.target.value)}/></div><Input label="Desde" type="date" value={from} onChange={setFrom}/><Input label="Hasta" type="date" value={to} onChange={setTo}/>{['sales','collections'].includes(view)&&<><Select label="Cliente" value={client} onChange={setClient} options={s.customers} empty="Todos"/><Select label="Sede" value={site} onChange={setSite} options={s.sites} empty="Todas"/></>}{['sales','collections','productions'].includes(view)&&<Select label="Estado" value={filter} onChange={setFilter} empty="Todos" options={view==='productions'?['DRAFT','CONFIRMED','CLOSED','CANCELLED']:view==='collections'?['PENDING','PARTIAL']:['DRAFT','CONFIRMED','RECTIFIED','PENDING','PARTIAL','PAID','DELIVERED','CANCELLED']}/>}<button className="text-button" onClick={()=>{setQ('');setFrom('');setTo('');setClient('');setSite('');setFilter('');}}>Limpiar</button></div>;
- const primary:Record<string,[string,string]>={sales:['sale','Nueva venta'],collections:['payment','Registrar pago'],customers:tab==='sites'?['site','Nueva sede']:['customer','Nuevo cliente'],...(tab==='products'?{config:['product','Nuevo producto'] as [string,string]}:{}),productions:[tab==='ingredients'?'ingredient':tab==='formulas'?'formula':'production',tab==='ingredients'?'Nuevo insumo':tab==='formulas'?'Nueva fórmula':'Nueva producción'],inventory:['adjust','Ajustar inventario'],expenses:['expense','Registrar gasto']};
- const productionList=productions.length?<Table heads={['Producción','Fecha','Estado','Sacos','Costo consolidado','Fuente']}>{productions.map((x)=>{const a=productionSummary(s,x);return <tr key={x.id}><td><button className="row-link" onClick={()=>open('production-detail',x)}>{x.code}</button></td><td>{x.production_date}</td><td><Badge value={x.status}/></td><td>{num(a.bags)}</td><td>{money(a.reconciled?a.real:a.estimated)}</td><td>{a.reconciled?'REAL':'ESTIMADO'}</td></tr>;})}</Table>:<Empty text="No hay producciones registradas." action={write&&<button onClick={()=>open('production')}>Crear lote a producir</button>}/>;
- return <div className="app-shell"><aside className={'sidebar '+(menu?'visible':'')}><a className="brand" href="#dashboard" onClick={()=>go('dashboard')}><Image width={150} height={150} unoptimized src="/brand/logo.jpg" alt="Nutrequine Pro"/><span>NUTREQUINE<span>PRO / ADMINISTRACIÓN</span></span></a><span className="nav-caption">OPERACIÓN DEL NEGOCIO</span><nav>{nav.map(([id,title,Icon])=><button key={id} className={view===id?'active':''} onClick={()=>go(id)}><Icon size={19}/>{title}{view===id&&<ChevronRight size={15}/>}</button>)}</nav><div className="sidebar-footer"><span className="avatar">{actor.name?.slice(0,1)?.toUpperCase()}</span><div><strong>{actor.name}</strong><small>{label(actor.role)}</small></div></div></aside>
- <div className="workspace"><header className="topbar"><button className="icon-button mobile-menu" aria-label="Abrir navegación" onClick={()=>setMenu(!menu)}><Menu size={20}/></button><div className="breadcrumb">Nutrequine Pro <ChevronRight size={14}/><strong>{nav.find(x=>x[0]===view)?.[1]}</strong></div><div className="topbar-right"><span>PEN · {day()}</span><button className="icon-button" aria-label={theme==='dark'?'Activar modo claro':'Activar modo oscuro'} title={theme==='dark'?'Modo claro':'Modo oscuro'} onClick={toggleTheme}>{theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button><a className="account-signout" href="/signout-with-chatgpt?return_to=%2F" target="_top" title="Salir de la cuenta actual"><LogOut size={17}/>Salir</a><button className="icon-button" title="Actualizar datos" aria-label="Actualizar datos" onClick={reload}><RefreshCw size={17}/></button></div></header><main><div className="page-heading"><div><span className="eyebrow">NUTREQUINE PRO</span><h1>{nav.find(x=>x[0]===view)?.[1]}</h1><p>{({dashboard:'Una vista clara de tus operaciones.',sales:'Ventas registradas, entregas e historial comercial.',collections:'Saldos pendientes y dinero efectivamente recibido.',productions:'Del lote planificado al producto terminado.',inventory:'Stock físico y movimientos con origen trazable.',balance:'Ventas, cobros y costos, consolidados desde la operación.',products:'Parámetros comerciales y presentaciones reales.',customers:'Clientes y sedes de entrega.',sites:'Destinos de tus operaciones.',expenses:'Egresos y sus operaciones relacionadas.',config:'Empresa, valores predeterminados, productos y accesos.'} as Record<string,string>)[view]}</p></div><div className="heading-actions">{view==='dashboard'&&write&&<><button onClick={()=>open('production')}>Registrar producción</button><button className="primary" onClick={()=>open('sale')}><Plus size={17}/>Nueva venta</button></>}{primary[view]&&write&&(!['config','inventory'].includes(view)||admin)&&(!(view==='productions'&&tab==='ingredients')||admin)&&<button className="primary" onClick={()=>open(primary[view][0])}><Plus size={17}/>{primary[view][1]}</button>}</div></div>
- {error&&!modal&&<div className="error" role="alert">{error}</div>}
- {view==='dashboard'&&<><div className="overview-banner"><div><span className="eyebrow">CONTROL DE OPERACIONES</span><h2>Producción y entregas</h2><p>{s.sales.filter((x)=>x.fulfillment_status==='PENDING'&&!['DRAFT','CANCELLED'].includes(x.commercial_status)).length} ventas pendientes de entrega · {s.productions.filter((x)=>x.status==='DRAFT').length} lotes a producir</p></div><Image width={150} height={150} unoptimized src="/brand/logo.jpg" alt="Logo Nutrequine Pro"/></div><Metrics items={[{label:'Ventas registradas',value:money(b.sales)},{label:'Cobros reales',value:money(b.collections)},{label:'Saldo por cobrar',value:money(b.receivable),note:'Saldo a favor de clientes: '+money(b.customer_credit)},{label:'Resultado estimado',value:money(b.estimated_result),note:b.estimated_productions+' producciones con costo estimado'}]}/><div className="section-heading"><h2>Inventario de producto terminado</h2><button className="text-button" onClick={()=>go('inventory')}>Ver movimientos <ArrowUpRight size={15}/></button></div>{productCards}<div className="dashboard-columns"><section className="panel"><div className="section-heading"><h2>Últimas ventas</h2><button className="text-button" onClick={()=>go('sales')}>Ver todas</button></div>{saleTable(s.sales.slice(-5).reverse())}</section><section className="panel compact"><h2>En operación</h2><button className="operation-link" onClick={()=>{go('productions','draft');}}><Factory size={20}/><div><strong>{s.productions.filter((x)=>x.status==='DRAFT').length} lotes a producir</strong><small>Planificación pendiente</small></div><ChevronRight size={16}/></button><button className="operation-link" onClick={()=>{go('sales','future');}}><Package size={20}/><div><strong>{s.sales.filter((x)=>x.fulfillment_status==='PENDING'&&!['DRAFT','CANCELLED'].includes(x.commercial_status)).length} ventas futuras</strong><small>Por entregar</small></div><ChevronRight size={16}/></button><dl className="cost-summary"><div><dt>Producción</dt><dd>{money(b.costs)}</dd></div><div><dt>Logística</dt><dd>{money(b.logistics)}</dd></div><div><dt>Otros gastos</dt><dd>{money(b.other)}</dd></div></dl></section></div></>}
- {view==='sales'&&<>{tabs([['all','Historial'],['future','Ventas futuras'],['draft','Borradores'],['corrections','Rectificaciones'],['returns','Devoluciones'],['cancelled','Anulaciones']])}{filters}<section className="panel flush">{tab==='corrections'?<Table heads={['Código','Venta','Motivo','Usuario','Fecha']}>{s.corrections.filter((x)=>x.entity_type==='SALE'&&match(x)).slice().reverse().map((x)=><tr key={x.id}><td>{x.code}</td><td><button className="row-link" onClick={()=>open('sale-detail',{id:x.entity_id})}>{find(s,'sales',x.entity_id)?.code}</button></td><td>{x.reason}</td><td>{find(s,'users',x.created_by)?.name}</td><td>{stamp(x.created_at)}</td></tr>)}</Table>:tab==='returns'?<Table heads={['Devolución','Venta','Fecha','Motivo','Reducción económica']}>{s.returns.filter(match).slice().reverse().map((x)=><tr key={x.id}><td>{x.code}</td><td><button className="row-link" onClick={()=>open('sale-detail',{id:x.sale_id})}>{find(s,'sales',x.sale_id)?.code}</button></td><td>{x.return_date}</td><td>{x.reason}</td><td>{money(x.economic_amount)}</td></tr>)}</Table>:saleTable(sales)}</section>{tab==='all'&&write&&<button className="text-button" onClick={()=>open('sale',undefined,'draft')}>＋ Guardar una venta en borrador</button>}</>}
- {view==='collections'&&<>{tabs([['all','Cuentas pendientes'],['payments','Historial de pagos']])}<Metrics items={[{label:'Por cobrar',value:money(pending.reduce((n:number,x)=>n+saleSummary(s,x).balance,0))},{label:'Saldo a favor de clientes',value:money(b.customer_credit)},{label:'Clientes con saldo',value:new Set(pending.map((x)=>x.customer_id)).size},{label:'Ventas pendientes',value:pending.length}]}/>{filters}<section className="panel flush">{tab==='payments'?<Table heads={['Pago','Fecha','Cliente','Método','Monto','Estado']}>{s.payments.filter(match).slice().reverse().map((x)=><tr key={x.id}><td><button className="row-link" onClick={()=>open('payment-detail',x)}>{x.code}</button></td><td>{x.payment_date}</td><td>{find(s,'customers',x.customer_id)?.name}</td><td>{label(x.payment_method)} {x.other_method}</td><td>{money(x.total_amount)}</td><td>{s.paymentReversals.some((r)=>r.payment_id===x.id)?'Revertido':'Registrado'}</td></tr>)}</Table>:saleTable(pending)}</section></>}
- {view==='customers'&&<>{tabs([['all','Clientes'],['sites','Sedes']])}<CustomerDirectory s={s} tab={tab} query={q} onQuery={setQ} write={write} open={open}/></>}
+"use client";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import Image from "next/image";
+import { errorMessage, recordId } from "../../lib/domain-types";
+import type { AppState, User, Sale, EditorRecord } from "../../lib/domain-types";
+import {
+  readTheme,
+  subscribeTheme,
+  changeTheme,
+  readView,
+  subscribeView,
+} from "../../lib/browser-preferences.mjs";
+import { createCommandRequest } from "../../lib/command-request.mjs";
+type Modal = { type: string; record?: EditorRecord; kind?: string };
+type Searchable = {
+  id: string;
+  code?: string;
+  name?: string;
+  description?: string;
+  reason?: string;
+  reference?: string;
+  item_type?: string;
+  item_id?: string;
+  customer_id?: string | null;
+  site_id?: string | null;
+  sale_date?: string;
+  production_date?: string;
+  payment_date?: string;
+  return_date?: string;
+  date?: string;
+  created_at?: string;
+};
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Wallet,
+  Users,
+  Package,
+  Factory,
+  Layers,
+  Receipt,
+  ChartNoAxesCombined,
+  Settings,
+  Search,
+  Plus,
+  ChevronRight,
+  RefreshCw,
+  Menu,
+  X,
+  ArrowUpRight,
+  Sun,
+  Moon,
+  LogOut,
+} from "lucide-react";
+import {
+  saleSummary,
+  productionSummary,
+  balanceSummary,
+  stock,
+  normalize,
+  customerSummary,
+} from "../../lib/domain.mjs";
+import {
+  Badge,
+  Table,
+  Empty,
+  ProductImage,
+  Metrics,
+  Input,
+  Select,
+  money,
+  kg,
+  num,
+  day,
+  stamp,
+  label,
+  find,
+} from "./shared";
+import { SaleForm, PaymentForm, ReturnForm } from "./SaleForms";
+import type { FormProps } from "./SaleForms";
+import { ProductionForm, ReconcileForm, FormulaForm, ProductionCorrectionForm } from "./ProductionForms";
+import SimpleForm from "./SimpleForm";
+import Details from "./Details";
+import CustomerDirectory from "./CustomerDirectory";
+import Configuration from "./Configuration";
+import AuthenticatedId from "./AuthenticatedId";
+const nav = [
+  ["dashboard", "Resumen", LayoutDashboard],
+  ["sales", "Ventas", ShoppingBag],
+  ["collections", "Cobranza", Wallet],
+  ["expenses", "Gastos", Receipt],
+  ["productions", "Producción", Factory],
+  ["inventory", "Inventario", Layers],
+  ["balance", "Balance", ChartNoAxesCombined],
+  ["customers", "Clientes", Users],
+  ["config", "Configuración", Settings],
+] as const;
+const titles: Record<string, string> = {
+  sale: "Nueva venta",
+  production: "Registrar producción",
+  payment: "Registrar pago",
+  credit: "Aplicar saldo a favor",
+  return: "Registrar devolución",
+  reconcile: "Costos y conciliación",
+  "production-quantities": "Rectificar producción",
+  formula: "Editar fórmula · nueva versión",
+  "customer-delete": "Eliminar cliente",
+  customer: "Cliente",
+  site: "Sede",
+  product: "Producto",
+  ingredient: "Insumo",
+  expense: "Registrar gasto",
+  adjust: "Ajuste de inventario",
+  config: "Configuración de empresa",
+  user: "Usuario",
+  reason: "Operación administrativa",
+  "sale-detail": "Detalle de venta",
+  "production-detail": "Detalle de producción",
+  "payment-detail": "Detalle de pago",
+  "customer-detail": "Cuenta del cliente",
+};
+class StateRequestError extends Error {
+  constructor(
+    message: string,
+    readonly authenticatedId?: string,
+  ) {
+    super(message);
+  }
+}
+async function fetchState() {
+  const response = await fetch("/api/state", { cache: "no-store" });
+  const body = (await response.json()) as {
+    state: AppState;
+    actor: User;
+    error?: string;
+    authenticated_id?: string;
+  };
+  if (!response.ok)
+    throw new StateRequestError(
+      body.error ?? "No se pudieron cargar los datos.",
+      response.status === 403 ? body.authenticated_id : undefined,
+    );
+  return body;
+}
+export default function AdminApp() {
+  const [authenticatedId, setAuthenticatedId] = useState<string | null>(null);
+  const [s, setS] = useState<AppState | null>(null),
+    [actor, setActor] = useState<User | null>(null),
+    [q, setQ] = useState(""),
+    [filter, setFilter] = useState(""),
+    [client, setClient] = useState(""),
+    [site, setSite] = useState(""),
+    [from, setFrom] = useState(""),
+    [to, setTo] = useState(""),
+    [modal, setModal] = useState<Modal | null>(null),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState(false),
+    [toast, setToast] = useState(""),
+    [menu, setMenu] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [requests] = useState(createCommandRequest);
+  const theme = useSyncExternalStore(subscribeTheme, readTheme, () => "light" as const);
+  const hash = useSyncExternalStore(subscribeView, readView, () => "dashboard");
+  const route = hash.split("/")[0];
+  const view =
+    route === "sites"
+      ? "customers"
+      : route === "products"
+        ? "config"
+        : nav.some((x) => x[0] === route)
+          ? route
+          : "dashboard";
+  const tab = route === "sites" ? "sites" : route === "products" ? "products" : (hash.split("/")[1] ?? "all");
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+  const toggleTheme = () => changeTheme(theme === "dark" ? "light" : "dark");
+  const reload = async () => {
+    try {
+      const j = await fetchState();
+      setS(j.state);
+      setActor(j.actor);
+      setError("");
+      setAuthenticatedId(null);
+    } catch (e) {
+      setError(errorMessage(e, "No se pudieron cargar los datos."));
+      setAuthenticatedId(e instanceof StateRequestError ? (e.authenticatedId ?? null) : null);
+    }
+  };
+  useEffect(() => {
+    let active = true;
+    fetchState()
+      .then((j) => {
+        if (active) {
+          setS(j.state);
+          setActor(j.actor);
+          setError("");
+          setAuthenticatedId(null);
+        }
+      })
+      .catch((e) => {
+        if (active) {
+          setError(errorMessage(e, "No se pudieron cargar los datos."));
+          setAuthenticatedId(e instanceof StateRequestError ? (e.authenticatedId ?? null) : null);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+  useEffect(() => {
+    if (modal && !dialog.current?.open) dialog.current?.showModal();
+    if (!modal && dialog.current?.open) dialog.current.close();
+  }, [modal]);
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(""), 5000);
+      return () => clearTimeout(t);
+    }
+  }, [toast]);
+  const go = (v: string, nextTab = "all") => {
+    location.hash = nextTab === "all" ? v : `${v}/${nextTab}`;
+    setQ("");
+    setFilter("");
+    setClient("");
+    setSite("");
+    setFrom("");
+    setTo("");
+    setMenu(false);
+  };
+  const open = (type: string, record?: EditorRecord, kind?: string) => {
+    setError("");
+    requests.reset();
+    setModal({ type, record, kind });
+  };
+  const close = () => {
+    if (!busy) {
+      setModal(null);
+      setError("");
+      requests.reset();
+    }
+  };
+  const run = async (type: string, p: object): Promise<string | true | null> => {
+    if (busy) return null;
+    const { _keep_open, ...payload } = p as { _keep_open?: boolean };
+    const fingerprint = JSON.stringify({ type, payload });
+    const requestId = requests.begin(fingerprint);
+    if (!requestId) return null;
+    setBusy(true);
+    setError("");
+    try {
+      const r = await fetch("/api/command", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, payload, request_id: requestId }),
+        }),
+        j = (await r.json()) as { state: AppState; result: string | null; error?: string };
+      if (!r.ok) throw Error(j.error);
+      setS(j.state);
+      requests.reset();
+      setToast("Operación registrada.");
+      if (!_keep_open) {
+        if (type.startsWith("SALE_") && j.result) setModal({ type: "sale-detail", record: { id: j.result } });
+        else if (type.startsWith("PRODUCTION_") && j.result)
+          setModal({ type: "production-detail", record: { id: j.result } });
+        else if (["PAYMENT_CREATE", "PAYMENT_APPLY_CREDIT"].includes(type) && j.result)
+          setModal({ type: "payment-detail", record: { id: j.result } });
+        else setModal(null);
+      }
+      return j.result ?? true;
+    } catch (e) {
+      setError(errorMessage(e, "No se pudo guardar. Vuelva a intentar."));
+      return null;
+    } finally {
+      requests.finish();
+      setBusy(false);
+    }
+  };
+  if (!s || !actor)
+    return (
+      <div className="loading">
+        <Image width={150} height={150} unoptimized src="/brand/logo.jpg" alt="Nutrequine Pro" />
+        <h1>Nutrequine Pro</h1>
+        {error ? (
+          <>
+            <p role="alert">{error}</p>
+            {authenticatedId && <AuthenticatedId id={authenticatedId} />}
+            <button onClick={reload}>Volver a intentar</button>
+            <a href="/signout-with-chatgpt?return_to=%2F" target="_top">
+              Salir de la cuenta actual
+            </a>
+          </>
+        ) : (
+          <p>Cargando operaciones…</p>
+        )}
+      </div>
+    );
+  const admin = actor.role === "ADMIN",
+    write = actor.role !== "VIEWER";
+  const b = balanceSummary(s, from, to || "9999");
+  const match = (x: Searchable) => {
+    const d =
+      x.sale_date ??
+      x.production_date ??
+      x.payment_date ??
+      x.return_date ??
+      x.date ??
+      x.created_at?.slice(0, 10) ??
+      "";
+    return (
+      (!q ||
+        normalize(
+          [
+            x.code,
+            x.name,
+            x.description,
+            x.reason,
+            x.reference,
+            find(s, x.item_type === "INGREDIENT" ? "ingredients" : "products", x.item_id)?.name,
+            find(s, "customers", x.customer_id)?.name,
+            find(s, "sites", x.site_id)?.name,
+          ].join(" "),
+        ).includes(normalize(q))) &&
+      (!from || !d || d >= from) &&
+      (!to || !d || d <= to) &&
+      (!client || x.customer_id === client) &&
+      (!site || x.site_id === site)
+    );
+  };
+  const sales = s.sales
+    .filter(
+      (x) =>
+        match(x) &&
+        (!filter ||
+          [x.commercial_status, x.fulfillment_status, saleSummary(s, x).financial_status].includes(filter)) &&
+        (tab === "all" ||
+          (tab === "future" &&
+            x.fulfillment_status === "PENDING" &&
+            !["DRAFT", "CANCELLED"].includes(x.commercial_status)) ||
+          (tab === "draft" && x.commercial_status === "DRAFT") ||
+          (tab === "cancelled" && x.commercial_status === "CANCELLED")),
+    )
+    .slice()
+    .reverse();
+  const pending = s.sales.filter(
+    (x) =>
+      !["DRAFT", "CANCELLED"].includes(x.commercial_status) &&
+      saleSummary(s, x).balance > 0 &&
+      match(x) &&
+      (!filter || saleSummary(s, x).financial_status === filter),
+  );
+  const productions = s.productions
+    .filter((x) => match(x) && (!filter || x.status === filter) && (tab !== "draft" || x.status === "DRAFT"))
+    .slice()
+    .reverse();
+  const productCards = (
+    <div className="product-grid">
+      {s.products.map((p) => {
+        const a = stock(s, p.id);
+        return (
+          <article className="product-card" key={p.id}>
+            <ProductImage image={p.image} name={p.name} />
+            <div>
+              <span className="eyebrow">{p.is_sellable ? "COMERCIAL" : "CONSUMO INTERNO"}</span>
+              <h3>{p.name}</h3>
+              <strong>
+                {num(a.quantity)} <span>sacos</span>
+              </strong>
+              <p>{kg(a.weight_kg)} kg físicos</p>
+              <small>{num(a.committed)} sacos comprometidos</small>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  );
+  const saleTable = (rows: Sale[]) =>
+    rows.length ? (
+      <Table heads={["Venta / fecha", "Cliente", "Sede", "Total", "Pagado", "Saldo", "Finanzas", "Entrega"]}>
+        {rows.map((x) => {
+          const a = saleSummary(s, x);
+          return (
+            <tr key={x.id}>
+              <td>
+                <button className="row-link" onClick={() => open("sale-detail", x)}>
+                  {x.code}
+                </button>
+                <small>{x.sale_date}</small>
+              </td>
+              <td>{find(s, "customers", x.customer_id)?.name}</td>
+              <td>{find(s, "sites", x.site_id)?.name}</td>
+              <td>{money(a.total)}</td>
+              <td>{money(a.paid)}</td>
+              <td className="strong">{money(a.balance)}</td>
+              <td>
+                <Badge
+                  value={
+                    x.commercial_status === "CANCELLED"
+                      ? "CANCELLED"
+                      : x.commercial_status === "DRAFT"
+                        ? "DRAFT"
+                        : a.financial_status
+                  }
+                />
+              </td>
+              <td>
+                <Badge value={x.fulfillment_status} />
+              </td>
+            </tr>
+          );
+        })}
+      </Table>
+    ) : (
+      <Empty
+        text="No hay ventas en esta vista."
+        action={write && <button onClick={() => open("sale")}>Registrar venta</button>}
+      />
+    );
+  const tabs = (options: [string, string][]) => (
+    <div className="tabs">
+      {options.map(([k, l]) => (
+        <button
+          key={k}
+          className={tab === k ? "selected" : ""}
+          onClick={() => {
+            location.hash = k === "all" ? view : `${view}/${k}`;
+            setFilter("");
+          }}
+        >
+          {l}
+        </button>
+      ))}
+    </div>
+  );
+  const filters = (
+    <div className="filters">
+      <div className="search">
+        <Search size={17} />
+        <input
+          aria-label="Buscar registros"
+          placeholder="Buscar nombre, código o referencia…"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+      </div>
+      <Input label="Desde" type="date" value={from} onChange={setFrom} />
+      <Input label="Hasta" type="date" value={to} onChange={setTo} />
+      {["sales", "collections"].includes(view) && (
+        <>
+          <Select label="Cliente" value={client} onChange={setClient} options={s.customers} empty="Todos" />
+          <Select label="Sede" value={site} onChange={setSite} options={s.sites} empty="Todas" />
+        </>
+      )}
+      {["sales", "collections", "productions"].includes(view) && (
+        <Select
+          label="Estado"
+          value={filter}
+          onChange={setFilter}
+          empty="Todos"
+          options={
+            view === "productions"
+              ? ["DRAFT", "CONFIRMED", "CLOSED", "CANCELLED"]
+              : view === "collections"
+                ? ["PENDING", "PARTIAL"]
+                : ["DRAFT", "CONFIRMED", "RECTIFIED", "PENDING", "PARTIAL", "PAID", "DELIVERED", "CANCELLED"]
+          }
+        />
+      )}
+      <button
+        className="text-button"
+        onClick={() => {
+          setQ("");
+          setFrom("");
+          setTo("");
+          setClient("");
+          setSite("");
+          setFilter("");
+        }}
+      >
+        Limpiar
+      </button>
+    </div>
+  );
+  const primary: Record<string, [string, string]> = {
+    sales: ["sale", "Nueva venta"],
+    collections: ["payment", "Registrar pago"],
+    customers: tab === "sites" ? ["site", "Nueva sede"] : ["customer", "Nuevo cliente"],
+    ...(tab === "products" ? { config: ["product", "Nuevo producto"] as [string, string] } : {}),
+    productions: [
+      tab === "ingredients" ? "ingredient" : tab === "formulas" ? "formula" : "production",
+      tab === "ingredients" ? "Nuevo insumo" : tab === "formulas" ? "Nueva fórmula" : "Nueva producción",
+    ],
+    inventory: ["adjust", "Ajustar inventario"],
+    expenses: ["expense", "Registrar gasto"],
+  };
+  const productionList = productions.length ? (
+    <Table heads={["Producción", "Fecha", "Estado", "Sacos", "Costo consolidado", "Fuente"]}>
+      {productions.map((x) => {
+        const a = productionSummary(s, x);
+        return (
+          <tr key={x.id}>
+            <td>
+              <button className="row-link" onClick={() => open("production-detail", x)}>
+                {x.code}
+              </button>
+            </td>
+            <td>{x.production_date}</td>
+            <td>
+              <Badge value={x.status} />
+            </td>
+            <td>{num(a.bags)}</td>
+            <td>{money(a.reconciled ? a.real : a.estimated)}</td>
+            <td>{a.reconciled ? "REAL" : "ESTIMADO"}</td>
+          </tr>
+        );
+      })}
+    </Table>
+  ) : (
+    <Empty
+      text="No hay producciones registradas."
+      action={write && <button onClick={() => open("production")}>Crear lote a producir</button>}
+    />
+  );
+  return (
+    <div className="app-shell">
+      <aside className={"sidebar " + (menu ? "visible" : "")}>
+        <a className="brand" href="#dashboard" onClick={() => go("dashboard")}>
+          <Image width={150} height={150} unoptimized src="/brand/logo.jpg" alt="Nutrequine Pro" />
+          <span>
+            NUTREQUINE<span>PRO / ADMINISTRACIÓN</span>
+          </span>
+        </a>
+        <span className="nav-caption">OPERACIÓN DEL NEGOCIO</span>
+        <nav>
+          {nav.map(([id, title, Icon]) => (
+            <button key={id} className={view === id ? "active" : ""} onClick={() => go(id)}>
+              <Icon size={19} />
+              {title}
+              {view === id && <ChevronRight size={15} />}
+            </button>
+          ))}
+        </nav>
+        <div className="sidebar-footer">
+          <span className="avatar">{actor.name?.slice(0, 1)?.toUpperCase()}</span>
+          <div>
+            <strong>{actor.name}</strong>
+            <small>{label(actor.role)}</small>
+          </div>
+        </div>
+      </aside>
+      <div className="workspace">
+        <header className="topbar">
+          <button
+            className="icon-button mobile-menu"
+            aria-label="Abrir navegación"
+            onClick={() => setMenu(!menu)}
+          >
+            <Menu size={20} />
+          </button>
+          <div className="breadcrumb">
+            Nutrequine Pro <ChevronRight size={14} />
+            <strong>{nav.find((x) => x[0] === view)?.[1]}</strong>
+          </div>
+          <div className="topbar-right">
+            <span>PEN · {day()}</span>
+            <button
+              className="icon-button"
+              aria-label={theme === "dark" ? "Activar modo claro" : "Activar modo oscuro"}
+              title={theme === "dark" ? "Modo claro" : "Modo oscuro"}
+              onClick={toggleTheme}
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <a
+              className="account-signout"
+              href="/signout-with-chatgpt?return_to=%2F"
+              target="_top"
+              title="Salir de la cuenta actual"
+            >
+              <LogOut size={17} />
+              Salir
+            </a>
+            <button
+              className="icon-button"
+              title="Actualizar datos"
+              aria-label="Actualizar datos"
+              onClick={reload}
+            >
+              <RefreshCw size={17} />
+            </button>
+          </div>
+        </header>
+        <main>
+          <div className="page-heading">
+            <div>
+              <span className="eyebrow">NUTREQUINE PRO</span>
+              <h1>{nav.find((x) => x[0] === view)?.[1]}</h1>
+              <p>
+                {
+                  (
+                    {
+                      dashboard: "Una vista clara de tus operaciones.",
+                      sales: "Ventas registradas, entregas e historial comercial.",
+                      collections: "Saldos pendientes y dinero efectivamente recibido.",
+                      productions: "Del lote planificado al producto terminado.",
+                      inventory: "Stock físico y movimientos con origen trazable.",
+                      balance: "Ventas, cobros y costos, consolidados desde la operación.",
+                      products: "Parámetros comerciales y presentaciones reales.",
+                      customers: "Clientes y sedes de entrega.",
+                      sites: "Destinos de tus operaciones.",
+                      expenses: "Egresos y sus operaciones relacionadas.",
+                      config: "Empresa, valores predeterminados, productos y accesos.",
+                    } as Record<string, string>
+                  )[view]
+                }
+              </p>
+            </div>
+            <div className="heading-actions">
+              {view === "dashboard" && write && (
+                <>
+                  <button onClick={() => open("production")}>Registrar producción</button>
+                  <button className="primary" onClick={() => open("sale")}>
+                    <Plus size={17} />
+                    Nueva venta
+                  </button>
+                </>
+              )}
+              {primary[view] &&
+                write &&
+                (!["config", "inventory"].includes(view) || admin) &&
+                (!(view === "productions" && tab === "ingredients") || admin) && (
+                  <button className="primary" onClick={() => open(primary[view][0])}>
+                    <Plus size={17} />
+                    {primary[view][1]}
+                  </button>
+                )}
+            </div>
+          </div>
+          {error && !modal && (
+            <div className="error" role="alert">
+              {error}
+            </div>
+          )}
+          {view === "dashboard" && (
+            <>
+              <div className="overview-banner">
+                <div>
+                  <span className="eyebrow">CONTROL DE OPERACIONES</span>
+                  <h2>Producción y entregas</h2>
+                  <p>
+                    {
+                      s.sales.filter(
+                        (x) =>
+                          x.fulfillment_status === "PENDING" &&
+                          !["DRAFT", "CANCELLED"].includes(x.commercial_status),
+                      ).length
+                    }{" "}
+                    ventas pendientes de entrega · {s.productions.filter((x) => x.status === "DRAFT").length}{" "}
+                    lotes a producir
+                  </p>
+                </div>
+                <Image width={150} height={150} unoptimized src="/brand/logo.jpg" alt="Logo Nutrequine Pro" />
+              </div>
+              <Metrics
+                items={[
+                  { label: "Ventas registradas", value: money(b.sales) },
+                  { label: "Cobros reales", value: money(b.collections) },
+                  {
+                    label: "Saldo por cobrar",
+                    value: money(b.receivable),
+                    note: "Saldo a favor de clientes: " + money(b.customer_credit),
+                  },
+                  {
+                    label: "Resultado estimado",
+                    value: money(b.estimated_result),
+                    note: b.estimated_productions + " producciones con costo estimado",
+                  },
+                ]}
+              />
+              <div className="section-heading">
+                <h2>Inventario de producto terminado</h2>
+                <button className="text-button" onClick={() => go("inventory")}>
+                  Ver movimientos <ArrowUpRight size={15} />
+                </button>
+              </div>
+              {productCards}
+              <div className="dashboard-columns">
+                <section className="panel">
+                  <div className="section-heading">
+                    <h2>Últimas ventas</h2>
+                    <button className="text-button" onClick={() => go("sales")}>
+                      Ver todas
+                    </button>
+                  </div>
+                  {saleTable(s.sales.slice(-5).reverse())}
+                </section>
+                <section className="panel compact">
+                  <h2>En operación</h2>
+                  <button
+                    className="operation-link"
+                    onClick={() => {
+                      go("productions", "draft");
+                    }}
+                  >
+                    <Factory size={20} />
+                    <div>
+                      <strong>
+                        {s.productions.filter((x) => x.status === "DRAFT").length} lotes a producir
+                      </strong>
+                      <small>Planificación pendiente</small>
+                    </div>
+                    <ChevronRight size={16} />
+                  </button>
+                  <button
+                    className="operation-link"
+                    onClick={() => {
+                      go("sales", "future");
+                    }}
+                  >
+                    <Package size={20} />
+                    <div>
+                      <strong>
+                        {
+                          s.sales.filter(
+                            (x) =>
+                              x.fulfillment_status === "PENDING" &&
+                              !["DRAFT", "CANCELLED"].includes(x.commercial_status),
+                          ).length
+                        }{" "}
+                        ventas futuras
+                      </strong>
+                      <small>Por entregar</small>
+                    </div>
+                    <ChevronRight size={16} />
+                  </button>
+                  <dl className="cost-summary">
+                    <div>
+                      <dt>Producción</dt>
+                      <dd>{money(b.costs)}</dd>
+                    </div>
+                    <div>
+                      <dt>Logística</dt>
+                      <dd>{money(b.logistics)}</dd>
+                    </div>
+                    <div>
+                      <dt>Otros gastos</dt>
+                      <dd>{money(b.other)}</dd>
+                    </div>
+                  </dl>
+                </section>
+              </div>
+            </>
+          )}
+          {view === "sales" && (
+            <>
+              {tabs([
+                ["all", "Historial"],
+                ["future", "Ventas futuras"],
+                ["draft", "Borradores"],
+                ["corrections", "Rectificaciones"],
+                ["returns", "Devoluciones"],
+                ["cancelled", "Anulaciones"],
+              ])}
+              {filters}
+              <section className="panel flush">
+                {tab === "corrections" ? (
+                  <Table heads={["Código", "Venta", "Motivo", "Usuario", "Fecha"]}>
+                    {s.corrections
+                      .filter((x) => x.entity_type === "SALE" && match(x))
+                      .slice()
+                      .reverse()
+                      .map((x) => (
+                        <tr key={x.id}>
+                          <td>{x.code}</td>
+                          <td>
+                            <button
+                              className="row-link"
+                              onClick={() => open("sale-detail", { id: x.entity_id })}
+                            >
+                              {find(s, "sales", x.entity_id)?.code}
+                            </button>
+                          </td>
+                          <td>{x.reason}</td>
+                          <td>{find(s, "users", x.created_by)?.name}</td>
+                          <td>{stamp(x.created_at)}</td>
+                        </tr>
+                      ))}
+                  </Table>
+                ) : tab === "returns" ? (
+                  <Table heads={["Devolución", "Venta", "Fecha", "Motivo", "Reducción económica"]}>
+                    {s.returns
+                      .filter(match)
+                      .slice()
+                      .reverse()
+                      .map((x) => (
+                        <tr key={x.id}>
+                          <td>{x.code}</td>
+                          <td>
+                            <button
+                              className="row-link"
+                              onClick={() => open("sale-detail", { id: x.sale_id })}
+                            >
+                              {find(s, "sales", x.sale_id)?.code}
+                            </button>
+                          </td>
+                          <td>{x.return_date}</td>
+                          <td>{x.reason}</td>
+                          <td>{money(x.economic_amount)}</td>
+                        </tr>
+                      ))}
+                  </Table>
+                ) : (
+                  saleTable(sales)
+                )}
+              </section>
+              {tab === "all" && write && (
+                <button className="text-button" onClick={() => open("sale", undefined, "draft")}>
+                  ＋ Guardar una venta en borrador
+                </button>
+              )}
+            </>
+          )}
+          {view === "collections" && (
+            <>
+              {tabs([
+                ["all", "Cuentas pendientes"],
+                ["payments", "Historial de pagos"],
+              ])}
+              <Metrics
+                items={[
+                  {
+                    label: "Por cobrar",
+                    value: money(pending.reduce((n: number, x) => n + saleSummary(s, x).balance, 0)),
+                  },
+                  { label: "Saldo a favor de clientes", value: money(b.customer_credit) },
+                  { label: "Clientes con saldo", value: new Set(pending.map((x) => x.customer_id)).size },
+                  { label: "Ventas pendientes", value: pending.length },
+                ]}
+              />
+              {filters}
+              <section className="panel flush">
+                {tab === "payments" ? (
+                  <Table heads={["Pago", "Fecha", "Cliente", "Método", "Monto", "Estado"]}>
+                    {s.payments
+                      .filter(match)
+                      .slice()
+                      .reverse()
+                      .map((x) => (
+                        <tr key={x.id}>
+                          <td>
+                            <button className="row-link" onClick={() => open("payment-detail", x)}>
+                              {x.code}
+                            </button>
+                          </td>
+                          <td>{x.payment_date}</td>
+                          <td>{find(s, "customers", x.customer_id)?.name}</td>
+                          <td>
+                            {label(x.payment_method)} {x.other_method}
+                          </td>
+                          <td>{money(x.total_amount)}</td>
+                          <td>
+                            {s.paymentReversals.some((r) => r.payment_id === x.id)
+                              ? "Revertido"
+                              : "Registrado"}
+                          </td>
+                        </tr>
+                      ))}
+                  </Table>
+                ) : (
+                  saleTable(pending)
+                )}
+              </section>
+            </>
+          )}
+          {view === "customers" && (
+            <>
+              {tabs([
+                ["all", "Clientes"],
+                ["sites", "Sedes"],
+              ])}
+              <CustomerDirectory s={s} tab={tab} query={q} onQuery={setQ} write={write} open={open} />
+            </>
+          )}
 
- {view==='productions'&&<>{tabs([['all','Historial'],['draft','Lotes a producir'],['ingredients','Insumos'],['formulas','Fórmulas']])}{filters}<section className="panel flush">{tab==='ingredients'?<Table heads={['Insumo','Precio actual S/ por kg','Estado','']}>{s.ingredients.filter(match).map((x)=><tr key={x.id}><td>{x.name}</td><td>{money(x.current_price_per_kg)}</td><td>{x.is_active?'Activo':'Inactivo'}</td><td>{admin&&<button onClick={()=>open('ingredient',x)}>Editar</button>}</td></tr>)}</Table>:tab==='formulas'?<div className="formula-list">{s.formulas.slice().reverse().map((f)=>{const rows=s.formulaIngredients.filter((x)=>x.formula_id===f.id);return <details key={f.id} open={f.is_active}><summary>{find(s,'products',f.product_id)?.name} · v{f.version} · {f.is_active?'Activa':'Histórica'} · desde {f.valid_from}</summary><Table heads={['Insumo','Kg / núcleo']}>{rows.map((x)=><tr key={x.id}><td>{find(s,'ingredients',x.ingredient_id)?.name}</td><td>{kg(x.kg_per_nucleus)}</td></tr>)}</Table>{write&&f.is_active&&<button className="formula-edit" onClick={()=>open('formula',f)}>Editar fórmula</button>}<p className="formula-total">Total fórmula: {kg(rows.reduce((n:number,x)=>n+x.kg_per_nucleus,0))} kg · Peso comercial: {kg(find(s,'products',f.product_id)?.commercial_weight_per_nucleus_kg)} kg</p></details>;})}</div>:productionList}</section></>}
- {view==='inventory'&&<>{tabs([['all','Stock actual'],['movements','Movimientos']])}{tab==='all'?<>{productCards}<section className="panel"><Table heads={['Producto','Sacos físicos','Kg físicos','Sacos comprometidos']}>{s.products.map((p)=>{const a=stock(s,p.id);return <tr key={p.id}><td>{p.name}</td><td>{num(a.quantity)}</td><td>{kg(a.weight_kg)}</td><td>{num(a.committed)}</td></tr>;})}</Table></section></>:<>{filters}<section className="panel flush"><Table heads={['Fecha','Ítem','Movimiento','Sacos','Kg','Origen','Notas']}>{s.inventoryMovements.filter(match).slice().reverse().map((x)=><tr key={x.id}><td>{x.date}</td><td>{find(s,x.item_type==='PRODUCT'?'products':'ingredients',x.item_id)?.name}</td><td>{label(x.movement_type)}</td><td>{x.quantity>0?'+':''}{x.quantity}</td><td>{kg(x.weight_kg)}</td><td>{['SALE','PRODUCTION'].includes(x.source_type)?<button className="row-link" onClick={()=>open(x.source_type==='SALE'?'sale-detail':'production-detail',{id:x.source_id})}>{find(s,x.source_type==='SALE'?'sales':'productions',x.source_id)?.code}</button>:x.source_type}</td><td>{x.notes}</td></tr>)}</Table></section></>}</>}
- {view==='expenses'&&<>{filters}<section className="panel flush"><Table heads={['Fecha','Categoría','Descripción','Monto','Relación','Estado','']}>{s.expenses.filter(match).slice().reverse().map((x)=><tr key={x.id}><td>{x.date}</td><td>{label(x.category)}</td><td>{x.description}<small>{x.notes}</small></td><td>{money(x.amount)}</td><td>{x.production_cost_id?'Costo de '+find(s,'productions',x.production_id)?.code:find(s,'sales',x.sale_id)?.code??find(s,'sites',x.site_id)?.name??'General'}</td><td><Badge value={x.status}/></td><td>{admin&&x.status!=='CANCELLED'&&<button className="danger" onClick={()=>open('reason',{...x,_operation:'EXPENSE_CANCEL'},'reason')}>Anular</button>}</td></tr>)}</Table>{!s.expenses.length&&<Empty/>}</section></>}
- {view==='balance'&&<>{filters}<Metrics items={[{label:'Ventas registradas',value:money(b.sales)},{label:'Cobros reales',value:money(b.collections)},{label:'Saldo por cobrar total',value:money(b.receivable),note:'Saldo actual de todo el historial'},{label:'Saldo a favor de clientes',value:money(b.customer_credit),note:'Importes disponibles de todo el historial'},{label:'Resultado de caja',value:money(b.cash_result)}]}/><div className="balance-grid"><section className="panel"><h2>Resultado comercial estimado</h2><dl className="balance-lines">{[['Ventas registradas',b.sales],['Costo de producción',-b.costs],['Gastos logísticos',-b.logistics],['Otros gastos',-b.other],['Resultado estimado',b.estimated_result]].map(([l,v])=><div key={String(l)}><dt>{l}</dt><dd>{money(Number(v))}</dd></div>)}</dl><p className="metadata">{b.estimated_productions} producciones usan costo estimado. El resultado considera el costo total de producción registrado en el periodo; no representa un margen por saco vendido.</p></section><section className="panel"><h2>Resultado de caja</h2><dl className="balance-lines">{[['Dinero cobrado',b.collections],['Costos de producción pagados',-b.paidCosts],['Gastos logísticos pagados',-b.logistics],['Otros gastos pagados',-b.other],['Resultado de caja',b.cash_result]].map(([l,v])=><div key={String(l)}><dt>{l}</dt><dd>{money(Number(v))}</dd></div>)}</dl><p className="metadata">Incluye pagos registrados y costos marcados como pagados. Las reversiones restan en la fecha de reversión.</p></section></div><section className="panel"><h2>Fuente del costo de producción</h2>{productionList}</section><section className="panel"><h2>Ventas y cobros por mes</h2><Table heads={['Mes','Ventas registradas','Cobros netos']}>{[...new Set([...s.sales.map((x)=>x.sale_date.slice(0,7)),...s.payments.map((x)=>x.payment_date.slice(0,7)),...s.paymentReversals.map((x)=>x.date.slice(0,7))])].sort().map((m)=>{const z=balanceSummary(s,m+'-01',m+'-31');return <tr key={m}><td>{m}</td><td>{money(z.sales)}</td><td>{money(z.collections)}</td></tr>;})}</Table></section></>}
- {view==='config'&&<>{tabs([['all','Empresa y valores'],['products','Productos'],['users','Usuarios'],['audit','Auditoría'],['appearance','Apariencia']])}<Configuration s={s} actor={actor} tab={tab} open={open} theme={theme}/></>}
- </main><footer className="app-footer">Nutrequine Pro <span>Operaciones conectadas · America/Lima · PEN</span></footer></div>
- {toast&&<div className="toast" role="status">✓ {toast}</div>}
- <dialog ref={dialog} onCancel={e=>{e.preventDefault();close();}} className="modal"><div className="modal-head"><h2>{modal?.kind==='correct'?'Rectificar venta':titles[modal?.type??'']??'Detalle'}</h2><button className="icon-button" aria-label="Cerrar" onClick={close} disabled={busy}><X size={20}/></button></div><div className="modal-body">{error&&<div className="error" role="alert">{error} <button type="button" className="text-button" onClick={reload}>Recargar datos</button></div>}{modal&&(()=>{const props:FormProps & {actor:User}={s,actor,record:modal.record?.id?(find(s,modal.type.includes('production')||modal.type==='reconcile'?'productions':modal.type.includes('sale')||modal.type==='return'?'sales':modal.type.includes('payment-detail')?'payments':modal.type.includes('customer')?'customers':modal.type==='site'?'sites':modal.type==='product'?'products':modal.type==='ingredient'?'ingredients':modal.type==='user'?'users':'audit',recordId(modal.record))??modal.record):modal.record,kind:modal.kind,submit:run,close,busy};if(modal.type==='sale')return <SaleForm {...props}/>;if(modal.type==='production')return <ProductionForm {...props}/>;if(modal.type==='credit')return <PaymentForm {...props} record={modal.record} kind="credit"/>;if(modal.type==='payment')return <PaymentForm {...props}/>;if(modal.type==='return')return <ReturnForm {...props}/>;if(modal.type==='production-quantities')return <ProductionCorrectionForm {...props}/>;if(modal.type==='reconcile')return <ReconcileForm {...props}/>;if(modal.type==='formula')return <FormulaForm {...props} record={modal.record}/>;if(modal.type==='customer-delete')return <form onSubmit={async e=>{e.preventDefault();await run('CUSTOMER_DELETE',{id:recordId(modal.record)});}}><h3>Eliminar {modal.record?.name} de la lista</h3><p className="notice">El cliente dejará de aparecer en la lista y en nuevas ventas. Sus ventas, pagos, saldos e historial se conservan.</p><div className="form-footer"><button type="button" onClick={close} disabled={busy}>Cancelar</button><button className="primary" disabled={busy}>{busy?'Guardando…':'Eliminar de la lista'}</button></div></form>;if(['sale-detail','production-detail','payment-detail'].includes(modal.type))return <Details s={s} actor={actor} entity={modal.type.split('-')[0]} id={recordId(modal.record)} open={open} run={run}/>;if(modal.type==='customer-detail'){const c=props.record;if(!c)return null;return <><h2>{c.name}</h2><Metrics items={[{label:'Deuda pendiente',value:money(customerSummary(s,recordId(c)).debt)},{label:'Saldo a favor',value:money(customerSummary(s,recordId(c)).credit)},{label:'Saldo neto (deuda − a favor)',value:money(customerSummary(s,recordId(c)).net)}]}/><p>{c.tax_id} · {c.contact_name} · {c.phone}</p><p>{c.address}</p><p>{c.notes}</p>{write&&<button onClick={()=>open('customer',c)}>Editar cliente</button>}{saleTable(s.sales.filter((x)=>x.customer_id===c.id))}</>;}return <SimpleForm {...props} record={modal.type==='reason'?modal.record:props.record} kind={modal.type}/>;})()}</div></dialog></div>;
+          {view === "productions" && (
+            <>
+              {tabs([
+                ["all", "Historial"],
+                ["draft", "Lotes a producir"],
+                ["ingredients", "Insumos"],
+                ["formulas", "Fórmulas"],
+              ])}
+              {filters}
+              <section className="panel flush">
+                {tab === "ingredients" ? (
+                  <Table heads={["Insumo", "Precio actual S/ por kg", "Estado", ""]}>
+                    {s.ingredients.filter(match).map((x) => (
+                      <tr key={x.id}>
+                        <td>{x.name}</td>
+                        <td>{money(x.current_price_per_kg)}</td>
+                        <td>{x.is_active ? "Activo" : "Inactivo"}</td>
+                        <td>{admin && <button onClick={() => open("ingredient", x)}>Editar</button>}</td>
+                      </tr>
+                    ))}
+                  </Table>
+                ) : tab === "formulas" ? (
+                  <div className="formula-list">
+                    {s.formulas
+                      .slice()
+                      .reverse()
+                      .map((f) => {
+                        const rows = s.formulaIngredients.filter((x) => x.formula_id === f.id);
+                        return (
+                          <details key={f.id} open={f.is_active}>
+                            <summary>
+                              {find(s, "products", f.product_id)?.name} · v{f.version} ·{" "}
+                              {f.is_active ? "Activa" : "Histórica"} · desde {f.valid_from}
+                            </summary>
+                            <Table heads={["Insumo", "Kg / núcleo"]}>
+                              {rows.map((x) => (
+                                <tr key={x.id}>
+                                  <td>{find(s, "ingredients", x.ingredient_id)?.name}</td>
+                                  <td>{kg(x.kg_per_nucleus)}</td>
+                                </tr>
+                              ))}
+                            </Table>
+                            {write && f.is_active && (
+                              <button className="formula-edit" onClick={() => open("formula", f)}>
+                                Editar fórmula
+                              </button>
+                            )}
+                            <p className="formula-total">
+                              Total fórmula: {kg(rows.reduce((n: number, x) => n + x.kg_per_nucleus, 0))} kg ·
+                              Peso comercial:{" "}
+                              {kg(find(s, "products", f.product_id)?.commercial_weight_per_nucleus_kg)} kg
+                            </p>
+                          </details>
+                        );
+                      })}
+                  </div>
+                ) : (
+                  productionList
+                )}
+              </section>
+            </>
+          )}
+          {view === "inventory" && (
+            <>
+              {tabs([
+                ["all", "Stock actual"],
+                ["movements", "Movimientos"],
+              ])}
+              {tab === "all" ? (
+                <>
+                  {productCards}
+                  <section className="panel">
+                    <Table heads={["Producto", "Sacos físicos", "Kg físicos", "Sacos comprometidos"]}>
+                      {s.products.map((p) => {
+                        const a = stock(s, p.id);
+                        return (
+                          <tr key={p.id}>
+                            <td>{p.name}</td>
+                            <td>{num(a.quantity)}</td>
+                            <td>{kg(a.weight_kg)}</td>
+                            <td>{num(a.committed)}</td>
+                          </tr>
+                        );
+                      })}
+                    </Table>
+                  </section>
+                </>
+              ) : (
+                <>
+                  {filters}
+                  <section className="panel flush">
+                    <Table heads={["Fecha", "Ítem", "Movimiento", "Sacos", "Kg", "Origen", "Notas"]}>
+                      {s.inventoryMovements
+                        .filter(match)
+                        .slice()
+                        .reverse()
+                        .map((x) => (
+                          <tr key={x.id}>
+                            <td>{x.date}</td>
+                            <td>
+                              {
+                                find(s, x.item_type === "PRODUCT" ? "products" : "ingredients", x.item_id)
+                                  ?.name
+                              }
+                            </td>
+                            <td>{label(x.movement_type)}</td>
+                            <td>
+                              {x.quantity > 0 ? "+" : ""}
+                              {x.quantity}
+                            </td>
+                            <td>{kg(x.weight_kg)}</td>
+                            <td>
+                              {["SALE", "PRODUCTION"].includes(x.source_type) ? (
+                                <button
+                                  className="row-link"
+                                  onClick={() =>
+                                    open(x.source_type === "SALE" ? "sale-detail" : "production-detail", {
+                                      id: x.source_id,
+                                    })
+                                  }
+                                >
+                                  {
+                                    find(s, x.source_type === "SALE" ? "sales" : "productions", x.source_id)
+                                      ?.code
+                                  }
+                                </button>
+                              ) : (
+                                x.source_type
+                              )}
+                            </td>
+                            <td>{x.notes}</td>
+                          </tr>
+                        ))}
+                    </Table>
+                  </section>
+                </>
+              )}
+            </>
+          )}
+          {view === "expenses" && (
+            <>
+              {filters}
+              <section className="panel flush">
+                <Table heads={["Fecha", "Categoría", "Descripción", "Monto", "Relación", "Estado", ""]}>
+                  {s.expenses
+                    .filter(match)
+                    .slice()
+                    .reverse()
+                    .map((x) => (
+                      <tr key={x.id}>
+                        <td>{x.date}</td>
+                        <td>{label(x.category)}</td>
+                        <td>
+                          {x.description}
+                          <small>{x.notes}</small>
+                        </td>
+                        <td>{money(x.amount)}</td>
+                        <td>
+                          {x.production_cost_id
+                            ? "Costo de " + find(s, "productions", x.production_id)?.code
+                            : (find(s, "sales", x.sale_id)?.code ??
+                              find(s, "sites", x.site_id)?.name ??
+                              "General")}
+                        </td>
+                        <td>
+                          <Badge value={x.status} />
+                        </td>
+                        <td>
+                          {admin && x.status !== "CANCELLED" && (
+                            <button
+                              className="danger"
+                              onClick={() => open("reason", { ...x, _operation: "EXPENSE_CANCEL" }, "reason")}
+                            >
+                              Anular
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                </Table>
+                {!s.expenses.length && <Empty />}
+              </section>
+            </>
+          )}
+          {view === "balance" && (
+            <>
+              {filters}
+              <Metrics
+                items={[
+                  { label: "Ventas registradas", value: money(b.sales) },
+                  { label: "Cobros reales", value: money(b.collections) },
+                  {
+                    label: "Saldo por cobrar total",
+                    value: money(b.receivable),
+                    note: "Saldo actual de todo el historial",
+                  },
+                  {
+                    label: "Saldo a favor de clientes",
+                    value: money(b.customer_credit),
+                    note: "Importes disponibles de todo el historial",
+                  },
+                  { label: "Resultado de caja", value: money(b.cash_result) },
+                ]}
+              />
+              <div className="balance-grid">
+                <section className="panel">
+                  <h2>Resultado comercial estimado</h2>
+                  <dl className="balance-lines">
+                    {[
+                      ["Ventas registradas", b.sales],
+                      ["Costo de producción", -b.costs],
+                      ["Gastos logísticos", -b.logistics],
+                      ["Otros gastos", -b.other],
+                      ["Resultado estimado", b.estimated_result],
+                    ].map(([l, v]) => (
+                      <div key={String(l)}>
+                        <dt>{l}</dt>
+                        <dd>{money(Number(v))}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p className="metadata">
+                    {b.estimated_productions} producciones usan costo estimado. El resultado considera el
+                    costo total de producción registrado en el periodo; no representa un margen por saco
+                    vendido.
+                  </p>
+                </section>
+                <section className="panel">
+                  <h2>Resultado de caja</h2>
+                  <dl className="balance-lines">
+                    {[
+                      ["Dinero cobrado", b.collections],
+                      ["Costos de producción pagados", -b.paidCosts],
+                      ["Gastos logísticos pagados", -b.logistics],
+                      ["Otros gastos pagados", -b.other],
+                      ["Resultado de caja", b.cash_result],
+                    ].map(([l, v]) => (
+                      <div key={String(l)}>
+                        <dt>{l}</dt>
+                        <dd>{money(Number(v))}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p className="metadata">
+                    Incluye pagos registrados y costos marcados como pagados. Las reversiones restan en la
+                    fecha de reversión.
+                  </p>
+                </section>
+              </div>
+              <section className="panel">
+                <h2>Fuente del costo de producción</h2>
+                {productionList}
+              </section>
+              <section className="panel">
+                <h2>Ventas y cobros por mes</h2>
+                <Table heads={["Mes", "Ventas registradas", "Cobros netos"]}>
+                  {[
+                    ...new Set([
+                      ...s.sales.map((x) => x.sale_date.slice(0, 7)),
+                      ...s.payments.map((x) => x.payment_date.slice(0, 7)),
+                      ...s.paymentReversals.map((x) => x.date.slice(0, 7)),
+                    ]),
+                  ]
+                    .sort()
+                    .map((m) => {
+                      const z = balanceSummary(s, m + "-01", m + "-31");
+                      return (
+                        <tr key={m}>
+                          <td>{m}</td>
+                          <td>{money(z.sales)}</td>
+                          <td>{money(z.collections)}</td>
+                        </tr>
+                      );
+                    })}
+                </Table>
+              </section>
+            </>
+          )}
+          {view === "config" && (
+            <>
+              {tabs([
+                ["all", "Empresa y valores"],
+                ["products", "Productos"],
+                ["users", "Usuarios"],
+                ["audit", "Auditoría"],
+                ["appearance", "Apariencia"],
+              ])}
+              <Configuration s={s} actor={actor} tab={tab} open={open} theme={theme} />
+            </>
+          )}
+        </main>
+        <footer className="app-footer">
+          Nutrequine Pro <span>Operaciones conectadas · America/Lima · PEN</span>
+        </footer>
+      </div>
+      {toast && (
+        <div className="toast" role="status">
+          ✓ {toast}
+        </div>
+      )}
+      <dialog
+        ref={dialog}
+        onCancel={(e) => {
+          e.preventDefault();
+          close();
+        }}
+        className="modal"
+      >
+        <div className="modal-head">
+          <h2>{modal?.kind === "correct" ? "Rectificar venta" : (titles[modal?.type ?? ""] ?? "Detalle")}</h2>
+          <button className="icon-button" aria-label="Cerrar" onClick={close} disabled={busy}>
+            <X size={20} />
+          </button>
+        </div>
+        <div className="modal-body">
+          {error && (
+            <div className="error" role="alert">
+              {error}{" "}
+              <button type="button" className="text-button" onClick={reload}>
+                Recargar datos
+              </button>
+            </div>
+          )}
+          {modal &&
+            (() => {
+              const props: FormProps & { actor: User } = {
+                s,
+                actor,
+                record: modal.record?.id
+                  ? (find(
+                      s,
+                      modal.type.includes("production") || modal.type === "reconcile"
+                        ? "productions"
+                        : modal.type.includes("sale") || modal.type === "return"
+                          ? "sales"
+                          : modal.type.includes("payment-detail")
+                            ? "payments"
+                            : modal.type.includes("customer")
+                              ? "customers"
+                              : modal.type === "site"
+                                ? "sites"
+                                : modal.type === "product"
+                                  ? "products"
+                                  : modal.type === "ingredient"
+                                    ? "ingredients"
+                                    : modal.type === "user"
+                                      ? "users"
+                                      : "audit",
+                      recordId(modal.record),
+                    ) ?? modal.record)
+                  : modal.record,
+                kind: modal.kind,
+                submit: run,
+                close,
+                busy,
+              };
+              if (modal.type === "sale") return <SaleForm {...props} />;
+              if (modal.type === "production") return <ProductionForm {...props} />;
+              if (modal.type === "credit")
+                return <PaymentForm {...props} record={modal.record} kind="credit" />;
+              if (modal.type === "payment") return <PaymentForm {...props} />;
+              if (modal.type === "return") return <ReturnForm {...props} />;
+              if (modal.type === "production-quantities") return <ProductionCorrectionForm {...props} />;
+              if (modal.type === "reconcile") return <ReconcileForm {...props} />;
+              if (modal.type === "formula") return <FormulaForm {...props} record={modal.record} />;
+              if (modal.type === "customer-delete")
+                return (
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      await run("CUSTOMER_DELETE", { id: recordId(modal.record) });
+                    }}
+                  >
+                    <h3>Eliminar {modal.record?.name} de la lista</h3>
+                    <p className="notice">
+                      El cliente dejará de aparecer en la lista y en nuevas ventas. Sus ventas, pagos, saldos
+                      e historial se conservan.
+                    </p>
+                    <div className="form-footer">
+                      <button type="button" onClick={close} disabled={busy}>
+                        Cancelar
+                      </button>
+                      <button className="primary" disabled={busy}>
+                        {busy ? "Guardando…" : "Eliminar de la lista"}
+                      </button>
+                    </div>
+                  </form>
+                );
+              if (["sale-detail", "production-detail", "payment-detail"].includes(modal.type))
+                return (
+                  <Details
+                    s={s}
+                    actor={actor}
+                    entity={modal.type.split("-")[0]}
+                    id={recordId(modal.record)}
+                    open={open}
+                    run={run}
+                  />
+                );
+              if (modal.type === "customer-detail") {
+                const c = props.record;
+                if (!c) return null;
+                return (
+                  <>
+                    <h2>{c.name}</h2>
+                    <Metrics
+                      items={[
+                        { label: "Deuda pendiente", value: money(customerSummary(s, recordId(c)).debt) },
+                        { label: "Saldo a favor", value: money(customerSummary(s, recordId(c)).credit) },
+                        {
+                          label: "Saldo neto (deuda − a favor)",
+                          value: money(customerSummary(s, recordId(c)).net),
+                        },
+                      ]}
+                    />
+                    <p>
+                      {c.tax_id} · {c.contact_name} · {c.phone}
+                    </p>
+                    <p>{c.address}</p>
+                    <p>{c.notes}</p>
+                    {write && <button onClick={() => open("customer", c)}>Editar cliente</button>}
+                    {saleTable(s.sales.filter((x) => x.customer_id === c.id))}
+                  </>
+                );
+              }
+              return (
+                <SimpleForm
+                  {...props}
+                  record={modal.type === "reason" ? modal.record : props.record}
+                  kind={modal.type}
+                />
+              );
+            })()}
+        </div>
+      </dialog>
+    </div>
+  );
 }

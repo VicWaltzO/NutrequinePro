@@ -40,10 +40,7 @@ export function connectorResponse(result: unknown): Response {
       retryAfterMs: z.never().optional(),
     });
     const schema =
-      result !== null &&
-      typeof result === "object" &&
-      "status" in result &&
-      result.status === "success"
+      result !== null && typeof result === "object" && "status" in result && result.status === "success"
         ? success
         : failure;
     const parsed = schema.safeParse(result);

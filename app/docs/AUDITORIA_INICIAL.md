@@ -16,14 +16,14 @@ No se despliega esta rama ni se modifica la base alojada.
 
 ## Comprobaciones antes de modificar código
 
-| Comando desde app/ | Resultado inicial |
-| --- | --- |
-| `npm.cmd ci` | 682 paquetes instalados, salida 0; advertencias de dependencias heredadas y scripts de instalación. El primer intento aislado se interrumpió; se repitió con permisos. |
-| `npm.cmd test` | 39 pruebas aprobadas, 0 fallidas. |
-| `npm.cmd run check` | Aprobado; no errores de TypeScript. |
-| `npm.cmd run lint` | Aprobado; no errores de ESLint. |
-| `npm.cmd run build` | Aprobado con permisos; el aislamiento produjo inicialmente EPERM al leer dependencias. |
-| `npm.cmd run dev` | Arranca en 127.0.0.1:5173; `/api/state` autenticado devuelve 200 con la base local existente. |
+| Comando desde app/  | Resultado inicial                                                                                                                                                      |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm.cmd ci`        | 682 paquetes instalados, salida 0; advertencias de dependencias heredadas y scripts de instalación. El primer intento aislado se interrumpió; se repitió con permisos. |
+| `npm.cmd test`      | 39 pruebas aprobadas, 0 fallidas.                                                                                                                                      |
+| `npm.cmd run check` | Aprobado; no errores de TypeScript.                                                                                                                                    |
+| `npm.cmd run lint`  | Aprobado; no errores de ESLint.                                                                                                                                        |
+| `npm.cmd run build` | Aprobado con permisos; el aislamiento produjo inicialmente EPERM al leer dependencias.                                                                                 |
+| `npm.cmd run dev`   | Arranca en 127.0.0.1:5173; `/api/state` autenticado devuelve 200 con la base local existente.                                                                          |
 
 Las comprobaciones lanzadas mientras `ci` aún terminaba no encontraron sus binarios;
 se repitieron después de completar la instalación. No son defectos de la aplicación.
@@ -59,13 +59,13 @@ carga D1, verifica identidad y reintentos y persiste un batch. `persistence.mjs`
 genera upserts y un guard de revisión; un fallo revierte toda la transacción.
 La única migración contiene 27 tablas, claves foráneas y el guard; es inmutable.
 
-| Archivo | Bytes | Líneas | Línea máxima (caracteres) |
-| --- | ---: | ---: | ---: |
-| AdminApp.tsx | 28.590 | 67 | 3.039 |
-| ProductionForms.tsx | 13.084 | 21 | 2.227 |
-| SaleForms.tsx | 13.503 | 40 | 1.886 |
-| shared.tsx | 5.541 | 24 | 837 |
-| domain.mjs | 41.212 | 209 | 1.532 |
+| Archivo             |  Bytes | Líneas | Línea máxima (caracteres) |
+| ------------------- | -----: | -----: | ------------------------: |
+| AdminApp.tsx        | 28.590 |     67 |                     3.039 |
+| ProductionForms.tsx | 13.084 |     21 |                     2.227 |
+| SaleForms.tsx       | 13.503 |     40 |                     1.886 |
+| shared.tsx          |  5.541 |     24 |                       837 |
+| domain.mjs          | 41.212 |    209 |                     1.532 |
 
 ## Invariantes y plan verificable
 

@@ -37,10 +37,7 @@ export class NpmCacheProgress {
     const [, spec, status] = match;
     // Pacote's direct content-cache log uses name@URL; HTTP cache logs use URL.
     const url = spec.replace(/^(?:@[^/]+\/)?[^@/]+@(?=https?:\/\/)/, "");
-    if (
-      url.length > 4096 ||
-      (this.entries.size >= MAX_PACKAGES && !this.entries.has(url))
-    ) {
+    if (url.length > 4096 || (this.entries.size >= MAX_PACKAGES && !this.entries.has(url))) {
       this.invalid = true;
       return;
     }
@@ -49,8 +46,7 @@ export class NpmCacheProgress {
   }
 
   counts(lock) {
-    if (this.invalid || lock?.lockfileVersion !== 3 || !lock.packages)
-      return {};
+    if (this.invalid || lock?.lockfileVersion !== 3 || !lock.packages) return {};
     const urls = new Set(
       Object.values(lock.packages)
         .map((pkg) => pkg?.resolved)
@@ -70,25 +66,16 @@ export class NpmCacheProgress {
             ...new Set([
               url,
               new URL(locked.pathname, this.registry).href,
-              this.registry.href.replace(/\/$/, "") +
-                locked.pathname +
-                locked.search,
+              this.registry.href.replace(/\/$/, "") + locked.pathname + locked.search,
             ]),
           ];
         }
       }
-      const matches = candidates.filter((candidate) =>
-        this.entries.has(candidate),
-      );
-      if (
-        !matches.length ||
-        matches.some((candidate) => observed.has(candidate))
-      )
-        return {};
+      const matches = candidates.filter((candidate) => this.entries.has(candidate));
+      if (!matches.length || matches.some((candidate) => observed.has(candidate))) return {};
       for (const candidate of matches) observed.add(candidate);
       // A corrupt direct-cache hit followed by a mirror fetch is a download.
-      if (matches.some((candidate) => this.entries.get(candidate)))
-        downloaded++;
+      if (matches.some((candidate) => this.entries.get(candidate))) downloaded++;
     }
     return {
       packages_reused: urls.size - downloaded,
@@ -175,16 +162,13 @@ export async function runNpmInstall(command, cacheSeed = "not_applicable") {
     lines.close();
     if (startError) process.stderr.write("Unable to start npm.\n");
   } finally {
-    for (const [signal, handler] of handlers)
-      process.removeListener(signal, handler);
+    for (const [signal, handler] of handlers) process.removeListener(signal, handler);
     result.signal ??= receivedSignal;
     try {
       let counts = {};
       if (result.code === 0 && !result.signal) {
         try {
-          counts = progress.counts(
-            JSON.parse(readFileSync("node_modules/.package-lock.json", "utf8")),
-          );
+          counts = progress.counts(JSON.parse(readFileSync("node_modules/.package-lock.json", "utf8")));
         } catch {}
       }
       if (descriptor !== undefined) {
@@ -193,10 +177,7 @@ export async function runNpmInstall(command, cacheSeed = "not_applicable") {
           descriptor,
           `${JSON.stringify({
             version: 1,
-            cache_seed:
-              result.code === 0 && !result.signal
-                ? cacheSeed
-                : "decision_unavailable",
+            cache_seed: result.code === 0 && !result.signal ? cacheSeed : "decision_unavailable",
             ...counts,
           })}\n`,
         );
@@ -214,15 +195,10 @@ export async function runNpmInstall(command, cacheSeed = "not_applicable") {
   return result;
 }
 
-if (
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
-) {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [cacheSeed, ...command] = process.argv.slice(2);
   const result = await runNpmInstall(command, cacheSeed);
-  process.exitCode = result.signal
-    ? 128 + (osConstants.signals[result.signal] ?? 0)
-    : result.code ?? 1;
+  process.exitCode = result.signal ? 128 + (osConstants.signals[result.signal] ?? 0) : (result.code ?? 1);
   if (result.signal) {
     try {
       process.kill(process.pid, result.signal);

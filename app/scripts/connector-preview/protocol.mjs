@@ -9,12 +9,8 @@ const fields = { connectorId: name, actionName: name };
 
 // Reject extra invocation fields: account selection and native tool names belong
 // to the owning agent, not to the generated Site's request envelope.
-export const invocationSchema = z
-  .object({ ...fields, arguments: z.record(z.unknown()) })
-  .strict();
-export const grantSchema = z
-  .object({ ...fields, readOnly: z.literal(true) })
-  .strict();
+export const invocationSchema = z.object({ ...fields, arguments: z.record(z.unknown()) }).strict();
+export const grantSchema = z.object({ ...fields, readOnly: z.literal(true) }).strict();
 export const grantsSchema = z.array(grantSchema);
 
 // Only the owning agent sets these limits. Sessions otherwise last until their

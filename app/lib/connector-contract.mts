@@ -1,10 +1,4 @@
-export type Json =
-  | null
-  | boolean
-  | number
-  | string
-  | Json[]
-  | { [key: string]: Json };
+export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 
 export type ConnectorFailureStatus =
   | "invalid_request"
@@ -42,11 +36,7 @@ export type ConnectorResult =
 
 /** A server-side binding supplied by the runtime, never by a browser. */
 export type ConnectorBinding = {
-  invoke(
-    connectorId: string,
-    actionName: string,
-    args: { [key: string]: Json },
-  ): Promise<ConnectorResult>;
+  invoke(connectorId: string, actionName: string, args: { [key: string]: Json }): Promise<ConnectorResult>;
   getContext?(): Promise<ConnectorContext>;
 };
 
@@ -65,11 +55,7 @@ export type ConnectorContext =
       }>;
     }
   | {
-      status:
-        | "request_context_expired"
-        | "internal_error"
-        | "binding_unavailable"
-        | "upstream_error";
+      status: "request_context_expired" | "internal_error" | "binding_unavailable" | "upstream_error";
     };
 
 /** Use in a Site server route. Connection selection and credentials stay in the host. */
@@ -77,17 +63,12 @@ export function createConnectors(binding: ConnectorBinding | undefined) {
   return {
     async getContext(): Promise<ConnectorContext> {
       if (typeof window !== "undefined") {
-        throw new Error(
-          "Connected apps are only available in Site server routes.",
-        );
+        throw new Error("Connected apps are only available in Site server routes.");
       }
       try {
         if (!binding?.getContext) return { status: "binding_unavailable" };
         const context = await binding.getContext();
-        if (
-          context?.status === "success" &&
-          Array.isArray(context.connectors)
-        ) {
+        if (context?.status === "success" && Array.isArray(context.connectors)) {
           return {
             status: "success",
             connectors: context.connectors.map((connector) => {
@@ -107,8 +88,7 @@ export function createConnectors(binding: ConnectorBinding | undefined) {
                     if (
                       !tool ||
                       typeof tool.actionName !== "string" ||
-                      (tool.description !== undefined &&
-                        typeof tool.description !== "string") ||
+                      (tool.description !== undefined && typeof tool.description !== "string") ||
                       !tool.inputSchema ||
                       typeof tool.inputSchema !== "object" ||
                       Array.isArray(tool.inputSchema)
@@ -117,9 +97,7 @@ export function createConnectors(binding: ConnectorBinding | undefined) {
                     }
                     return {
                       actionName: tool.actionName,
-                      ...(tool.description !== undefined
-                        ? { description: tool.description }
-                        : {}),
+                      ...(tool.description !== undefined ? { description: tool.description } : {}),
                       inputSchema: tool.inputSchema,
                     };
                   }) ?? null,
@@ -146,15 +124,12 @@ export function createConnectors(binding: ConnectorBinding | undefined) {
       args: { [key: string]: Json },
     ): Promise<ConnectorResult> {
       if (typeof window !== "undefined") {
-        throw new Error(
-          "Connected apps are only available in Site server routes.",
-        );
+        throw new Error("Connected apps are only available in Site server routes.");
       }
       if (!binding) {
         return {
           status: "binding_unavailable",
-          message:
-            "This runtime does not provide connected apps for this request.",
+          message: "This runtime does not provide connected apps for this request.",
         };
       }
       try {

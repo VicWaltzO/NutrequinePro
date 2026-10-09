@@ -5,10 +5,7 @@ import type { ConnectorBinding } from "./connector-contract.mjs";
 // which does not retain custom execution-context props. Never share across requests.
 const bindings = new AsyncLocalStorage<ConnectorBinding | undefined>();
 
-export function runWithConnectorBinding<T>(
-  binding: ConnectorBinding | undefined,
-  run: () => T,
-): T {
+export function runWithConnectorBinding<T>(binding: ConnectorBinding | undefined, run: () => T): T {
   return bindings.run(binding, run);
 }
 
