@@ -2,3 +2,9 @@
 *.sh text eol=lf
 *.mjs text eol=lf
 *.md text whitespace=-blank-at-eol
+
+# Match Prettier's LF convention on Windows and Linux without rewriting binaries.
+app/** text=auto eol=lf
+.github/** text=auto eol=lf
+README.md text eol=lf
+CONTRIBUTING.md text eol=lf

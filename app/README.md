@@ -18,25 +18,24 @@ Configuración permite registrar RUC, dirección, teléfono y correo de la empre
 
 ```powershell
 npm.cmd ci
-npm.cmd run build
-node node_modules/wrangler/bin/wrangler.js d1 execute DB --local --file drizzle/0000_nervous_silver_fox.sql --persist-to .wrangler/state --config dist/server/wrangler.json
 npm.cmd run dev
 ```
 
-Aplicar la migración inicial una sola vez a una base local vacía. Las migraciones posteriores se aplican en orden. No ejecutar nuevamente la inicial sobre una base existente. La vista previa responde en http://127.0.0.1:5173. El helper de Sites aplica las migraciones versionadas al publicar. El comando `db:generate` genera migraciones futuras; las aplicadas son inmutables.
+`dev` prepara D1 local antes de iniciar: inspecciona el esquema, reconoce bases históricas completas y aplica solo migraciones pendientes. Servidor y migraciones comparten binding, identidad y persistencia. La vista previa responde en http://127.0.0.1:5173. El helper de Sites aplica las migraciones versionadas al publicar. El comando `db:generate` genera migraciones futuras; las aplicadas son inmutables. Ver [GUIA_DESARROLLO.md](docs/GUIA_DESARROLLO.md) para bases aisladas y diagnósticos.
 
 ```powershell
 npm.cmd test
 npm.cmd run check
 npm.cmd run lint
 npm.cmd run build
+npm.cmd run format:check
 ```
 
 ## Integridad y arquitectura
 
-- `lib/domain.mjs`: validaciones y transiciones puras; no depende del navegador ni de la base.
+- `features/*/domain` y `shared/domain`: reglas, validaciones, unidades y transiciones puras. `lib/domain.mjs` conserva la API pública anterior como fachada.
 - `lib/persistence.mjs`: plan de escrituras para todas las entidades de una operación.
-- `lib/store.ts`: acceso preparado a D1; lotes atómicos y control optimista de revisión. Un conflicto obliga a recargar, sin sobrescribir otra operación.
+- `lib/application-store.mjs`: carga, inicialización y casos de uso idempotentes. `lib/store.ts` conecta el binding D1; lotes atómicos y control optimista de revisión. Un conflicto obliga a recargar, sin sobrescribir otra operación.
 - `db/schema.ts` y `drizzle/`: 27 tablas con relaciones y migraciones. Cada entidad usa columnas de identidad/relación y un documento JSON de datos; los snapshots completos permanecen en las tablas de operación y auditoría. Se eligió este modelo para el volumen reducido documentado. La extensión a columnas de consulta se hace mediante migraciones.
 - Importes enteros en céntimos, pesos enteros en gramos. Las multiplicaciones de insumos se redondean a céntimos con aritmética entera BigInt. Los cálculos fuera de rango se rechazan.
 - Formularios y vistas solo consolidan; el servidor vuelve a calcular todos los totales. Los IDs de operación permiten reintentar sin crear un segundo pago o venta.
@@ -57,3 +56,5 @@ npm.cmd run build
 ## Verificación
 
 Ver [matriz de aceptación](docs/ACEPTACION.md). Las pruebas operan sobre estados aislados y bases SQLite en memoria. Las pruebas manuales de navegador usan una base local separada; esos registros no se publican.
+
+`npm.cmd run verify` ejecuta pruebas, tipos, lint, formato y compilación en orden. La suite incorpora regresión de 66 escenarios HTML, casos de uso del store real y límites de arquitectura. Ver [arquitectura](docs/ARQUITECTURA.md), [resultados](docs/REFACTORIZACION_RESULTADOS.md) y [colaboración](../CONTRIBUTING.md). El workflow de GitHub usa las mismas verificaciones.
