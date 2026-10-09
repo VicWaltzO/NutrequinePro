@@ -51,7 +51,7 @@ export interface CommandResult { state: AppState; result: string | null }
 export interface SaleSummary { items: SaleItem[]; gross: number; total: number; returned: number; paid: number; balance: number; financial_status: string }
 export interface ProductionSummary { ingredients: ProductionIngredient[]; costs: ProductionCost[]; products: ProductionProduct[]; estimated: number; real: number; reconciled: boolean; variation: number; bags: number; weight: number }
 export interface StockSummary { quantity: number; weight_kg: number; committed: number }
-export interface BalanceSummary { sales: number; collections: number; receivable: number; costs: number; paidCosts: number; logistics: number; other: number; estimated_result: number; cash_result: number; estimated_productions: number }
+export interface BalanceSummary { customer_credit:number; sales: number; collections: number; receivable: number; costs: number; paidCosts: number; logistics: number; other: number; estimated_result: number; cash_result: number; estimated_productions: number }
 
 export function errorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;

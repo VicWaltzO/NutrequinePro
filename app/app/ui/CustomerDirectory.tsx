@@ -1,7 +1,7 @@
 'use client';
 import { Search } from 'lucide-react';
 import type { AppState, OpenModal } from '../../lib/domain-types';
-import { normalize, saleSummary } from '../../lib/domain.mjs';
+import { normalize, customerSummary } from '../../lib/domain.mjs';
 import { Empty, Table, find, money } from './shared';
 
 export default function CustomerDirectory({s,tab,query,onQuery,write,open}:{s:AppState;tab:string;query:string;onQuery:(value:string)=>void;write:boolean;open:OpenModal}){
@@ -15,13 +15,13 @@ export default function CustomerDirectory({s,tab,query,onQuery,write,open}:{s:Ap
   <section className="panel flush">
    {tab==='sites'?<Table heads={['Sede','Clientes asociados','Estado','']}>
     {siteRows.map(x=><tr key={x.id}><td>{x.name}</td><td>{linkedCustomers(x.id).map(c=><button className="row-link directory-link" key={c.id} onClick={()=>open('customer-detail',c)}>{c.name}</button>)}</td><td>{x.is_active?'Activo':'Inactivo'}</td><td>{write&&<button onClick={()=>open('site',x)}>Editar</button>}</td></tr>)}
-   </Table>:<Table heads={['Cliente','Contacto','Sedes','Saldo','Estado','']}>
+   </Table>:<Table heads={['Cliente','Contacto','Sedes','Deuda','Saldo a favor','Estado','']}>
     {customerRows.map(x=><tr key={x.id}>
      <td><button className="row-link" onClick={()=>open('customer-detail',x)}>{x.name}</button><small>{x.code}</small></td>
      <td>{x.contact_name||'-'}<small>{x.phone}</small></td>
      <td>{linkedSites(x.id).map(({link,site})=><small key={link.id}>{site?.name}{link.is_default?' (principal)':''}</small>)}</td>
-     <td>{money(s.sales.filter(a=>a.customer_id===x.id&&!['DRAFT','CANCELLED'].includes(a.commercial_status)).reduce((n,a)=>n+saleSummary(s,a).balance,0))}</td>
-     <td>{x.is_active?'Activo':'Inactivo'}</td>
+     <td>{money(customerSummary(s,x.id).debt)}</td>
+     <td>{money(customerSummary(s,x.id).credit)}</td><td>{x.is_active?'Activo':'Inactivo'}</td>
      <td>{write&&<><button onClick={()=>open('customer',x)}>Editar</button><button className="text-button danger" onClick={()=>open('customer-delete',x)}>Eliminar</button></>}</td>
     </tr>)}
    </Table>}

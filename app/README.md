@@ -6,7 +6,9 @@ WebApp administrativa basada en la [especificación maestra](docs/ESPECIFICACION
 
 La versión alojada requiere autenticación de ChatGPT y conserva el acceso privado del propietario. El primer usuario autenticado en una base vacía queda registrado como ADMIN. Otros usuarios requieren tanto acceso al sitio como alta de su ID en Configuración → Usuarios. Se aplican permisos también en el servidor. La vista previa local utiliza la identidad de prueba del starter y tiene su propia base, separada de producción.
 
-Los accesos frecuentes están en Ventas, Producción, Cobranza y Gastos. Los códigos abren el detalle con las acciones disponibles. El stock insuficiente se resuelve con venta futura, lote planificado o corrección de cantidades. La entrega total es una acción separada. No hay entregas parciales ni vencimientos de deuda.
+Los accesos frecuentes están en Ventas, Producción, Cobranza y Gastos. Los códigos abren el detalle con las acciones disponibles. El stock insuficiente se resuelve con venta futura, lote planificado o corrección de cantidades. La entrega total es una acción separada. Su detalle compara sacos y kilos físicos con la venta por producto; los compromisos no se descuentan de nuevo al entregar. No hay entregas parciales ni vencimientos de deuda.
+
+Contado permite ingresar el monto pagado: cero, parcial, exacto o mayor que el total. El pago se aplica hasta cubrir la venta; el resto queda como saldo a favor del cliente. La deuda y el saldo a favor se muestran por separado en Clientes, Cobranza y Balance. Para utilizar un excedente, abrir el pago original en Cobranza → Aplicar saldo a favor a una venta y distribuirlo entre ventas pendientes del mismo cliente. Esto agrega aplicaciones auditadas al pago existente, sin registrar otro ingreso de caja. Estas reglas incorporan el cambio solicitado el 09/10/2026 a las condiciones originales de la especificación.
 
 El menú operativo sigue el orden Resumen, Ventas, Cobranza, Gastos, Producción, Inventario, Balance y Clientes. Clientes reúne el directorio y las sedes de entrega, con búsqueda por contacto o relación. El catálogo comercial se administra desde Configuración → Productos. Los enlaces anteriores `#sites` y `#products` siguen abriendo sus contenidos.
 
@@ -26,6 +28,7 @@ Aplicar la migración inicial una sola vez a una base local vacía. Las migracio
 ```powershell
 npm.cmd test
 npm.cmd run check
+npm.cmd run lint
 npm.cmd run build
 ```
 
@@ -43,7 +46,7 @@ npm.cmd run build
 ## Decisiones técnicas y límites explícitos
 
 - Las devoluciones registran retorno físico. Su efecto económico es un importe explícito ingresado por el administrador; valor inicial cero. No se inventa una política automática de descuento o reembolso.
-- La reversión de pago es total, administrativa y auditada. Para una reasignación o corrección parcial se revierte el original y se registra el pago correcto con nuevas aplicaciones. No existe saldo a favor automático.
+- La reversión de pago es total, administrativa y auditada; revierte también las aplicaciones posteriores de su saldo a favor. Para corregir importes ya aplicados se revierte el original y se registra el pago correcto con nuevas aplicaciones. Los excedentes permanecen disponibles en su pago original hasta una aplicación explícita; no se compensan ni se reembolsan automáticamente. Una rectificación o devolución que deje el total por debajo del pago aplicado continúa requiriendo la reversión previa.
 - Una rectificación de venta con devoluciones anteriores queda bloqueada porque no está definida la reasignación económica y física de devoluciones a líneas corregidas. **TODO negocio:** definir este caso antes de permitirlo. El historial y las devoluciones se pueden consultar; no se destruyen.
 - La rectificación de cantidades de producción usa los productos y fórmulas originales. Los cobros reales de insumos se conservan; el administrador confirma los importes adicionales. La conciliación permite corregir descuentos, cobros y costos con motivo. Agregar un producto nuevo a una producción confirmada se registra en otra producción.
 - Costos marcados como pagados son los egresos de caja de producción, incluso si luego se anula su inventario. El periodo se atribuye a la fecha de producción. **TODO negocio:** si se requiere pago parcial de proveedores o fechas independientes de desembolso, añadir un libro de pagos a proveedores; no se simula en este MVP.
