@@ -1,9 +1,13 @@
 "use client";
 import { Search } from "lucide-react";
-import type { AppState, OpenModal } from "../../lib/domain-types";
-import { normalize, customerSummary } from "../../lib/domain.mjs";
-import { Empty, Table, find, money } from "./shared";
-
+import type { AppState } from "@/lib/domain-types";
+import type { OpenModal } from "@/lib/domain-types";
+import { normalize } from "@/lib/domain.mjs";
+import { customerSummary } from "@/lib/domain.mjs";
+import { Empty } from "@/shared/ui";
+import { Table } from "@/shared/ui";
+import { find } from "@/shared/ui";
+import { money } from "@/shared/ui";
 export default function CustomerDirectory({
   s,
   tab,

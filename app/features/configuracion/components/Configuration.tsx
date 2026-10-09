@@ -1,11 +1,17 @@
 "use client";
 import Image from "next/image";
-import { Moon, Sun } from "lucide-react";
-import type { AppState, OpenModal, User } from "../../lib/domain-types";
-import { changeTheme } from "../../lib/browser-preferences.mjs";
-import { Table, kg, label, money, stamp } from "./shared";
-import AuthenticatedId from "./AuthenticatedId";
-
+import { Moon } from "lucide-react";
+import { Sun } from "lucide-react";
+import type { AppState } from "@/lib/domain-types";
+import type { OpenModal } from "@/lib/domain-types";
+import type { User } from "@/lib/domain-types";
+import { changeTheme } from "@/lib/browser-preferences.mjs";
+import { Table } from "@/shared/ui";
+import { kg } from "@/shared/ui";
+import { label } from "@/shared/ui";
+import { money } from "@/shared/ui";
+import { stamp } from "@/shared/ui";
+import AuthenticatedId from "@/shared/ui/AuthenticatedId";
 export default function Configuration({
   s,
   actor,

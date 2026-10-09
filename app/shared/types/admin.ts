@@ -1,0 +1,20 @@
+import type { EditorRecord } from "@/lib/domain-types";
+export type Modal = { type: string; record?: EditorRecord; kind?: string };
+export type Searchable = {
+  id: string;
+  code?: string;
+  name?: string;
+  description?: string;
+  reason?: string;
+  reference?: string;
+  item_type?: string;
+  item_id?: string;
+  customer_id?: string | null;
+  site_id?: string | null;
+  sale_date?: string;
+  production_date?: string;
+  payment_date?: string;
+  return_date?: string;
+  date?: string;
+  created_at?: string;
+};

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Check, Copy } from "lucide-react";
-
+import { Check } from "lucide-react";
+import { Copy } from "lucide-react";
 export default function AuthenticatedId({ id }: { id: string }) {
   const [status, setStatus] = useState<"idle" | "copied" | "manual">("idle");
   const copy = async () => {

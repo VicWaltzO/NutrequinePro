@@ -1,108 +1,37 @@
 "use client";
-import { useState } from "react";
-import { recordId } from "../../lib/domain-types";
-import type { AppState, EditorRecord, Submit } from "../../lib/domain-types";
-import type { SaleFields, SaleLine, PaymentValues, ReturnValues } from "./form-types";
-import { stock, saleSummary, normalize, paymentSummary, customerSummary } from "../../lib/domain.mjs";
-import { Input, Select, Check, Table, PaymentFields, money, kg, day, find } from "./shared";
-export type FormProps = {
-  s: AppState;
-  record?: EditorRecord;
-  kind?: string;
-  submit: Submit;
-  close: () => void;
-  busy: boolean;
-};
-export function Footer({
-  busy,
-  close,
-  label = "Guardar",
-  disabled = false,
-}: {
-  busy: boolean;
-  close: () => void;
-  label?: string;
-  disabled?: boolean;
-}) {
-  return (
-    <footer className="form-footer">
-      <button type="button" className="secondary" onClick={close} disabled={busy}>
-        Cancelar
-      </button>
-      <button className="primary" disabled={busy || disabled}>
-        {busy ? "Guardando…" : label}
-      </button>
-    </footer>
-  );
-}
+import { useSaleFormState } from "../hooks/useSaleFormState";
+import { stock } from "@/lib/domain.mjs";
+import { Input } from "@/shared/ui";
+import { Select } from "@/shared/ui";
+import { Check } from "@/shared/ui";
+import { Table } from "@/shared/ui";
+import { PaymentFields } from "@/shared/ui";
+import { money } from "@/shared/ui";
+import { kg } from "@/shared/ui";
+import { find } from "@/shared/ui";
+import { Footer } from "@/shared/ui/FormFooter";
+import type { FormProps } from "@/shared/types/forms";
 export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
-  const old = record?.id ? saleSummary(s, { id: record.id }).items : [],
-    edit = kind === "correct";
-  const [v, setV] = useState<SaleFields>({
-    sale_date: record?.sale_date ?? day(),
-    customer_id: record?.customer_id ?? "",
-    site_id: record?.site_id ?? "",
-    payment_condition: record?.payment_condition ?? s.config.default_payment_condition ?? "CREDIT",
-    notes: record?.notes ?? "",
-    mode: "immediate",
-    payment_method: s.config.default_payment_method ?? "",
-    reference: "",
-    reason: "",
-    production_id: "",
-    id: record?.id,
-  });
-  const set = (k: string, x: string | boolean) => setV((a) => ({ ...a, [k]: x }));
-  const [rows, setRows] = useState<SaleLine[]>(
-    old.length
-      ? old.map((x) => ({
-          original_item_id: x.id,
-          product_id: x.product_id,
-          quantity: x.quantity,
-          unit_weight_kg: x.unit_weight_kg / 1000,
-          unit_price: x.unit_price / 100,
-        }))
-      : [{ product_id: "", quantity: 1, unit_weight_kg: "", unit_price: "" }],
-  );
-  const [paidAmount, setPaidAmount] = useState<string | null>(null);
-  const [quick, setQuick] = useState(""),
-    [newName, setNewName] = useState(""),
-    [duplicate, setDuplicate] = useState(false);
-  const update = (i: number, k: keyof SaleLine, x: string) =>
-    setRows((a) =>
-      a.map((r, j) => {
-        if (i !== j) return r;
-        const n = { ...r, [k]: x };
-        if (k === "product_id") {
-          const p = find(s, "products", x);
-          n.unit_price = (p?.default_sale_price ?? 0) / 100;
-          n.unit_weight_kg = (p?.standard_bag_weight_kg ?? 0) / 1000;
-        }
-        return n;
-      }),
-    );
-  const grouped: Record<string, { q: number; w: number }> = {};
-  rows.forEach((r) => {
-    grouped[r.product_id] ??= { q: 0, w: 0 };
-    grouped[r.product_id].q += Number(r.quantity) || 0;
-    grouped[r.product_id].w += (Number(r.quantity) || 0) * (Number(r.unit_weight_kg) || 0) * 1000;
-  });
-  const missing = Object.entries(grouped).filter(
-    ([id, a]) =>
-      id &&
-      (a.q >
-        stock(s, id).quantity +
-          (edit && record?.fulfillment_status === "DELIVERED"
-            ? old.filter((x) => x.product_id === id).reduce((n: number, x) => n + x.quantity, 0)
-            : 0) ||
-        a.w >
-          stock(s, id).weight_kg +
-            (edit && record?.fulfillment_status === "DELIVERED"
-              ? old.filter((x) => x.product_id === id).reduce((n: number, x) => n + x.total_weight_kg, 0)
-              : 0)),
-  );
-  const total = rows.reduce((a, r) => a + Math.round(Number(r.quantity) * Number(r.unit_price) * 100), 0),
-    dup = s.customers.some((x) => normalize(x.name) === normalize(newName));
-  const paid = paidAmount === null ? total : Math.round(Number(paidAmount || 0) * 100);
+  const {
+    edit,
+    v,
+    set,
+    rows,
+    setRows,
+    paidAmount,
+    setPaidAmount,
+    quick,
+    setQuick,
+    newName,
+    setNewName,
+    duplicate,
+    setDuplicate,
+    update,
+    missing,
+    total,
+    dup,
+    paid,
+  } = useSaleFormState({ s, record, kind });
   return (
     <form
       onSubmit={async (e) => {
@@ -391,192 +320,6 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
         close={close}
         label={edit ? "Registrar rectificación" : kind === "draft" ? "Guardar borrador" : "Confirmar venta"}
       />
-    </form>
-  );
-}
-export function PaymentForm({ s, record, kind, submit, close, busy }: FormProps) {
-  const usingCredit = kind === "credit",
-    source = s.payments.find((x) => x.id === record?.id),
-    available = source ? paymentSummary(s, source).available : 0;
-  const [v, setV] = useState<PaymentValues>({
-    customer_id: record?.customer_id ?? "",
-    payment_date: day(),
-    total_amount: "",
-    payment_method: s.config.default_payment_method ?? "",
-    reference: "",
-    notes: "",
-  });
-  const [apps, setApps] = useState<Record<string, string>>({});
-  const set = (k: string, x: string | boolean) => setV((a) => ({ ...a, [k]: x }));
-  const sales = s.sales.filter(
-    (x) =>
-      x.customer_id === v.customer_id &&
-      !["DRAFT", "CANCELLED"].includes(x.commercial_status) &&
-      saleSummary(s, x).balance > 0,
-  );
-  const applied = Object.values(apps).reduce((a, x) => a + Math.round(Number(x || 0) * 100), 0),
-    received = usingCredit ? available : Math.round(Number(v.total_amount || 0) * 100);
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const applications = Object.entries(apps)
-          .filter(([, v]) => Number(v) > 0)
-          .map(([sale_id, applied_amount]) => ({ sale_id, applied_amount }));
-        await submit(
-          usingCredit ? "PAYMENT_APPLY_CREDIT" : "PAYMENT_CREATE",
-          usingCredit ? { payment_id: source?.id, applications } : { ...v, applications },
-        );
-      }}
-    >
-      {usingCredit ? (
-        <p className="notice">
-          Saldo a favor de {find(s, "customers", v.customer_id)?.name}: {money(available)} · Pago{" "}
-          {source?.code}. Esta aplicación no registra un cobro nuevo.
-        </p>
-      ) : (
-        <div className="form-grid">
-          <Select
-            label="Cliente"
-            required
-            value={v.customer_id}
-            onChange={(x) => {
-              set("customer_id", x);
-              setApps({});
-            }}
-            options={s.customers.filter((x) => x.is_active || customerSummary(s, x.id).debt > 0)}
-          />
-          <Input
-            label="Fecha del pago"
-            type="date"
-            required
-            value={v.payment_date}
-            onChange={(x) => set("payment_date", x)}
-          />
-          <Input
-            label="Monto recibido S/"
-            type="number"
-            min="0.01"
-            step="0.01"
-            required
-            value={v.total_amount}
-            onChange={(x) => set("total_amount", x)}
-          />
-          <PaymentFields v={v} set={set} />
-        </div>
-      )}
-      <h3>Aplicar a ventas pendientes</h3>
-      <Table heads={["Venta", "Fecha", "Sede", "Saldo", "Aplicar S/"]}>
-        {sales.map((x) => {
-          const a = saleSummary(s, x);
-          return (
-            <tr key={x.id}>
-              <td>{x.code}</td>
-              <td>{x.sale_date}</td>
-              <td>{find(s, "sites", x.site_id)?.name}</td>
-              <td>{money(a.balance)}</td>
-              <td>
-                <input
-                  aria-label={"Aplicar a " + x.code}
-                  type="number"
-                  min="0"
-                  max={a.balance / 100}
-                  step="0.01"
-                  value={apps[x.id] ?? ""}
-                  onChange={(e) => setApps((a) => ({ ...a, [x.id]: e.target.value }))}
-                />
-              </td>
-            </tr>
-          );
-        })}
-      </Table>
-      <div className="total-line">
-        <span>Aplicado {money(applied)}</span>
-        <strong>Saldo a favor restante {money(Math.max(0, received - applied))}</strong>
-      </div>
-      {applied > received && <p className="error">El importe aplicado supera el monto disponible.</p>}
-      {!usingCredit && (
-        <>
-          <p className="notice">
-            El importe sin aplicar queda a favor del cliente. Puede usarlo posteriormente desde el detalle del
-            pago.
-          </p>
-          <Input label="Notas" value={v.notes} onChange={(x) => set("notes", x)} />
-        </>
-      )}
-      <Footer
-        busy={busy}
-        disabled={applied > received || received <= 0 || (usingCredit && applied <= 0)}
-        close={close}
-        label={usingCredit ? "Aplicar saldo a favor" : "Registrar pago"}
-      />
-    </form>
-  );
-}
-export function ReturnForm({ s, record, submit, close, busy }: FormProps) {
-  const id = recordId(record);
-  const a = saleSummary(s, { id });
-  const [q, setQ] = useState<Record<string, string>>({}),
-    [v, setV] = useState<ReturnValues>({ return_date: day(), reason: "", economic_amount: "0", notes: "" });
-  const set = (k: string, x: string | boolean) => setV((a) => ({ ...a, [k]: x }));
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        await submit("RETURN_CREATE", {
-          ...v,
-          sale_id: id,
-          items: Object.entries(q)
-            .filter(([, x]) => Number(x) > 0)
-            .map(([sale_item_id, quantity]) => ({ sale_item_id, quantity })),
-        });
-      }}
-    >
-      <p className="notice">
-        La devolución registra el retorno físico. La reducción económica se ingresa explícitamente; no se
-        calcula como descuento automático.
-      </p>
-      <Input
-        label="Fecha de devolución"
-        type="date"
-        value={v.return_date}
-        onChange={(x) => set("return_date", x)}
-      />
-      <Table heads={["Producto", "Entregado", "Ya devuelto", "Devolver sacos"]}>
-        {a.items.map((x) => {
-          const returned = s.returnItems
-            .filter((r) => r.sale_item_id === x.id)
-            .reduce((n: number, r) => n + r.quantity, 0);
-          return (
-            <tr key={x.id}>
-              <td>{find(s, "products", x.product_id)?.name}</td>
-              <td>{x.quantity}</td>
-              <td>{returned}</td>
-              <td>
-                <input
-                  aria-label="Sacos a devolver"
-                  type="number"
-                  min="0"
-                  step="1"
-                  max={x.quantity - returned}
-                  value={q[x.id] ?? 0}
-                  onChange={(e) => setQ((a) => ({ ...a, [x.id]: e.target.value }))}
-                />
-              </td>
-            </tr>
-          );
-        })}
-      </Table>
-      <Input
-        label="Reducción económica S/ (0 si no aplica)"
-        type="number"
-        min="0"
-        step="0.01"
-        value={v.economic_amount}
-        onChange={(x) => set("economic_amount", x)}
-      />
-      <Input label="Motivo de devolución" required value={v.reason} onChange={(x) => set("reason", x)} />
-      <Footer busy={busy} close={close} label="Confirmar devolución" />
     </form>
   );
 }

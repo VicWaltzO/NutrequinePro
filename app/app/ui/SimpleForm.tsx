@@ -1,61 +1,22 @@
 "use client";
+import CustomerFields from "@/features/clientes/components/CustomerFields";
+import ProductFields from "@/features/configuracion/components/ProductFields";
+import IngredientFields from "@/features/produccion/components/IngredientFields";
+import UserFields from "@/features/configuracion/components/UserFields";
+import ExpenseFields from "@/features/gastos/components/ExpenseFields";
+import InventoryAdjustmentFields from "@/features/inventario/components/InventoryAdjustmentFields";
+import CompanyFields from "@/features/configuracion/components/CompanyFields";
+import AdministrativeReasonFields from "@/features/configuracion/components/AdministrativeReasonFields";
+import { simpleFormInitial } from "@/shared/lib/simple-form-initial";
 import { useState } from "react";
 import type { HTMLInputTypeAttribute } from "react";
-import type { SimpleFields } from "./form-types";
-import { normalize } from "../../lib/domain.mjs";
-import { Field, Input, Select, Check, day } from "./shared";
-import { Footer, FormProps } from "./SaleForms";
+import type { SimpleFields } from "@/shared/types/forms";
+import { Input } from "@/shared/ui";
+import { Check } from "@/shared/ui";
+import { Footer } from "@/shared/ui/FormFooter";
+import type { FormProps } from "@/shared/types/forms";
 export default function SimpleForm({ s, record, kind, submit, close, busy }: FormProps) {
-  const defaults: Record<string, SimpleFields> = {
-    customer: { name: "", is_active: true, site_ids: [] },
-    site: { name: "", is_active: true },
-    ingredient: { name: "", is_active: true, current_price_per_kg: 0 },
-    product: {
-      name: "",
-      category: "PREMIUM",
-      default_sale_price: 0,
-      standard_bag_weight_kg: 25,
-      bags_per_nucleus: 40,
-      commercial_weight_per_nucleus_kg: 1000,
-      is_active: true,
-      is_sellable: true,
-    },
-    expense: {
-      date: day(),
-      category: s.config.default_expense_category ?? s.config.expense_categories[0],
-      description: "",
-      amount: "",
-      production_id: "",
-      sale_id: "",
-      site_id: "",
-      ingredient_id: "",
-      notes: "",
-    },
-    adjust: { date: day(), product_id: "", quantity: "", weight_kg: "", direction: "IN", reason: "" },
-    config: {
-      ...s.config,
-      default_payment_condition: s.config.default_payment_condition ?? "CREDIT",
-      default_payment_method: s.config.default_payment_method ?? "",
-      default_expense_category: s.config.default_expense_category ?? s.config.expense_categories[0],
-      default_nucleus_cost: s.config.default_nucleus_cost / 100,
-      default_packaging_cost: s.config.default_packaging_cost / 100,
-      categories_text: s.config.expense_categories.join(", "),
-    },
-    user: { id: "", name: "", role: "VIEWER", is_active: true },
-    reason: { reason: "", date: day() },
-  };
-  const initial = { ...defaults[kind ?? "reason"], ...record };
-  if (kind === "product" && record) {
-    initial.default_sale_price = (record.default_sale_price ?? 0) / 100;
-    for (const k of ["standard_bag_weight_kg", "commercial_weight_per_nucleus_kg"] as const)
-      initial[k] = (record[k] ?? 0) / 1000;
-  }
-  if (kind === "ingredient" && record)
-    initial.current_price_per_kg = (record.current_price_per_kg ?? 0) / 100;
-  if (kind === "customer" && record)
-    initial.site_ids = s.customerSites
-      .filter((x) => x.customer_id === record.id && x.is_active !== false)
-      .map((x) => x.site_id);
+  const initial = simpleFormInitial({ s, record, kind });
   const [v, setV] = useState<SimpleFields>(initial);
   const set = <K extends keyof SimpleFields>(k: K, x: SimpleFields[K]) => setV((a) => ({ ...a, [k]: x }));
   const input = (
@@ -106,206 +67,25 @@ export default function SimpleForm({ s, record, kind, submit, close, busy }: For
       {["customer", "site", "product", "ingredient", "user"].includes(kind ?? "") && (
         <div className="form-grid">
           {input("name", "Nombre")}
-          {kind === "customer" && (
-            <>
-              {input("tax_id", "RUC / identificación", "text", false)}
-              {input("contact_name", "Contacto", "text", false)}
-              {input("phone", "Teléfono", "text", false)}
-              {input("address", "Dirección", "text", false)}
-              {input("notes", "Notas", "text", false)}
-              <Field label="Sedes del cliente (primera = predeterminada)">
-                {s.sites.map((x) => (
-                  <Check
-                    key={x.id}
-                    label={x.name}
-                    value={v.site_ids?.includes(x.id)}
-                    onChange={(yes) =>
-                      set(
-                        "site_ids",
-                        yes
-                          ? [...(v.site_ids ?? []), x.id]
-                          : (v.site_ids ?? []).filter((id: string) => id !== x.id),
-                      )
-                    }
-                  />
-                ))}
-              </Field>
-              {s.customers.some((x) => x.id !== v.id && normalize(x.name) === normalize(v.name)) && (
-                <Check
-                  label="Confirmo un cliente diferente con nombre similar"
-                  value={v.confirm_duplicate}
-                  onChange={(x) => set("confirm_duplicate", x)}
-                />
-              )}
-            </>
-          )}
-          {kind === "product" && (
-            <>
-              {input("category", "Categoría")}
-              {input("default_sale_price", "Precio base S/", "number")}
-              {input("standard_bag_weight_kg", "Kg estándar por saco", "number")}
-              {input("bags_per_nucleus", "Sacos por núcleo", "number")}
-              {input("commercial_weight_per_nucleus_kg", "Kg comerciales por núcleo", "number")}
-              <Check
-                label="Habilitado para venta"
-                value={v.is_sellable}
-                onChange={(x) => set("is_sellable", x)}
-              />
-            </>
-          )}
-          {kind === "ingredient" && input("current_price_per_kg", "Precio S/ por kg", "number")}
-          {kind === "user" && (
-            <>
-              {input("id", "ID de usuario autenticado")}
-              <Select
-                label="Rol"
-                required
-                empty={false}
-                value={v.role}
-                onChange={(x) => set("role", x)}
-                options={["ADMIN", "OPERATOR", "VIEWER"]}
-              />
-            </>
-          )}
+          {kind === "customer" && <CustomerFields s={s} v={v} set={set} input={input} />}
+          {kind === "product" && <ProductFields v={v} set={set} input={input} />}
+          {kind === "ingredient" && <IngredientFields input={input} />}
+          {kind === "user" && <UserFields v={v} set={set} input={input} />}
           <Check label="Activo" value={v.is_active} onChange={(x) => set("is_active", x)} />
         </div>
       )}
-      {kind === "expense" && (
-        <>
-          <div className="form-grid">
-            {input("date", "Fecha", "date")}
-            <Select
-              label="Categoría"
-              required
-              value={v.category}
-              onChange={(x) => set("category", x)}
-              options={s.config.expense_categories}
-            />
-            {input("description", "Descripción")}
-            {input("amount", "Monto pagado S/", "number")}
-            <Select
-              label="Producción (opcional)"
-              value={v.production_id}
-              onChange={(x) => set("production_id", x)}
-              options={s.productions
-                .filter((x) => !["CLOSED", "CANCELLED"].includes(x.status))
-                .map((x) => ({ id: x.id, name: x.code }))}
-            />
-            <Select
-              label="Venta (opcional)"
-              value={v.sale_id}
-              onChange={(x) => set("sale_id", x)}
-              options={s.sales.map((x) => ({ id: x.id, name: x.code }))}
-            />
-            <Select
-              label="Sede (opcional)"
-              value={v.site_id}
-              onChange={(x) => set("site_id", x)}
-              options={s.sites}
-            />
-            <Select
-              label="Insumo (opcional)"
-              value={v.ingredient_id}
-              onChange={(x) => set("ingredient_id", x)}
-              options={s.ingredients}
-            />
-            {input("notes", "Notas", "text", false)}
-          </div>
-          {v.production_id && (
-            <p className="notice">
-              Este importe será un único costo de producción vinculado. No se sumará como gasto independiente.
-            </p>
-          )}
-        </>
-      )}
-      {kind === "adjust" && (
-        <div className="form-grid">
-          {input("date", "Fecha", "date")}
-          <Select
-            label="Producto"
-            required
-            value={v.product_id}
-            onChange={(x) => set("product_id", x)}
-            options={s.products}
-          />
-          <Select
-            label="Movimiento"
-            required
-            empty={false}
-            value={v.direction}
-            onChange={(x) => set("direction", x)}
-            options={[
-              { id: "IN", name: "Entrada" },
-              { id: "OUT", name: "Salida" },
-            ]}
-          />
-          {input("quantity", "Cantidad de sacos", "number")}
-          {input("weight_kg", "Peso total kg", "number")}
-          {input("reason", "Motivo")}
-        </div>
-      )}
+      {kind === "expense" && <ExpenseFields s={s} v={v} set={set} input={input} />}
+      {kind === "adjust" && <InventoryAdjustmentFields s={s} v={v} set={set} input={input} />}
       {kind === "config" && (
-        <>
-          <h3>Empresa</h3>
-          <div className="form-grid">
-            {input("company_name", "Empresa")}
-            {input("tax_id", "RUC / identificación", "text", false)}
-            {input("address", "Dirección", "text", false)}
-            {input("phone", "Teléfono", "tel", false)}
-            {input("contact_email", "Correo de contacto", "email", false)}
-          </div>
-          <h3>Valores predeterminados</h3>
-          <div className="form-grid">
-            <Select
-              label="Condición de pago en nuevas ventas"
-              required
-              empty={false}
-              value={v.default_payment_condition}
-              onChange={(x) => set("default_payment_condition", x)}
-              options={[
-                { id: "CREDIT", name: "Crédito" },
-                { id: "CASH", name: "Contado" },
-              ]}
-            />
-            <Select
-              label="Método de pago predeterminado"
-              empty="Elegir en cada operación"
-              value={v.default_payment_method}
-              onChange={(x) => set("default_payment_method", x)}
-              options={["CASH", "TRANSFER", "CHECK"]}
-            />
-            {input("default_nucleus_cost", "Costo por núcleo S/", "number")}
-            {input("default_packaging_cost", "Costo por saco S/", "number")}
-          </div>
-          <h3>Gastos</h3>
-          <div className="form-grid">
-            {input("categories_text", "Categorías de gastos (separadas por coma)")}
-            <Select
-              label="Categoría predeterminada"
-              required
-              empty={false}
-              value={defaultCategory}
-              onChange={(x) => set("default_expense_category", x)}
-              options={[...new Set(categories)]}
-            />
-          </div>
-          <p className="metadata">Moneda: PEN · Zona horaria: America/Lima</p>
-        </>
+        <CompanyFields
+          v={v}
+          set={set}
+          input={input}
+          categories={categories}
+          defaultCategory={defaultCategory}
+        />
       )}
-      {kind === "reason" && (
-        <>
-          {input("reason", "Motivo obligatorio")}
-          {record?._operation === "PAYMENT_REVERSE" && (
-            <>
-              {input("date", "Fecha de reversión", "date")}
-              <p className="warning">
-                Se registra una reversión total del pago y se liberan todas sus aplicaciones. El pago original
-                permanece en el historial.
-              </p>
-            </>
-          )}
-        </>
-      )}
+      {kind === "reason" && <AdministrativeReasonFields record={record} input={input} />}
       <Footer busy={busy} close={close} label={kind === "reason" ? "Registrar operación" : "Guardar"} />
     </form>
   );

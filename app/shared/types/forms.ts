@@ -1,4 +1,18 @@
-import type { NumericInput, CostInput, ProductionIngredient } from "../../lib/domain-types";
+import type { AppState } from "@/lib/domain-types";
+import type { EditorRecord } from "@/lib/domain-types";
+import type { Submit } from "@/lib/domain-types";
+import type { NumericInput } from "@/lib/domain-types";
+import type { CostInput } from "@/lib/domain-types";
+import type { ProductionIngredient } from "@/lib/domain-types";
+export type FormProps = {
+  s: AppState;
+  record?: EditorRecord;
+  kind?: string;
+  submit: Submit;
+  close: () => void;
+  busy: boolean;
+};
+
 export interface PaymentFieldsValue {
   payment_method: string;
   other_method?: string;
