@@ -4,6 +4,7 @@ import { Moon, Sun } from 'lucide-react';
 import type { AppState, OpenModal, User } from '../../lib/domain-types';
 import { changeTheme } from '../../lib/browser-preferences.mjs';
 import { Table, kg, label, money, stamp } from './shared';
+import AuthenticatedId from './AuthenticatedId';
 
 export default function Configuration({s,actor,tab,open,theme}:{s:AppState;actor:User;tab:string;open:OpenModal;theme:'light'|'dark'}){
  const admin=actor.role==='ADMIN',c=s.config;
@@ -13,7 +14,7 @@ export default function Configuration({s,actor,tab,open,theme}:{s:AppState;actor
   </Table></section>
   <details className="settings-section"><summary>Presentación original de productos</summary><Image width={1440} height={1728} unoptimized className="catalog-image" src="/brand/productos.jpg" alt="Presentación real de Nutrelin, Hi-Performance y Potripregnant"/></details>
  </>;
- if(tab==='users')return <section className="settings-section"><div className="section-heading"><h2>Accesos</h2>{admin&&<button onClick={()=>open('user')}>Agregar usuario</button>}</div><p className="notice">El acceso requiere una identidad autenticada y permiso de acceso al sitio. ID actual: {actor.id}</p><Table heads={['Usuario','ID autenticado','Rol','Estado','']}>
+ if(tab==='users')return <section className="settings-section"><div className="section-heading"><h2>Accesos</h2>{admin&&<button onClick={()=>open('user')}>Agregar usuario</button>}</div><p className="notice">El acceso requiere una identidad autenticada y permiso de acceso al sitio.</p><AuthenticatedId id={actor.id}/><Table heads={['Usuario','ID autenticado','Rol','Estado','']}>
   {s.users.map(x=><tr key={x.id}><td>{x.name}</td><td><code>{x.id}</code></td><td>{label(x.role)}</td><td>{x.is_active?'Activo':'Inactivo'}</td><td>{admin&&<button onClick={()=>open('user',x)}>Editar</button>}</td></tr>)}
  </Table></section>;
  if(tab==='audit')return <section className="settings-section"><h2>Historial de acciones</h2><Table heads={['Fecha','Usuario','Acción','Detalle']}>
