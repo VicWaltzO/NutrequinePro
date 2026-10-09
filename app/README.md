@@ -18,12 +18,16 @@ Configuración permite registrar RUC, dirección, teléfono y correo de la empre
 
 ```powershell
 npm.cmd ci
-npm.cmd run build
-node node_modules/wrangler/bin/wrangler.js d1 execute DB --local --file drizzle/0000_nervous_silver_fox.sql --persist-to .wrangler/state --config dist/server/wrangler.json
 npm.cmd run dev
 ```
 
-Aplicar la migración inicial una sola vez a una base local vacía. Las migraciones posteriores se aplican en orden. No ejecutar nuevamente la inicial sobre una base existente. La vista previa responde en http://127.0.0.1:5173. El helper de Sites aplica las migraciones versionadas al publicar. El comando `db:generate` genera migraciones futuras; las aplicadas son inmutables.
+La vista previa responde en http://127.0.0.1:5173. Iniciar sesión habilita la identidad de prueba local; el primer usuario de una base vacía recibe ADMIN. No se necesita Docker, una cuenta de Cloudflare ni compilar previamente: D1 se ejecuta localmente como SQLite.
+
+En el perfil portátil (incluido Windows), `npm.cmd run dev` crea la base y aplica las migraciones pendientes antes de arrancar. Puede repetirse conservando los datos. La configuración compartida con Vite asegura la misma identidad de base y la misma carpeta `.wrangler/state/`. Para preparar la base sin arrancar, usar `npm.cmd run db:migrate:local`.
+
+Si se siguieron las instrucciones anteriores con `d1 execute --file`, el arranque reconoce la migración inicial solo si su esquema está completo y registra su aplicación sin reimportarla ni borrar datos. Un esquema parcial o distinto detiene el arranque con un error en la terminal. No volver a ejecutar manualmente la migración inicial sobre una base existente. La base de desarrollo es independiente de producción; no eliminar `.wrangler/state/` si se quieren conservar los registros locales.
+
+El perfil Linux administrado conserva el arranque del helper de Sites. El helper aplica las migraciones versionadas al publicar. El comando `db:generate` genera migraciones futuras; las aplicadas son inmutables.
 
 ```powershell
 npm.cmd test

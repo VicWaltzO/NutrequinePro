@@ -9,12 +9,10 @@ Se requiere Node.js 22.13 o posterior. Desde la raíz del proyecto:
 ```powershell
 cd app
 npm.cmd ci
-npm.cmd run build
-node node_modules/wrangler/bin/wrangler.js d1 execute DB --local --file drizzle/0000_nervous_silver_fox.sql --persist-to .wrangler/state --config dist/server/wrangler.json
 npm.cmd run dev
 ```
 
-Aplicar la migración inicial solo una vez a una base local vacía. Consultar `app/README.md` para las migraciones posteriores, arquitectura y configuración de acceso.
+Abrir http://127.0.0.1:5173 e iniciar sesión con la identidad de prueba local. `npm.cmd run dev` prepara la base y aplica las migraciones pendientes antes de arrancar. No requiere Docker ni una compilación previa. Los datos SQLite se conservan en `app/.wrangler/state/`, separados de producción. Consultar `app/README.md` para más detalles.
 
 ## Verificación
 
