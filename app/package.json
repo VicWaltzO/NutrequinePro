@@ -13,6 +13,7 @@
     "lint": "eslint . --max-warnings 0",
     "db:generate": "drizzle-kit generate",
     "db:prepare": "node scripts/prepare-local-db.mjs",
+    "db:migrate:local": "node scripts/prepare-local-db.mjs",
     "test": "node --test tests/*.test.mjs",
     "check": "tsc --noEmit",
     "format": "prettier --write .",

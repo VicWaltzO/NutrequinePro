@@ -118,16 +118,18 @@ devoluciones y rectificaciones conservan registros, compensaciones y motivos.
 ## D1 local y alojado
 
 `wrangler.local.json` centraliza binding `DB`, identidad local y directorio de
-migraciones. Vite y la preparación usan la misma ruta, por defecto
+migraciones. `local-bindings.mjs` conserva el contrato incorporado desde main y
+reutiliza esa configuración. Vite y la preparación usan la misma ruta, por defecto
 `.wrangler/state`; Miniflare conserva SQLite dentro de `v3/d1`. La variable
 `NUTREQUINE_LOCAL_STATE_DIR` permite una base de pruebas separada.
 
-Antes de `dev`, la preparación inspecciona esquema y ledger. Aplica migraciones
+Antes de `dev` portable, la preparación inspecciona esquema y ledger. Aplica migraciones
 pendientes; reconoce una base antigua con el esquema inicial completo y registra
 su migración sin repetir los `CREATE TABLE`. Un esquema parcial o desconocido sin
 ledger se bloquea para revisión. El ledger existente se valida como prefijo de las
-migraciones versionadas. La verificación de adopción compara definiciones de tablas;
-no reconstruye ni modifica índices de una base antigua.
+migraciones versionadas. La verificación de adopción compara definiciones de tablas
+e índices; no reconstruye ni modifica el esquema de una base antigua. El perfil
+Linux administrado conserva el arranque del helper de Sites, como en main.
 
 Los comandos de preparación son exclusivamente locales. La plataforma alojada
 conserva sus bindings y su mecanismo de publicación/migración. La refactorización

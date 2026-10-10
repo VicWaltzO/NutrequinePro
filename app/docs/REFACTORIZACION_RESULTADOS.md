@@ -85,16 +85,18 @@ visual y el markup de las muestras comprobadas se conservan.
 | Comprobación               | Inicial                                                  | Final local                                                                    |
 | -------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `npm.cmd ci`               | Aprobado, 682 paquetes                                   | Lockfile conserva instalación reproducible y fija Prettier                     |
-| `npm.cmd test`             | 39 aprobadas                                             | 50 aprobadas, 0 fallidas                                                       |
+| `npm.cmd test`             | 39 aprobadas                                             | 55 aprobadas, 0 fallidas                                                       |
 | `npm.cmd run check`        | Aprobado                                                 | Aprobado, TypeScript estricto                                                  |
 | `npm.cmd run lint`         | Aprobado                                                 | Aprobado, cero advertencias permitidas                                         |
 | `npm.cmd run build`        | Aprobado con permisos                                    | Aprobado con las tres rutas originales                                         |
 | `npm.cmd run format:check` | No existía                                               | Aprobado                                                                       |
 | `npm.cmd run dev`          | Funcionaba con base ya migrada; 503 con esquema faltante | Migra una base aislada vacía y arranca; segundo arranque no repite migraciones |
 
-La suite conserva las 39 pruebas originales y agrega 11: tres de preparación D1,
+La suite conserva las 39 pruebas originales y agrega 11 de la refactorización: tres de preparación D1,
 cinco de casos de uso del store, dos de arquitectura y una que compara 66 escenarios
-de interfaz. El fixture de HTML se capturó del commit de formato `2f7c03b`, antes
+de interfaz. Al integrar main se conservaron sus cuatro pruebas adicionales de
+migración y se agregó una de índice faltante: total final 55 pruebas.
+El fixture de HTML se capturó del commit de formato `2f7c03b`, antes
 de modularizar, con reloj, IDs y estado sintético deterministas. Comprueba 44
 vistas/roles y 22 formularios/modales sin diferencias. Es regresión de SSR; no es
 una afirmación de igualdad de píxeles ni cobertura de todas las interacciones.
@@ -140,6 +142,11 @@ habitual y de producción:
 8. Recarga HTTP y reinicio de `dev` sobre esa misma ruta: coinciden revisión,
    cantidades de registros, resúmenes, snapshots, balance y stock.
 
+Después de integrar `e82af39` se repitió el flujo completo en una nueva base
+`.wrangler/refactor-integrated`: los mismos resultados y salida 0. Se detuvo y
+reinició el servidor sobre esa ruta, comprobando nuevamente las huellas del
+estado sintético. Las 27 tablas de la base habitual permanecieron intactas.
+
 La comprobación de reinicio inicialmente terminó con un error de Node/Windows al
 cerrar abruptamente el script auxiliar mediante `process.exit`, después de pasar
 las aserciones. Se retiró ese cierre y se repitió con salida 0. Fue un defecto del
@@ -161,7 +168,7 @@ automatizada de píxeles ni una prueba manual exhaustiva de todos los formulario
 
 ## Cambios de comportamiento expresos
 
-- `dev` ahora prepara D1 local; corrige el arranque sin esquema. La preparación
+- `dev` portable ahora prepara D1 local; corrige el arranque sin esquema. La preparación
   automática agrega metadata de migraciones a bases históricas verificadas y
   rechaza estados desconocidos en lugar de iniciar con el error posterior.
 - `lint` falla también con advertencias y `verify` agrupa los controles.
@@ -172,6 +179,13 @@ automatizada de píxeles ni una prueba manual exhaustiva de todos los formulario
   de datos existentes. `start` conserva su persistencia default documentada.
 
 ## Git, colaboración y pendientes
+
+Tras el primer push se detectó el commit remoto `e82af39`, que corregía también
+el arranque D1. Se integró en esta rama, resolviendo conflictos en los README,
+package, preparación, runner y Vite. Sus helpers y alias permanecen compatibles,
+pero reutilizan una sola configuración y validación. Se conservó su inspección de
+índices y el arranque del perfil administrado. No se sobrescribió main ni se
+descartaron sus pruebas. Se repitieron las verificaciones después de la integración.
 
 La secuencia de commits separa auditoría, formato, entorno, interfaz, lógica,
 regresión y documentación:
@@ -185,6 +199,9 @@ regresión y documentación:
 | `e684310`                         | Reglas por funcionalidad y casos de uso del store    |
 | `a29d22d`                         | Regresión de interfaz/store/arquitectura y CI        |
 | Commit de documentación posterior | Arquitectura, desarrollo, resultados y colaboración  |
+
+El commit de documentación es `4de1120`. Un commit de integración posterior
+incorpora `e82af39`, la comprobación de índices y las 55 pruebas finales.
 
 La eliminación previa del documento maestro en la raíz y el archivo local
 `NutrequinePro_especificaciones.md` pertenecen al usuario y quedan fuera de estos

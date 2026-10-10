@@ -26,13 +26,14 @@ export function migrationPreparation(tables, initialTables, applied, files) {
     return { adopt: false, pending: files.slice(applied.length) };
   }
   if (!businessTables.length) return { adopt: false, pending: files };
-  const actual = new Map(businessTables.map((row) => [row.name, normalizeSql(row.sql)]));
+  const signature = (row) => `${row.type ?? "table"}:${normalizeSql(row.sql)}`;
+  const actual = new Map(businessTables.map((row) => [row.name, signature(row)]));
   if (
     actual.size !== initialTables.length ||
-    initialTables.some((row) => actual.get(row.name) !== normalizeSql(row.sql))
+    initialTables.some((row) => actual.get(row.name) !== signature(row))
   ) {
     throw new Error(
-      "Esquema local parcial o desconocido. No se aplicó ninguna migración ni se modificaron sus registros. Revise la ruta de D1 y restaure su esquema mediante un procedimiento revisado.",
+      "Esquema local parcial o desconocido: esquema incompleto o distinto de la migración inicial. No se aplicó ninguna migración ni se modificaron sus registros. Revise la ruta de D1 y restaure su esquema mediante un procedimiento revisado.",
     );
   }
   return { adopt: true, pending: files.slice(1) };

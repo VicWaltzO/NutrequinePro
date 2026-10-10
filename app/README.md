@@ -21,7 +21,7 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-`dev` prepara D1 local antes de iniciar: inspecciona el esquema, reconoce bases históricas completas y aplica solo migraciones pendientes. Servidor y migraciones comparten binding, identidad y persistencia. La vista previa responde en http://127.0.0.1:5173. El helper de Sites aplica las migraciones versionadas al publicar. El comando `db:generate` genera migraciones futuras; las aplicadas son inmutables. Ver [GUIA_DESARROLLO.md](docs/GUIA_DESARROLLO.md) para bases aisladas y diagnósticos.
+`dev` portable prepara D1 local antes de iniciar: inspecciona tablas e índices, reconoce bases históricas completas y aplica solo migraciones pendientes. Servidor y migraciones comparten binding, identidad y persistencia. No requiere Docker, cuenta Cloudflare ni compilación previa. La vista previa responde en http://127.0.0.1:5173. `db:migrate:local` y `db:prepare` preparan la misma base. El perfil Linux administrado conserva el arranque del helper de Sites, que aplica las migraciones versionadas al publicar. El comando `db:generate` genera migraciones futuras; las aplicadas son inmutables. Ver [GUIA_DESARROLLO.md](docs/GUIA_DESARROLLO.md) para bases aisladas y diagnósticos.
 
 ```powershell
 npm.cmd test

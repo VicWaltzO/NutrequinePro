@@ -11,8 +11,7 @@ import {
   migrationPreparation,
 } from "./local-database.mjs";
 import "./sites-env.mjs";
-
-const tableQuery = "SELECT name, sql FROM sqlite_schema WHERE type = 'table' ORDER BY name";
+import { schemaQuery } from "./local-migration-plan.mjs";
 
 export function prepareLocalDatabase() {
   const files = readdirSync(path.join(appRoot, "drizzle"))
@@ -48,7 +47,7 @@ export function prepareLocalDatabase() {
     return responses.flatMap((response) => response.results);
   };
   const query = (sql) => wrangler(["execute", localD1.binding, "--command", sql], true);
-  const tables = query(tableQuery);
+  const tables = query(schemaQuery);
   const applied = tables.some((row) => row.name === "d1_migrations")
     ? query("SELECT name FROM d1_migrations ORDER BY id").map((row) => row.name)
     : [];
@@ -56,7 +55,7 @@ export function prepareLocalDatabase() {
   let initialTables;
   try {
     reference.exec(readFileSync(path.join(appRoot, "drizzle", files[0]), "utf8"));
-    initialTables = reference.prepare(tableQuery).all();
+    initialTables = reference.prepare(schemaQuery).all();
   } finally {
     reference.close();
   }

@@ -22,9 +22,11 @@ usa la identidad de prueba del starter. Esa identidad solo tiene autoridad en la
 base local; no habilita usuarios del sitio alojado. Una base nueva contiene los
 maestros documentados y ninguna venta, pago o producción ficticia.
 
-`dev` inspecciona y prepara D1 automáticamente antes de iniciar Vinext. No es
+`dev` portable inspecciona y prepara D1 automáticamente antes de iniciar Vinext. No es
 necesario compilar ni ejecutar manualmente la migración inicial. Puede ejecutarse
 `npm.cmd run db:prepare` para preparar o comprobar D1 sin iniciar el servidor.
+`db:migrate:local` conserva el mismo alias incorporado desde main. El perfil Linux
+administrado conserva el mecanismo de arranque del helper de Sites.
 
 ## Configuración local y bases de pruebas
 
@@ -90,7 +92,7 @@ continúa usando su mecanismo existente; `db:prepare` nunca incluye `--remote`.
 La preparación reconoce cuatro situaciones:
 
 - Base sin tablas de aplicación: aplica las migraciones versionadas.
-- Esquema inicial completo sin ledger: compara las tablas, registra la migración
+- Esquema inicial completo sin ledger: compara tablas e índices, registra la migración
   inicial como aplicada y conserva registros; solo ejecuta posteriores pendientes.
 - Ledger conocido: valida el orden y aplica únicamente pendientes.
 - Esquema parcial/ajeno sin ledger, ledger desconocido o ledger sin esquema:
