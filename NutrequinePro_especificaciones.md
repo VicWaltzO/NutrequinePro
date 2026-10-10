@@ -1,10 +1,8 @@
 # NUTREQUINE PRO
 ## Especificación funcional maestra del MVP
-### Fuente única de verdad para implementación con Codex
 
 **Versión:** 1.0  
-**Fecha de consolidación:** 2026-10-06  
-**Estado:** APROBADO PARA IMPLEMENTACIÓN DEL MVP  
+**Fecha de consolidación:** 2026-10-06 
 **Propósito:** sustituir especificaciones previas fragmentadas y evitar interpretaciones ambiguas durante el desarrollo.
 
 ---
@@ -27,7 +25,6 @@ Si una regla no aparece aquí:
 6. implementar la alternativa más simple compatible con el modelo actual;
 7. dejar comentarios técnicos o TODO cuando se trate de una decisión de negocio aún no definida.
 
-No convertir el MVP en un ERP contable completo.
 
 ---
 
