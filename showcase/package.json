@@ -1,0 +1,20 @@
+{
+  "name": "nutrequine-pro-showcase-45s",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "tools": "node scripts/prepare-tools.mjs",
+    "rehearse": "node scripts/capture.mjs --rehearse",
+    "capture": "node scripts/capture.mjs",
+    "preview": "node scripts/preview.mjs",
+    "render": "node scripts/render.mjs",
+    "verify": "node scripts/verify.mjs",
+    "all": "npm run capture && npm run render && npm run verify"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

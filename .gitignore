@@ -5,6 +5,8 @@ node_modules/
 .next/
 .vinext/
 dist/
+# Final showcase media is reviewed; its own .gitignore allows only the deliverables.
+!showcase/dist/
 out/
 coverage/
 *.tsbuildinfo

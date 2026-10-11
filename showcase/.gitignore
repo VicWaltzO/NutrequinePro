@@ -1,0 +1,13 @@
+node_modules/
+.tools/
+.local-state/
+.raw/
+references/
+assets/captures/*
+!assets/captures/source.webm
+qa/*.png
+qa/*.log
+qa/*failure.json
+dist/*
+!dist/nutrequine-pro-showcase-45s-1080p.mp4
+!dist/nutrequine-pro-poster.png

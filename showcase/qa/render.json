@@ -1,0 +1,548 @@
+{
+  "output": "nutrequine-pro-showcase-45s-1080p.mp4",
+  "poster": "nutrequine-pro-poster.png",
+  "sourcePreserved": true,
+  "sourceSha256": "5282d651a1de9a7350737b3b05ec328f3a1414d92254a539f599b307ab5bc9ca",
+  "source": "../assets/captures/source.webm",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 45,
+  "frameCount": 1350,
+  "composition": "editable deterministic HTML brand cards and real browser clips, composed with FFmpeg",
+  "audio": "none; no licensed soundtrack supplied",
+  "frame": {
+    "x": 160,
+    "y": 128,
+    "width": 1600,
+    "height": 900,
+    "radius": 18
+  },
+  "cursor": {
+    "scale": 1,
+    "pulseDurationMs": 200,
+    "color": "#191b1e",
+    "pulseColor": "#b79b62"
+  },
+  "transitions": [
+    {
+      "boundary": 3,
+      "start": 2.8666666666666667,
+      "end": 3.1666666666666665,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    },
+    {
+      "boundary": 6,
+      "start": 5.866666666666666,
+      "end": 6.166666666666666,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    },
+    {
+      "boundary": 11,
+      "start": 10.866666666666667,
+      "end": 11.166666666666668,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    },
+    {
+      "boundary": 15,
+      "start": 14.866666666666667,
+      "end": 15.166666666666668,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    },
+    {
+      "boundary": 22,
+      "start": 21.866666666666667,
+      "end": 22.166666666666668,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    },
+    {
+      "boundary": 29,
+      "start": 28.866666666666667,
+      "end": 29.166666666666668,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    },
+    {
+      "boundary": 32,
+      "start": 31.866666666666667,
+      "end": 32.166666666666664,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    },
+    {
+      "boundary": 36,
+      "start": 35.86666666666667,
+      "end": 36.166666666666664,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    },
+    {
+      "boundary": 39,
+      "start": 38.86666666666667,
+      "end": 39.166666666666664,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    },
+    {
+      "boundary": 41,
+      "start": 40.86666666666667,
+      "end": 41.166666666666664,
+      "frames": 9,
+      "kind": "crossfade without black frames"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "intro",
+      "title": "NUTREQUINE PRO",
+      "start": 0,
+      "end": 3,
+      "duration": 3,
+      "coreFrames": 90,
+      "clipFrames": 95,
+      "leadingFrames": 0,
+      "trailingFrames": 5,
+      "animation": "frame-based HTML easing; original brand logo"
+    },
+    {
+      "id": "summary",
+      "title": "Tu operación, en una sola vista",
+      "start": 3,
+      "end": 6,
+      "duration": 3,
+      "coreFrames": 90,
+      "clipFrames": 99,
+      "leadingFrames": 4,
+      "trailingFrames": 5,
+      "actualSourceBounds": {
+        "start": 2.982500000000001,
+        "end": 5.984500000000001,
+        "trimStart": 2.84,
+        "trimEnd": 6.1610000000000005,
+        "firstCoreFrame": 3,
+        "lastCoreFrame": 5.96
+      },
+      "speed": 0.997752808988764,
+      "zoom": {
+        "from": 1,
+        "to": 1.01,
+        "anchor": "top-left",
+        "orientationSeconds": 0.9
+      },
+      "cursor": "real pointer and click events already recorded in source",
+      "clicks": []
+    },
+    {
+      "id": "production",
+      "title": "Control de producción",
+      "start": 6,
+      "end": 11,
+      "duration": 5,
+      "coreFrames": 150,
+      "clipFrames": 159,
+      "leadingFrames": 4,
+      "trailingFrames": 5,
+      "actualSourceBounds": {
+        "start": 6.620500000000001,
+        "end": 11.633500000000002,
+        "trimStart": 6.48,
+        "trimEnd": 11.801,
+        "firstCoreFrame": 6.64,
+        "lastCoreFrame": 11.6
+      },
+      "speed": 0.9986577181208053,
+      "zoom": {
+        "from": 1,
+        "to": 1.25,
+        "anchor": "center",
+        "orientationSeconds": 0.9
+      },
+      "cursor": "real pointer and click events already recorded in source",
+      "clicks": [
+        {
+          "kind": "click",
+          "x": 117.5,
+          "y": 358.84375,
+          "target": "Navegar: Producción",
+          "at": 0.46999999999999975
+        },
+        {
+          "kind": "click",
+          "x": 332.015625,
+          "y": 466.828125,
+          "target": "Abrir producción",
+          "at": 1.2679999999999998
+        },
+        {
+          "kind": "click",
+          "x": 648.34375,
+          "y": 456.828125,
+          "target": "PRODUCTION_CONFIRM",
+          "at": 2.143
+        }
+      ]
+    },
+    {
+      "id": "inventory",
+      "title": "Existencias trazables",
+      "start": 11,
+      "end": 15,
+      "duration": 4,
+      "coreFrames": 120,
+      "clipFrames": 129,
+      "leadingFrames": 4,
+      "trailingFrames": 5,
+      "actualSourceBounds": {
+        "start": 12.7735,
+        "end": 16.7805,
+        "trimStart": 12.64,
+        "trimEnd": 16.961000000000002,
+        "firstCoreFrame": 12.8,
+        "lastCoreFrame": 16.76
+      },
+      "speed": 0.9983193277310927,
+      "zoom": {
+        "from": 1,
+        "to": 1.01,
+        "anchor": "top-left",
+        "orientationSeconds": 0.9
+      },
+      "cursor": "real pointer and click events already recorded in source",
+      "clicks": [
+        {
+          "kind": "click",
+          "x": 117.5,
+          "y": 403.84375,
+          "target": "Navegar: Inventario",
+          "at": 0.39400000000000013
+        },
+        {
+          "kind": "click",
+          "x": 419.6171875,
+          "y": 250.296875,
+          "target": "Ver movimientos de inventario",
+          "at": 2.7110000000000003
+        }
+      ]
+    },
+    {
+      "id": "sales",
+      "title": "Gestión comercial",
+      "start": 15,
+      "end": 22,
+      "duration": 7,
+      "coreFrames": 210,
+      "clipFrames": 219,
+      "leadingFrames": 4,
+      "trailingFrames": 5,
+      "actualSourceBounds": {
+        "start": 17.4205,
+        "end": 24.4325,
+        "trimStart": 17.28,
+        "trimEnd": 24.601000000000003,
+        "firstCoreFrame": 17.44,
+        "lastCoreFrame": 24.4
+      },
+      "speed": 0.9990430622009566,
+      "zoom": {
+        "from": 1,
+        "to": 1.25,
+        "anchor": "center",
+        "orientationSeconds": 0.9
+      },
+      "cursor": "real pointer and click events already recorded in source",
+      "clicks": [
+        {
+          "kind": "click",
+          "x": 117.5,
+          "y": 223.84375,
+          "target": "Navegar: Ventas",
+          "at": 0.3760000000000012
+        },
+        {
+          "kind": "click",
+          "x": 1805.828125,
+          "y": 148.890625,
+          "target": "Nueva venta",
+          "at": 1.2420000000000009
+        },
+        {
+          "kind": "click",
+          "x": 1211,
+          "y": 238.2734375,
+          "target": "Seleccionar Cliente Demo",
+          "at": 1.8629999999999995
+        },
+        {
+          "kind": "click",
+          "x": 598.359375,
+          "y": 534.3828125,
+          "target": "Seleccionar Hi-Performance",
+          "at": 2.591000000000001
+        },
+        {
+          "kind": "click",
+          "x": 802.21875,
+          "y": 534.375,
+          "target": "Escribir 10 sacos",
+          "at": 3.2779999999999987
+        },
+        {
+          "kind": "click",
+          "x": 1384.703125,
+          "y": 952.984375,
+          "target": "SALE_SAVE",
+          "at": 4.623999999999999
+        }
+      ]
+    },
+    {
+      "id": "collections",
+      "title": "Seguimiento de pagos",
+      "start": 22,
+      "end": 29,
+      "duration": 7,
+      "coreFrames": 210,
+      "clipFrames": 219,
+      "leadingFrames": 4,
+      "trailingFrames": 5,
+      "actualSourceBounds": {
+        "start": 25.5675,
+        "end": 32.582499999999996,
+        "trimStart": 25.44,
+        "trimEnd": 32.760999999999996,
+        "firstCoreFrame": 25.6,
+        "lastCoreFrame": 32.56
+      },
+      "speed": 0.9990430622009571,
+      "zoom": {
+        "from": 1,
+        "to": 1.25,
+        "anchor": "center",
+        "orientationSeconds": 0.9
+      },
+      "cursor": "real pointer and click events already recorded in source",
+      "clicks": [
+        {
+          "kind": "click",
+          "x": 117.5,
+          "y": 268.84375,
+          "target": "Navegar: Cobranza",
+          "at": 0.3860000000000028
+        },
+        {
+          "kind": "click",
+          "x": 328.03125,
+          "y": 598.984375,
+          "target": "Consultar saldo venta",
+          "at": 1.0380000000000003
+        },
+        {
+          "kind": "click",
+          "x": 526.453125,
+          "y": 471.6171875,
+          "target": "Registrar pago parcial",
+          "at": 1.6050000000000004
+        },
+        {
+          "kind": "click",
+          "x": 709,
+          "y": 327.1484375,
+          "target": "Escribir pago 300",
+          "at": 2.0900000000000034
+        },
+        {
+          "kind": "click",
+          "x": 1316.8515625,
+          "y": 595.1640625,
+          "target": "Aplicar pago a venta",
+          "at": 2.7540000000000013
+        },
+        {
+          "kind": "click",
+          "x": 1389.5625,
+          "y": 941.8671875,
+          "target": "PAYMENT_CREATE",
+          "at": 3.5970000000000013
+        },
+        {
+          "kind": "click",
+          "x": 511.625,
+          "y": 742.296875,
+          "target": "Ver saldo después del pago",
+          "at": 4.266000000000002
+        }
+      ]
+    },
+    {
+      "id": "expenses",
+      "title": "Registro de egresos",
+      "start": 29,
+      "end": 32,
+      "duration": 3,
+      "coreFrames": 90,
+      "clipFrames": 99,
+      "leadingFrames": 4,
+      "trailingFrames": 5,
+      "actualSourceBounds": {
+        "start": 34.0055,
+        "end": 37.01650000000001,
+        "trimStart": 33.88,
+        "trimEnd": 37.201,
+        "firstCoreFrame": 34.04,
+        "lastCoreFrame": 37
+      },
+      "speed": 0.9977528089887644,
+      "zoom": {
+        "from": 1,
+        "to": 1.01,
+        "anchor": "top-left",
+        "orientationSeconds": 0.9
+      },
+      "cursor": "real pointer and click events already recorded in source",
+      "clicks": [
+        {
+          "kind": "click",
+          "x": 117.5,
+          "y": 313.84375,
+          "target": "Navegar: Gastos",
+          "at": 0.3919999999999959
+        }
+      ]
+    },
+    {
+      "id": "balance",
+      "title": "Visibilidad financiera",
+      "start": 32,
+      "end": 36,
+      "duration": 4,
+      "coreFrames": 120,
+      "clipFrames": 129,
+      "leadingFrames": 4,
+      "trailingFrames": 5,
+      "actualSourceBounds": {
+        "start": 37.73350000000001,
+        "end": 41.7415,
+        "trimStart": 37.6,
+        "trimEnd": 41.921,
+        "firstCoreFrame": 37.76,
+        "lastCoreFrame": 41.72
+      },
+      "speed": 0.9983193277310927,
+      "zoom": {
+        "from": 1,
+        "to": 1.01,
+        "anchor": "top-left",
+        "orientationSeconds": 0.9
+      },
+      "cursor": "real pointer and click events already recorded in source",
+      "clicks": [
+        {
+          "kind": "click",
+          "x": 117.5,
+          "y": 448.84375,
+          "target": "Navegar: Balance",
+          "at": 0.39399999999999835
+        }
+      ]
+    },
+    {
+      "id": "customers",
+      "title": "Información centralizada",
+      "start": 36,
+      "end": 39,
+      "duration": 3,
+      "coreFrames": 90,
+      "clipFrames": 99,
+      "leadingFrames": 4,
+      "trailingFrames": 5,
+      "actualSourceBounds": {
+        "start": 42.460499999999996,
+        "end": 45.471500000000006,
+        "trimStart": 42.32,
+        "trimEnd": 45.641,
+        "firstCoreFrame": 42.48,
+        "lastCoreFrame": 45.44
+      },
+      "speed": 0.9977528089887644,
+      "zoom": {
+        "from": 1,
+        "to": 1.01,
+        "anchor": "top-left",
+        "orientationSeconds": 0.9
+      },
+      "cursor": "real pointer and click events already recorded in source",
+      "clicks": [
+        {
+          "kind": "click",
+          "x": 117.5,
+          "y": 493.84375,
+          "target": "Navegar: Clientes",
+          "at": 0.4029999999999987
+        },
+        {
+          "kind": "click",
+          "x": 340.140625,
+          "y": 435.5,
+          "target": "Abrir cuenta Cliente Demo",
+          "at": 1.1709999999999994
+        }
+      ]
+    },
+    {
+      "id": "configuration",
+      "title": "Control administrativo",
+      "start": 39,
+      "end": 41,
+      "duration": 2,
+      "coreFrames": 60,
+      "clipFrames": 69,
+      "leadingFrames": 4,
+      "trailingFrames": 5,
+      "actualSourceBounds": {
+        "start": 46.673500000000004,
+        "end": 48.685500000000005,
+        "trimStart": 46.52,
+        "trimEnd": 48.921,
+        "firstCoreFrame": 46.68,
+        "lastCoreFrame": 48.68
+      },
+      "speed": 1.0169491525423728,
+      "zoom": {
+        "from": 1,
+        "to": 1,
+        "anchor": "top-left",
+        "orientationSeconds": 0.9
+      },
+      "cursor": "real pointer and click events already recorded in source",
+      "clicks": [
+        {
+          "kind": "click",
+          "x": 117.5,
+          "y": 538.84375,
+          "target": "Navegar: Configuración",
+          "at": 0.39399999999999835
+        }
+      ]
+    },
+    {
+      "id": "outro",
+      "title": "NUTREQUINE PRO",
+      "start": 41,
+      "end": 45,
+      "duration": 4,
+      "coreFrames": 120,
+      "clipFrames": 124,
+      "leadingFrames": 4,
+      "trailingFrames": 0,
+      "animation": "frame-based HTML easing; original brand logo"
+    }
+  ],
+  "posterSourceTime": 4.483500000000001,
+  "posterNativeScreenshot": "summary-wide.png"
+}

@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-11",
+  "passed": true,
+  "command": "node scripts/preview.mjs",
+  "origin": "http://127.0.0.1:5188",
+  "checks": [
+    { "name": "HTML with Nutrequine Pro title", "status": 200 },
+    { "name": "Poster PNG", "status": 200, "bytes": 267007 },
+    {
+      "name": "MP4 bytes 0-1023",
+      "status": 206,
+      "bytes": 1024,
+      "contentRange": "bytes 0-1023/8220309"
+    },
+    { "name": "Invalid range at end", "status": 416 },
+    { "name": "Unmapped path", "status": 404 }
+  ],
+  "serverStoppedAfterCheck": true
+}

@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "ended": true,
+  "duration": 45,
+  "currentTime": 45,
+  "width": 1920,
+  "height": 1080,
+  "playbackRate": 1,
+  "elapsedSeconds": 44.9685,
+  "lastPresentedTime": 44.966667,
+  "callbacks": 1349,
+  "monotonic": true,
+  "totalVideoFrames": 1350,
+  "droppedVideoFrames": 0,
+  "error": null,
+  "errors": []
+}
