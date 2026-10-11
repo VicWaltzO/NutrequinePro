@@ -1,0 +1,102 @@
+{
+  "source": "showcase_source.webm",
+  "viewport": [1920, 1080],
+  "alignment": {
+    "method": "First authentic Producción navigation activation, sampled at native 8×8 background region",
+    "pixel": {
+      "x": 177,
+      "y": 344
+    },
+    "wallBefore": 6.062,
+    "wallAfter": 6.18,
+    "videoCueTime": 6.08,
+    "sourceFrame": 152,
+    "offsetSeconds": -0.04100000000000037,
+    "toleranceSeconds": 0.09899999999999973
+  },
+  "scenes": [
+    {
+      "name": "01-resumen",
+      "start": 2.566,
+      "end": 5.922,
+      "seconds": 3,
+      "speed": 1.1186666666666667,
+      "highlights": [],
+      "wallStart": 2.607,
+      "wallEnd": 5.963
+    },
+    {
+      "name": "02-produccion",
+      "start": 6.005,
+      "end": 13.363,
+      "seconds": 7,
+      "speed": 1.0511428571428572,
+      "highlights": [
+        {
+          "at": 1.2859999999999996,
+          "duration": 0.3,
+          "box": {
+            "x": 568.59375,
+            "y": 436.875,
+            "width": 159.5,
+            "height": 39.90625
+          }
+        }
+      ],
+      "wallStart": 6.046,
+      "wallEnd": 13.404
+    },
+    {
+      "name": "03-ventas",
+      "start": 14.093,
+      "end": 21.453,
+      "seconds": 7,
+      "speed": 1.0514285714285714,
+      "highlights": [
+        {
+          "at": 1.5009999999999994,
+          "duration": 0.7,
+          "box": {
+            "x": 1363.453125,
+            "y": 657.875,
+            "width": 88.546875,
+            "height": 30
+          }
+        }
+      ],
+      "wallStart": 14.134,
+      "wallEnd": 21.494
+    },
+    {
+      "name": "04-cobranza",
+      "start": 22.076999999999998,
+      "end": 30.443,
+      "seconds": 8,
+      "speed": 1.0457500000000004,
+      "highlights": [
+        {
+          "at": 2.9030000000000022,
+          "duration": 0.7,
+          "box": {
+            "x": 1156.328125,
+            "y": 343.7734375,
+            "width": 272.65625,
+            "height": 34.09375
+          }
+        }
+      ],
+      "wallStart": 22.118,
+      "wallEnd": 30.484
+    },
+    {
+      "name": "05-resumen-final",
+      "start": 31.021,
+      "end": 36.373000000000005,
+      "seconds": 5,
+      "speed": 1.0704,
+      "highlights": [],
+      "wallStart": 31.062,
+      "wallEnd": 36.414
+    }
+  ]
+}
