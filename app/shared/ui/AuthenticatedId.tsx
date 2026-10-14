@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Check } from "lucide-react";
-import { Copy } from "lucide-react";
+import { Check, Copy } from "lucide-react";
+
 export default function AuthenticatedId({ id }: { id: string }) {
   const [status, setStatus] = useState<"idle" | "copied" | "manual">("idle");
   const copy = async () => {
@@ -29,6 +29,11 @@ export default function AuthenticatedId({ id }: { id: string }) {
       }
     }
   };
+  let copyMessage = "Copia este ID completo y envíalo al administrador para habilitar tu acceso.";
+  if (status === "copied") copyMessage = "ID completo copiado. Puedes pegarlo y enviarlo al administrador.";
+  else if (status === "manual")
+    copyMessage =
+      "El navegador bloqueó la copia. Mantén pulsado el ID o selecciona el campo siguiente para copiarlo manualmente.";
   return (
     <section className="authenticated-id" aria-label="Tu ID autenticado">
       <strong>ID autenticado</strong>
@@ -38,11 +43,7 @@ export default function AuthenticatedId({ id }: { id: string }) {
         {status === "copied" ? "ID copiado" : "Copiar ID"}
       </button>
       <p role="status" aria-live="polite">
-        {status === "copied"
-          ? "ID completo copiado. Puedes pegarlo y enviarlo al administrador."
-          : status === "manual"
-            ? "El navegador bloqueó la copia. Mantén pulsado el ID o selecciona el campo siguiente para copiarlo manualmente."
-            : "Copia este ID completo y envíalo al administrador para habilitar tu acceso."}
+        {copyMessage}
       </p>
       {status === "manual" && (
         <textarea

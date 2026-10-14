@@ -1,9 +1,12 @@
-import type { AppState } from "@/lib/domain-types";
-import type { EditorRecord } from "@/lib/domain-types";
-import type { Submit } from "@/lib/domain-types";
-import type { NumericInput } from "@/lib/domain-types";
-import type { CostInput } from "@/lib/domain-types";
-import type { ProductionIngredient } from "@/lib/domain-types";
+import type {
+  AppState,
+  EditorRecord,
+  Submit,
+  NumericInput,
+  CostInput,
+  ProductionIngredient,
+} from "@/lib/domain-types";
+
 export type FormProps = {
   s: AppState;
   record?: EditorRecord;

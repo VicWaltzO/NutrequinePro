@@ -1,25 +1,16 @@
 "use client";
-import { saleSummary } from "@/lib/domain.mjs";
-import { deliveryAvailability } from "@/lib/domain.mjs";
-import { Table } from "@/shared/ui";
-import { Metrics } from "@/shared/ui";
-import { Badge } from "@/shared/ui";
-import { History } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { kg } from "@/shared/ui";
-import { find } from "@/shared/ui";
-import { stamp } from "@/shared/ui";
-import { label } from "@/shared/ui";
+import { saleSummary, deliveryAvailability } from "@/lib/domain.mjs";
+import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
-export default function SaleDetail({ s, actor, id, open, run }: DetailProps) {
-  const admin = actor.role === "ADMIN",
-    write = actor.role !== "VIEWER";
-  const sale = find(s, "sales", id);
+export default function SaleDetail({ s: state, actor, id, open, run }: DetailProps) {
+  const admin = actor.role === "ADMIN";
+  const write = actor.role !== "VIEWER";
+  const sale = find(state, "sales", id);
   if (!sale) return null;
-  const a = saleSummary(s, sale);
-  const payments = s.paymentApplications.filter((x) => x.sale_id === id);
-  const availability = deliveryAvailability(s, a.items),
-    shortage = availability.some((x) => x.missing_quantity || x.missing_weight);
+  const a = saleSummary(state, sale);
+  const payments = state.paymentApplications.filter((x) => x.sale_id === id);
+  const availability = deliveryAvailability(state, a.items);
+  const shortage = availability.some((x) => x.missing_quantity || x.missing_weight);
   return (
     <>
       <div className="detail-heading">
@@ -27,7 +18,7 @@ export default function SaleDetail({ s, actor, id, open, run }: DetailProps) {
           <span className="eyebrow">VENTA · {sale.sale_date}</span>
           <h2>{sale.code}</h2>
           <p>
-            {find(s, "customers", sale.customer_id)?.name} · {find(s, "sites", sale.site_id)?.name}
+            {find(state, "customers", sale.customer_id)?.name} · {find(state, "sites", sale.site_id)?.name}
           </p>
         </div>
         <div className="status-group">
@@ -92,7 +83,7 @@ export default function SaleDetail({ s, actor, id, open, run }: DetailProps) {
           >
             {availability.map((x) => (
               <tr key={x.product_id}>
-                <td>{find(s, "products", x.product_id)?.name}</td>
+                <td>{find(state, "products", x.product_id)?.name}</td>
                 <td>
                   {x.requested} / {kg(x.weight)}
                 </td>
@@ -122,7 +113,7 @@ export default function SaleDetail({ s, actor, id, open, run }: DetailProps) {
         >
           {a.items.map((x) => (
             <tr key={x.id}>
-              <td>{find(s, "products", x.product_id)?.name}</td>
+              <td>{find(state, "products", x.product_id)?.name}</td>
               <td>{x.quantity}</td>
               <td>{kg(x.unit_weight_kg)}</td>
               <td>{kg(x.total_weight_kg)}</td>
@@ -141,9 +132,9 @@ export default function SaleDetail({ s, actor, id, open, run }: DetailProps) {
         <h3>Pagos aplicados</h3>
         <Table heads={["Pago", "Fecha", "Método", "Aplicado", "Estado"]}>
           {payments.map((x) => {
-            const p = find(s, "payments", x.payment_id);
+            const p = find(state, "payments", x.payment_id);
             if (!p) return null;
-            const reversed = s.paymentReversals.some((r) => r.payment_id === p.id);
+            const reversed = state.paymentReversals.some((r) => r.payment_id === p.id);
             return (
               <tr key={x.id}>
                 <td>
@@ -160,13 +151,13 @@ export default function SaleDetail({ s, actor, id, open, run }: DetailProps) {
           })}
         </Table>
       </section>
-      {s.saleProductionLinks.filter((x) => x.sale_id === id).length > 0 && (
+      {state.saleProductionLinks.filter((x) => x.sale_id === id).length > 0 && (
         <section className="panel">
           <h3>Producciones vinculadas</h3>
-          {s.saleProductionLinks
+          {state.saleProductionLinks
             .filter((x) => x.sale_id === id)
             .map((x) => {
-              const p = find(s, "productions", x.production_id);
+              const p = find(state, "productions", x.production_id);
               if (!p) return null;
               return (
                 <button key={x.id} onClick={() => open("production-detail", p)}>
@@ -176,7 +167,7 @@ export default function SaleDetail({ s, actor, id, open, run }: DetailProps) {
             })}
         </section>
       )}
-      {s.returns
+      {state.returns
         .filter((x) => x.sale_id === id)
         .map((r) => (
           <section className="panel" key={r.id}>
@@ -187,11 +178,13 @@ export default function SaleDetail({ s, actor, id, open, run }: DetailProps) {
               {r.reason} · Reducción económica {money(r.economic_amount)}
             </p>
             <Table heads={["Producto", "Sacos", "Peso"]}>
-              {s.returnItems
+              {state.returnItems
                 .filter((x) => x.return_id === r.id)
                 .map((x) => (
                   <tr key={x.id}>
-                    <td>{find(s, "products", find(s, "saleItems", x.sale_item_id)?.product_id)?.name}</td>
+                    <td>
+                      {find(state, "products", find(state, "saleItems", x.sale_item_id)?.product_id)?.name}
+                    </td>
                     <td>{x.quantity}</td>
                     <td>{kg(x.weight_kg)} kg</td>
                   </tr>
@@ -199,9 +192,9 @@ export default function SaleDetail({ s, actor, id, open, run }: DetailProps) {
             </Table>
           </section>
         ))}
-      <History s={s} type="SALE" id={id} />
+      <History s={state} type="SALE" id={id} />
       <p className="metadata">
-        Creada por {find(s, "users", sale.created_by)?.name} · {stamp(sale.created_at)}
+        Creada por {find(state, "users", sale.created_by)?.name} · {stamp(sale.created_at)}
         {sale.delivered_at && " · Entregada " + stamp(sale.delivered_at)}
       </p>
     </>

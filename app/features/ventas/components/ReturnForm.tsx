@@ -1,19 +1,21 @@
 "use client";
 import { useState } from "react";
 import { recordId } from "@/lib/domain-types";
-import type { ReturnValues } from "@/shared/types/forms";
+import type { ReturnValues, FormProps } from "@/shared/types/forms";
 import { saleSummary } from "@/lib/domain.mjs";
-import { Input } from "@/shared/ui";
-import { Table } from "@/shared/ui";
-import { day } from "@/shared/ui";
-import { find } from "@/shared/ui";
+import { Input, Table, day, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
-import type { FormProps } from "@/shared/types/forms";
-export function ReturnForm({ s, record, submit, close, busy }: FormProps) {
+
+export function ReturnForm({ s: state, record, submit, close, busy }: FormProps) {
   const id = recordId(record);
-  const a = saleSummary(s, { id });
-  const [q, setQ] = useState<Record<string, string>>({}),
-    [v, setV] = useState<ReturnValues>({ return_date: day(), reason: "", economic_amount: "0", notes: "" });
+  const a = saleSummary(state, { id });
+  const [q, setQ] = useState<Record<string, string>>({});
+  const [v, setV] = useState<ReturnValues>({
+    return_date: day(),
+    reason: "",
+    economic_amount: "0",
+    notes: "",
+  });
   const set = (k: string, x: string | boolean) => setV((a) => ({ ...a, [k]: x }));
   return (
     <form
@@ -40,12 +42,12 @@ export function ReturnForm({ s, record, submit, close, busy }: FormProps) {
       />
       <Table heads={["Producto", "Entregado", "Ya devuelto", "Devolver sacos"]}>
         {a.items.map((x) => {
-          const returned = s.returnItems
+          const returned = state.returnItems
             .filter((r) => r.sale_item_id === x.id)
             .reduce((n: number, r) => n + r.quantity, 0);
           return (
             <tr key={x.id}>
-              <td>{find(s, "products", x.product_id)?.name}</td>
+              <td>{find(state, "products", x.product_id)?.name}</td>
               <td>{x.quantity}</td>
               <td>{returned}</td>
               <td>

@@ -24,8 +24,19 @@ import ModalHost from "@/app/ui/ModalHost";
 import { useAdminOperations } from "./hooks/useAdminOperations";
 import { useAdminNavigation } from "./hooks/useAdminNavigation";
 export default function AdminApp() {
-  const { s, actor, modal, error, busy, toast, authenticatedId, reload, open, close, run } =
-    useAdminOperations();
+  const {
+    s: state,
+    actor,
+    modal,
+    error,
+    busy,
+    toast,
+    authenticatedId,
+    reload,
+    open,
+    close,
+    run,
+  } = useAdminOperations();
   const {
     q,
     setQ,
@@ -48,11 +59,12 @@ export default function AdminApp() {
     toggleTheme,
   } = useAdminNavigation();
 
-  if (!s || !actor) return <LoadingScreen reload={reload} error={error} authenticatedId={authenticatedId} />;
-  const admin = actor.role === "ADMIN",
-    write = actor.role !== "VIEWER";
-  const b = balanceSummary(s, from, to || "9999");
-  const { match, sales, pending, productions, primary } = adminSelectors(s, {
+  if (!state || !actor)
+    return <LoadingScreen reload={reload} error={error} authenticatedId={authenticatedId} />;
+  const admin = actor.role === "ADMIN";
+  const write = actor.role !== "VIEWER";
+  const balance = balanceSummary(state, from, to || "9999");
+  const { match, sales, pending, productions, primary } = adminSelectors(state, {
     q,
     filter,
     client,
@@ -62,14 +74,14 @@ export default function AdminApp() {
     tab,
   });
 
-  const productCards = <ProductCards s={s} />;
-  const saleTable = (rows: Sale[]) => <SaleTable s={s} write={write} open={open} rows={rows} />;
+  const productCards = <ProductCards s={state} />;
+  const saleTable = (rows: Sale[]) => <SaleTable s={state} write={write} open={open} rows={rows} />;
   const tabs = (options: [string, string][]) => (
     <Tabs options={options} view={view} tab={tab} onSelect={() => setFilter("")} />
   );
   const filters = (
     <RecordFilters
-      s={s}
+      s={state}
       view={view}
       q={q}
       setQ={setQ}
@@ -86,7 +98,7 @@ export default function AdminApp() {
     />
   );
 
-  const productionList = <ProductionList s={s} write={write} open={open} productions={productions} />;
+  const productionList = <ProductionList s={state} write={write} open={open} productions={productions} />;
   return (
     <div className="app-shell">
       <Sidebar actor={actor} view={view} go={go} menu={menu} />
@@ -107,11 +119,11 @@ export default function AdminApp() {
             </div>
           )}
           {view === "dashboard" && (
-            <DashboardView s={s} b={b} go={go} productCards={productCards} saleTable={saleTable} />
+            <DashboardView s={state} b={balance} go={go} productCards={productCards} saleTable={saleTable} />
           )}
           {view === "sales" && (
             <SalesView
-              s={s}
+              s={state}
               tab={tab}
               write={write}
               open={open}
@@ -124,8 +136,8 @@ export default function AdminApp() {
           )}
           {view === "collections" && (
             <CollectionsView
-              s={s}
-              b={b}
+              s={state}
+              b={balance}
               tab={tab}
               open={open}
               match={match}
@@ -136,12 +148,12 @@ export default function AdminApp() {
             />
           )}
           {view === "customers" && (
-            <CustomersView s={s} tab={tab} write={write} open={open} q={q} setQ={setQ} tabs={tabs} />
+            <CustomersView s={state} tab={tab} write={write} open={open} q={q} setQ={setQ} tabs={tabs} />
           )}
 
           {view === "productions" && (
             <ProductionsView
-              s={s}
+              s={state}
               tab={tab}
               admin={admin}
               write={write}
@@ -154,7 +166,7 @@ export default function AdminApp() {
           )}
           {view === "inventory" && (
             <InventoryView
-              s={s}
+              s={state}
               tab={tab}
               open={open}
               match={match}
@@ -164,13 +176,13 @@ export default function AdminApp() {
             />
           )}
           {view === "expenses" && (
-            <ExpensesView s={s} admin={admin} open={open} match={match} filters={filters} />
+            <ExpensesView s={state} admin={admin} open={open} match={match} filters={filters} />
           )}
           {view === "balance" && (
-            <BalanceView s={s} b={b} filters={filters} productionList={productionList} />
+            <BalanceView s={state} b={balance} filters={filters} productionList={productionList} />
           )}
           {view === "config" && (
-            <ConfigurationView s={s} actor={actor} tab={tab} open={open} theme={theme} tabs={tabs} />
+            <ConfigurationView s={state} actor={actor} tab={tab} open={open} theme={theme} tabs={tabs} />
           )}
         </main>
         <footer className="app-footer">
@@ -183,7 +195,7 @@ export default function AdminApp() {
         </div>
       )}
       <ModalHost
-        s={s}
+        s={state}
         actor={actor}
         write={write}
         open={open}

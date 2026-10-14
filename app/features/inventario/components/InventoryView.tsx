@@ -1,16 +1,11 @@
 "use client";
-import type { AppState } from "@/lib/domain-types";
+import type { AppState, OpenModal } from "@/lib/domain-types";
 import { stock } from "@/lib/domain.mjs";
-import { Table } from "@/shared/ui";
-import { kg } from "@/shared/ui";
-import { num } from "@/shared/ui";
-import { label } from "@/shared/ui";
-import { find } from "@/shared/ui";
-import type { OpenModal } from "@/lib/domain-types";
+import { Table, kg, num, label, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";
 export default function InventoryView({
-  s,
+  s: state,
   tab,
   open,
   match,
@@ -37,8 +32,8 @@ export default function InventoryView({
           {productCards}
           <section className="panel">
             <Table heads={["Producto", "Sacos físicos", "Kg físicos", "Sacos comprometidos"]}>
-              {s.products.map((p) => {
-                const a = stock(s, p.id);
+              {state.products.map((p) => {
+                const a = stock(state, p.id);
                 return (
                   <tr key={p.id}>
                     <td>{p.name}</td>
@@ -56,7 +51,7 @@ export default function InventoryView({
           {filters}
           <section className="panel flush">
             <Table heads={["Fecha", "Ítem", "Movimiento", "Sacos", "Kg", "Origen", "Notas"]}>
-              {s.inventoryMovements
+              {state.inventoryMovements
                 .filter(match)
                 .slice()
                 .reverse()
@@ -64,7 +59,7 @@ export default function InventoryView({
                   <tr key={x.id}>
                     <td>{x.date}</td>
                     <td>
-                      {find(s, x.item_type === "PRODUCT" ? "products" : "ingredients", x.item_id)?.name}
+                      {find(state, x.item_type === "PRODUCT" ? "products" : "ingredients", x.item_id)?.name}
                     </td>
                     <td>{label(x.movement_type)}</td>
                     <td>
@@ -82,7 +77,7 @@ export default function InventoryView({
                             })
                           }
                         >
-                          {find(s, x.source_type === "SALE" ? "sales" : "productions", x.source_id)?.code}
+                          {find(state, x.source_type === "SALE" ? "sales" : "productions", x.source_id)?.code}
                         </button>
                       ) : (
                         x.source_type

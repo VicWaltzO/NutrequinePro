@@ -1,17 +1,12 @@
 "use client";
 import { useProductionFormState } from "../hooks/useProductionFormState";
-import { Input } from "@/shared/ui";
-import { Select } from "@/shared/ui";
-import { Check } from "@/shared/ui";
-import { Table } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { kg } from "@/shared/ui";
+import { Input, Select, Check, Table, money, kg } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import type { FormProps } from "@/shared/types/forms";
 import { CostRows } from "./CostRows";
-export function ProductionForm({ s, record, submit, close, busy }: FormProps) {
+export function ProductionForm({ s: state, record, submit, close, busy }: FormProps) {
   const {
-    v,
+    v: values,
     set,
     counts,
     setCounts,
@@ -25,13 +20,13 @@ export function ProductionForm({ s, record, submit, close, busy }: FormProps) {
     estimated,
     real,
     adj,
-  } = useProductionFormState({ s, record });
+  } = useProductionFormState({ s: state, record });
   return (
     <form
       onSubmit={async (e) => {
         e.preventDefault();
         await submit("PRODUCTION_SAVE", {
-          ...v,
+          ...values,
           id: record?.id,
           products: Object.entries(counts)
             .filter(([, n]) => Number(n) > 0)
@@ -46,14 +41,14 @@ export function ProductionForm({ s, record, submit, close, busy }: FormProps) {
           label="Fecha de producción"
           type="date"
           required
-          value={v.production_date}
+          value={values.production_date}
           onChange={(x) => set("production_date", x)}
         />
-        <Input label="Notas" value={v.notes} onChange={(x) => set("notes", x)} />
+        <Input label="Notas" value={values.notes} onChange={(x) => set("notes", x)} />
       </div>
       <h3>Núcleos por producto</h3>
       <div className="form-grid">
-        {s.products
+        {state.products
           .filter((x) => x.is_active)
           .map((x) => (
             <Input
@@ -121,7 +116,7 @@ export function ProductionForm({ s, record, submit, close, busy }: FormProps) {
           min="0"
           step="0.01"
           required
-          value={v.nucleus_cost}
+          value={values.nucleus_cost}
           onChange={(x) => set("nucleus_cost", x)}
         />
         <Input
@@ -130,13 +125,17 @@ export function ProductionForm({ s, record, submit, close, busy }: FormProps) {
           min="0"
           step="0.01"
           required
-          value={v.packaging_cost}
+          value={values.packaging_cost}
           onChange={(x) => set("packaging_cost", x)}
         />
-        <Check label="Núcleos pagados" value={v.nucleus_paid} onChange={(x) => set("nucleus_paid", x)} />
-        <Check label="Envases pagados" value={v.packaging_paid} onChange={(x) => set("packaging_paid", x)} />
+        <Check label="Núcleos pagados" value={values.nucleus_paid} onChange={(x) => set("nucleus_paid", x)} />
+        <Check
+          label="Envases pagados"
+          value={values.packaging_paid}
+          onChange={(x) => set("packaging_paid", x)}
+        />
       </div>
-      <CostRows s={s} costs={costs} setCosts={setCosts} />
+      <CostRows s={state} costs={costs} setCosts={setCosts} />
       <div className="total-line">
         <span>
           Estimado <strong>{money(estimated)}</strong>
@@ -150,7 +149,7 @@ export function ProductionForm({ s, record, submit, close, busy }: FormProps) {
       </div>
       <Select
         label="Guardar como"
-        value={v.confirm ? "yes" : "no"}
+        value={values.confirm ? "yes" : "no"}
         empty={false}
         onChange={(x) => set("confirm", x === "yes")}
         options={[
@@ -161,7 +160,7 @@ export function ProductionForm({ s, record, submit, close, busy }: FormProps) {
       <Footer
         busy={busy}
         close={close}
-        label={v.confirm ? "Confirmar producción" : "Guardar lote a producir"}
+        label={values.confirm ? "Confirmar producción" : "Guardar lote a producir"}
       />
     </form>
   );

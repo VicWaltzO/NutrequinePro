@@ -1,11 +1,11 @@
 import { requireValue, scaled, positiveInt, pick, multiply } from "../../../shared/domain/core.mjs";
 import { deliveryAvailability } from "../../inventario/domain/stock.mjs";
 export function createSaleOperations(context) {
-  const { movement, s, p } = context;
+  const { movement, s: state, p: payload } = context;
   const saleItems = (sale_id, rows, old = []) => {
     requireValue(Array.isArray(rows) && rows.length > 0, "Agregue al menos un producto.");
     return rows.map((r) => {
-      const product = pick(s, "products", r.product_id);
+      const product = pick(state, "products", r.product_id);
       requireValue(
         product.is_active && product.is_sellable,
         "El producto debe estar activo y habilitado para venta.",
@@ -30,7 +30,7 @@ export function createSaleOperations(context) {
     });
   };
   const assertStock = (rows, allowOld = []) => {
-    const missing = deliveryAvailability(s, rows, allowOld).filter(
+    const missing = deliveryAvailability(state, rows, allowOld).filter(
       (x) => x.missing_quantity || x.missing_weight,
     );
     requireValue(
@@ -39,7 +39,7 @@ export function createSaleOperations(context) {
         missing
           .map(
             (x) =>
-              pick(s, "products", x.product_id).name +
+              pick(state, "products", x.product_id).name +
               ": disponibles " +
               x.quantity +
               " sacos / " +
@@ -67,7 +67,7 @@ export function createSaleOperations(context) {
         weight_kg: -mult * x.total_weight_kg,
         source_type: "SALE",
         source_id: sale.id,
-        notes: p.reason ?? sale.code,
+        notes: payload.reason ?? sale.code,
       }),
     );
   return { saleItems, assertStock, outputSale };

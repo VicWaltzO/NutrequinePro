@@ -1,15 +1,11 @@
 "use client";
 import { Search } from "lucide-react";
-import type { AppState } from "@/lib/domain-types";
-import type { OpenModal } from "@/lib/domain-types";
-import { normalize } from "@/lib/domain.mjs";
-import { customerSummary } from "@/lib/domain.mjs";
-import { Empty } from "@/shared/ui";
-import { Table } from "@/shared/ui";
-import { find } from "@/shared/ui";
-import { money } from "@/shared/ui";
+import type { AppState, OpenModal } from "@/lib/domain-types";
+import { normalize, customerSummary } from "@/lib/domain.mjs";
+import { Empty, Table, find, money } from "@/shared/ui";
+
 export default function CustomerDirectory({
-  s,
+  s: state,
   tab,
   query,
   onQuery,
@@ -23,21 +19,21 @@ export default function CustomerDirectory({
   write: boolean;
   open: OpenModal;
 }) {
-  const customers = s.customers.filter((x) => !x.deleted_at);
+  const customers = state.customers.filter((x) => !x.deleted_at);
   const linkedCustomers = (siteId: string) =>
     customers.filter((c) =>
-      s.customerSites.some((l) => l.customer_id === c.id && l.site_id === siteId && l.is_active),
+      state.customerSites.some((l) => l.customer_id === c.id && l.site_id === siteId && l.is_active),
     );
   const linkedSites = (customerId: string) =>
-    s.customerSites
+    state.customerSites
       .filter((l) => l.customer_id === customerId && l.is_active)
-      .map((l) => ({ link: l, site: find(s, "sites", l.site_id) }));
+      .map((l) => ({ link: l, site: find(state, "sites", l.site_id) }));
   const customerRows = customers.filter((c) =>
     normalize(
       [c.name, c.contact_name, c.phone, c.tax_id, ...linkedSites(c.id).map((x) => x.site?.name)].join(" "),
     ).includes(normalize(query)),
   );
-  const siteRows = s.sites.filter((x) =>
+  const siteRows = state.sites.filter((x) =>
     normalize([x.name, ...linkedCustomers(x.id).map((c) => c.name)].join(" ")).includes(normalize(query)),
   );
   return (
@@ -97,8 +93,8 @@ export default function CustomerDirectory({
                     </small>
                   ))}
                 </td>
-                <td>{money(customerSummary(s, x.id).debt)}</td>
-                <td>{money(customerSummary(s, x.id).credit)}</td>
+                <td>{money(customerSummary(state, x.id).debt)}</td>
+                <td>{money(customerSummary(state, x.id).credit)}</td>
                 <td>{x.is_active ? "Activo" : "Inactivo"}</td>
                 <td>
                   {write && (

@@ -1,12 +1,12 @@
 "use client";
-import { useEffect } from "react";
-import { useState } from "react";
-import { useSyncExternalStore } from "react";
-import { readTheme } from "@/lib/browser-preferences.mjs";
-import { subscribeTheme } from "@/lib/browser-preferences.mjs";
-import { changeTheme } from "@/lib/browser-preferences.mjs";
-import { readView } from "@/lib/browser-preferences.mjs";
-import { subscribeView } from "@/lib/browser-preferences.mjs";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import {
+  readTheme,
+  subscribeTheme,
+  changeTheme,
+  readView,
+  subscribeView,
+} from "@/lib/browser-preferences.mjs";
 import { nav } from "../navigation";
 export function useAdminNavigation() {
   const [q, setQ] = useState("");
@@ -19,21 +19,20 @@ export function useAdminNavigation() {
   const theme = useSyncExternalStore(subscribeTheme, readTheme, () => "light" as const);
   const hash = useSyncExternalStore(subscribeView, readView, () => "dashboard");
   const route = hash.split("/")[0];
-  const view =
-    route === "sites"
-      ? "customers"
-      : route === "products"
-        ? "config"
-        : nav.some((x) => x[0] === route)
-          ? route
-          : "dashboard";
-  const tab = route === "sites" ? "sites" : route === "products" ? "products" : (hash.split("/")[1] ?? "all");
+  let view = "dashboard";
+  if (route === "sites") view = "customers";
+  else if (route === "products") view = "config";
+  else if (nav.some(([name]) => name === route)) view = route;
+
+  let tab = hash.split("/")[1] ?? "all";
+  if (route === "sites") tab = "sites";
+  else if (route === "products") tab = "products";
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
   const toggleTheme = () => changeTheme(theme === "dark" ? "light" : "dark");
-  const go = (v: string, nextTab = "all") => {
-    location.hash = nextTab === "all" ? v : `${v}/${nextTab}`;
+  const go = (viewName: string, nextTab = "all") => {
+    location.hash = nextTab === "all" ? viewName : `${viewName}/${nextTab}`;
     setQ("");
     setFilter("");
     setClient("");

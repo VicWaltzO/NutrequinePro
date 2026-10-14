@@ -1,21 +1,13 @@
 "use client";
 import { productionSummary } from "@/lib/domain.mjs";
-import { Table } from "@/shared/ui";
-import { Metrics } from "@/shared/ui";
-import { Badge } from "@/shared/ui";
-import { History } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { kg } from "@/shared/ui";
-import { find } from "@/shared/ui";
-import { stamp } from "@/shared/ui";
-import { label } from "@/shared/ui";
+import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
-export default function ProductionDetail({ s, actor, id, open, run }: DetailProps) {
-  const admin = actor.role === "ADMIN",
-    write = actor.role !== "VIEWER";
-  const p = find(s, "productions", id);
+export default function ProductionDetail({ s: state, actor, id, open, run }: DetailProps) {
+  const admin = actor.role === "ADMIN";
+  const write = actor.role !== "VIEWER";
+  const p = find(state, "productions", id);
   if (!p) return null;
-  const a = productionSummary(s, p);
+  const a = productionSummary(state, p);
   return (
     <>
       <div className="detail-heading">
@@ -74,8 +66,8 @@ export default function ProductionDetail({ s, actor, id, open, run }: DetailProp
         <Table heads={["Producto", "Versión", "Núcleos", "Sacos", "Kg comerciales", "Kg fórmula"]}>
           {a.products.map((x) => (
             <tr key={x.id}>
-              <td>{find(s, "products", x.product_id)?.name}</td>
-              <td>v{find(s, "formulas", x.formula_id)?.version}</td>
+              <td>{find(state, "products", x.product_id)?.name}</td>
+              <td>v{find(state, "formulas", x.formula_id)?.version}</td>
               <td>{x.nuclei_count}</td>
               <td>{x.bags_produced}</td>
               <td>{kg(x.commercial_weight_kg)}</td>
@@ -85,11 +77,11 @@ export default function ProductionDetail({ s, actor, id, open, run }: DetailProp
         </Table>
         {a.products.map((x) => (
           <details key={x.id}>
-            <summary>Snapshot de fórmula · {find(s, "products", x.product_id)?.name}</summary>
+            <summary>Snapshot de fórmula · {find(state, "products", x.product_id)?.name}</summary>
             <Table heads={["Insumo", "Kg por núcleo"]}>
               {x.formula_snapshot?.map((f) => (
                 <tr key={f.id}>
-                  <td>{find(s, "ingredients", f.ingredient_id)?.name}</td>
+                  <td>{find(state, "ingredients", f.ingredient_id)?.name}</td>
                   <td>{kg(f.kg_per_nucleus)}</td>
                 </tr>
               ))}
@@ -114,7 +106,7 @@ export default function ProductionDetail({ s, actor, id, open, run }: DetailProp
         >
           {a.ingredients.map((x) => (
             <tr key={x.id}>
-              <td>{find(s, "ingredients", x.ingredient_id)?.name}</td>
+              <td>{find(state, "ingredients", x.ingredient_id)?.name}</td>
               <td>{kg(x.total_kg)}</td>
               <td>{money(x.historical_price_per_kg)}</td>
               <td>{money(x.theoretical_gross_cost)}</td>
@@ -135,7 +127,7 @@ export default function ProductionDetail({ s, actor, id, open, run }: DetailProp
               <td>{label(x.category)}</td>
               <td>
                 {x.description}
-                {x.ingredient_id && " · " + find(s, "ingredients", x.ingredient_id)?.name}
+                {x.ingredient_id && " · " + find(state, "ingredients", x.ingredient_id)?.name}
               </td>
               <td>{x.quantity ?? "—"}</td>
               <td>{x.unit_cost === undefined ? "—" : money(x.unit_cost)}</td>
@@ -146,9 +138,9 @@ export default function ProductionDetail({ s, actor, id, open, run }: DetailProp
         </Table>
       </section>
       {p.cancellation_reason && <p className="warning">Anulada: {p.cancellation_reason}</p>}
-      <History s={s} type="PRODUCTION" id={id} />
+      <History s={state} type="PRODUCTION" id={id} />
       <p className="metadata">
-        Registrada por {find(s, "users", p.created_by)?.name} · {stamp(p.created_at)}
+        Registrada por {find(state, "users", p.created_by)?.name} · {stamp(p.created_at)}
         {p.confirmed_at && " · Confirmada " + stamp(p.confirmed_at)}
         {p.closed_at && " · Cerrada " + stamp(p.closed_at)}
       </p>

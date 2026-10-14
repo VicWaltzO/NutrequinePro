@@ -1,14 +1,10 @@
 "use client";
-import type { AppState } from "@/lib/domain-types";
-import { Table } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { kg } from "@/shared/ui";
-import { find } from "@/shared/ui";
-import type { OpenModal } from "@/lib/domain-types";
+import type { AppState, OpenModal } from "@/lib/domain-types";
+import { Table, money, kg, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";
 export default function ProductionsView({
-  s,
+  s: state,
   tab,
   admin,
   write,
@@ -40,7 +36,7 @@ export default function ProductionsView({
       <section className="panel flush">
         {tab === "ingredients" ? (
           <Table heads={["Insumo", "Precio actual S/ por kg", "Estado", ""]}>
-            {s.ingredients.filter(match).map((x) => (
+            {state.ingredients.filter(match).map((x) => (
               <tr key={x.id}>
                 <td>{x.name}</td>
                 <td>{money(x.current_price_per_kg)}</td>
@@ -51,21 +47,21 @@ export default function ProductionsView({
           </Table>
         ) : tab === "formulas" ? (
           <div className="formula-list">
-            {s.formulas
+            {state.formulas
               .slice()
               .reverse()
               .map((f) => {
-                const rows = s.formulaIngredients.filter((x) => x.formula_id === f.id);
+                const rows = state.formulaIngredients.filter((x) => x.formula_id === f.id);
                 return (
                   <details key={f.id} open={f.is_active}>
                     <summary>
-                      {find(s, "products", f.product_id)?.name} · v{f.version} ·{" "}
+                      {find(state, "products", f.product_id)?.name} · v{f.version} ·{" "}
                       {f.is_active ? "Activa" : "Histórica"} · desde {f.valid_from}
                     </summary>
                     <Table heads={["Insumo", "Kg / núcleo"]}>
                       {rows.map((x) => (
                         <tr key={x.id}>
-                          <td>{find(s, "ingredients", x.ingredient_id)?.name}</td>
+                          <td>{find(state, "ingredients", x.ingredient_id)?.name}</td>
                           <td>{kg(x.kg_per_nucleus)}</td>
                         </tr>
                       ))}
@@ -77,7 +73,8 @@ export default function ProductionsView({
                     )}
                     <p className="formula-total">
                       Total fórmula: {kg(rows.reduce((n: number, x) => n + x.kg_per_nucleus, 0))} kg · Peso
-                      comercial: {kg(find(s, "products", f.product_id)?.commercial_weight_per_nucleus_kg)} kg
+                      comercial: {kg(find(state, "products", f.product_id)?.commercial_weight_per_nucleus_kg)}{" "}
+                      kg
                     </p>
                   </details>
                 );

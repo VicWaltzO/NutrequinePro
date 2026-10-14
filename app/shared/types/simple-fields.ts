@@ -1,7 +1,5 @@
-import type { ReactNode } from "react";
-import type { HTMLInputTypeAttribute } from "react";
-import type { AppState } from "@/lib/domain-types";
-import type { EditorRecord } from "@/lib/domain-types";
+import type { ReactNode, HTMLInputTypeAttribute } from "react";
+import type { AppState, EditorRecord } from "@/lib/domain-types";
 import type { SimpleFields } from "./forms";
 export interface SimpleFieldProps {
   s: AppState;

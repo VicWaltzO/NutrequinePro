@@ -18,6 +18,19 @@ const eslintConfig = defineConfig([
     "coverage/**",
   ]),
   {
+    files: ["{app,features,shared,lib,db}/**/*.{ts,tsx,mts,mjs,js,jsx}"],
+    rules: {
+      "one-var": ["error", "never"],
+      "no-duplicate-imports": ["error", { allowSeparateTypeImports: true }],
+    },
+  },
+  {
+    files: ["{app,features,shared,lib,db}/**/*.{ts,mts,mjs,js}"],
+    rules: {
+      "no-nested-ternary": "error",
+    },
+  },
+  {
     files: ["components/ui/**/*.{ts,tsx}", "hooks/use-mobile.ts"],
     rules: {
       // These files are vendored verbatim from shadcn@4.17.0. Keep the

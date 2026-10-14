@@ -1,15 +1,10 @@
 "use client";
-import type { AppState } from "@/lib/domain-types";
+import type { AppState, Production, OpenModal } from "@/lib/domain-types";
 import { productionSummary } from "@/lib/domain.mjs";
-import { Badge } from "@/shared/ui";
-import { Table } from "@/shared/ui";
-import { Empty } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { num } from "@/shared/ui";
-import type { Production } from "@/lib/domain-types";
-import type { OpenModal } from "@/lib/domain-types";
+import { Badge, Table, Empty, money, num } from "@/shared/ui";
+
 export default function ProductionList({
-  s,
+  s: state,
   write,
   open,
   productions,
@@ -22,7 +17,7 @@ export default function ProductionList({
   return productions.length ? (
     <Table heads={["Producción", "Fecha", "Estado", "Sacos", "Costo consolidado", "Fuente"]}>
       {productions.map((x) => {
-        const a = productionSummary(s, x);
+        const a = productionSummary(state, x);
         return (
           <tr key={x.id}>
             <td>

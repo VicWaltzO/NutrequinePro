@@ -1,15 +1,10 @@
 "use client";
-import type { AppState } from "@/lib/domain-types";
-import type { Sale } from "@/lib/domain-types";
-import { Table } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { stamp } from "@/shared/ui";
-import { find } from "@/shared/ui";
-import type { OpenModal } from "@/lib/domain-types";
+import type { AppState, Sale, OpenModal } from "@/lib/domain-types";
+import { Table, money, stamp, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";
 export default function SalesView({
-  s,
+  s: state,
   tab,
   write,
   open,
@@ -43,7 +38,7 @@ export default function SalesView({
       <section className="panel flush">
         {tab === "corrections" ? (
           <Table heads={["Código", "Venta", "Motivo", "Usuario", "Fecha"]}>
-            {s.corrections
+            {state.corrections
               .filter((x) => x.entity_type === "SALE" && match(x))
               .slice()
               .reverse()
@@ -52,18 +47,18 @@ export default function SalesView({
                   <td>{x.code}</td>
                   <td>
                     <button className="row-link" onClick={() => open("sale-detail", { id: x.entity_id })}>
-                      {find(s, "sales", x.entity_id)?.code}
+                      {find(state, "sales", x.entity_id)?.code}
                     </button>
                   </td>
                   <td>{x.reason}</td>
-                  <td>{find(s, "users", x.created_by)?.name}</td>
+                  <td>{find(state, "users", x.created_by)?.name}</td>
                   <td>{stamp(x.created_at)}</td>
                 </tr>
               ))}
           </Table>
         ) : tab === "returns" ? (
           <Table heads={["Devolución", "Venta", "Fecha", "Motivo", "Reducción económica"]}>
-            {s.returns
+            {state.returns
               .filter(match)
               .slice()
               .reverse()
@@ -72,7 +67,7 @@ export default function SalesView({
                   <td>{x.code}</td>
                   <td>
                     <button className="row-link" onClick={() => open("sale-detail", { id: x.sale_id })}>
-                      {find(s, "sales", x.sale_id)?.code}
+                      {find(state, "sales", x.sale_id)?.code}
                     </button>
                   </td>
                   <td>{x.return_date}</td>

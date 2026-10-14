@@ -1,17 +1,11 @@
 "use client";
 import Image from "next/image";
-import type { AppState } from "@/lib/domain-types";
-import type { Sale } from "@/lib/domain-types";
-import { Package } from "lucide-react";
-import { Factory } from "lucide-react";
-import { ChevronRight } from "lucide-react";
-import { ArrowUpRight } from "lucide-react";
-import { Metrics } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import type { BalanceSummary } from "@/lib/domain-types";
+import type { AppState, Sale, BalanceSummary } from "@/lib/domain-types";
+import { Package, Factory, ChevronRight, ArrowUpRight } from "lucide-react";
+import { Metrics, money } from "@/shared/ui";
 import type { ReactNode } from "react";
 export default function DashboardView({
-  s,
+  s: state,
   b,
   go,
   productCards,
@@ -31,13 +25,13 @@ export default function DashboardView({
           <h2>Producción y entregas</h2>
           <p>
             {
-              s.sales.filter(
+              state.sales.filter(
                 (x) =>
                   x.fulfillment_status === "PENDING" && !["DRAFT", "CANCELLED"].includes(x.commercial_status),
               ).length
             }{" "}
-            ventas pendientes de entrega · {s.productions.filter((x) => x.status === "DRAFT").length} lotes a
-            producir
+            ventas pendientes de entrega · {state.productions.filter((x) => x.status === "DRAFT").length}{" "}
+            lotes a producir
           </p>
         </div>
         <Image width={150} height={150} unoptimized src="/brand/logo.jpg" alt="Logo Nutrequine Pro" />
@@ -73,7 +67,7 @@ export default function DashboardView({
               Ver todas
             </button>
           </div>
-          {saleTable(s.sales.slice(-5).reverse())}
+          {saleTable(state.sales.slice(-5).reverse())}
         </section>
         <section className="panel compact">
           <h2>En operación</h2>
@@ -85,7 +79,7 @@ export default function DashboardView({
           >
             <Factory size={20} />
             <div>
-              <strong>{s.productions.filter((x) => x.status === "DRAFT").length} lotes a producir</strong>
+              <strong>{state.productions.filter((x) => x.status === "DRAFT").length} lotes a producir</strong>
               <small>Planificación pendiente</small>
             </div>
             <ChevronRight size={16} />
@@ -100,7 +94,7 @@ export default function DashboardView({
             <div>
               <strong>
                 {
-                  s.sales.filter(
+                  state.sales.filter(
                     (x) =>
                       x.fulfillment_status === "PENDING" &&
                       !["DRAFT", "CANCELLED"].includes(x.commercial_status),

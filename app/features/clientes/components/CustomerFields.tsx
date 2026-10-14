@@ -1,10 +1,9 @@
 "use client";
 import { normalize } from "@/lib/domain.mjs";
-import { Field } from "@/shared/ui";
-import { Check } from "@/shared/ui";
+import { Field, Check } from "@/shared/ui";
 import type { SimpleFieldProps } from "@/shared/types/simple-fields";
 export default function CustomerFields({
-  s,
+  s: state,
   v,
   set,
   input,
@@ -17,7 +16,7 @@ export default function CustomerFields({
       {input("address", "Dirección", "text", false)}
       {input("notes", "Notas", "text", false)}
       <Field label="Sedes del cliente (primera = predeterminada)">
-        {s.sites.map((x) => (
+        {state.sites.map((x) => (
           <Check
             key={x.id}
             label={x.name}
@@ -31,7 +30,7 @@ export default function CustomerFields({
           />
         ))}
       </Field>
-      {s.customers.some((x) => x.id !== v.id && normalize(x.name) === normalize(v.name)) && (
+      {state.customers.some((x) => x.id !== v.id && normalize(x.name) === normalize(v.name)) && (
         <Check
           label="Confirmo un cliente diferente con nombre similar"
           value={v.confirm_duplicate}

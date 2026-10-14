@@ -10,13 +10,12 @@ import AdministrativeReasonFields from "@/features/configuracion/components/Admi
 import { simpleFormInitial } from "@/shared/lib/simple-form-initial";
 import { useState } from "react";
 import type { HTMLInputTypeAttribute } from "react";
-import type { SimpleFields } from "@/shared/types/forms";
-import { Input } from "@/shared/ui";
-import { Check } from "@/shared/ui";
+import type { SimpleFields, FormProps } from "@/shared/types/forms";
+import { Input, Check } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
-import type { FormProps } from "@/shared/types/forms";
-export default function SimpleForm({ s, record, kind, submit, close, busy }: FormProps) {
-  const initial = simpleFormInitial({ s, record, kind });
+
+export default function SimpleForm({ s: state, record, kind, submit, close, busy }: FormProps) {
+  const initial = simpleFormInitial({ s: state, record, kind });
   const [v, setV] = useState<SimpleFields>(initial);
   const set = <K extends keyof SimpleFields>(k: K, x: SimpleFields[K]) => setV((a) => ({ ...a, [k]: x }));
   const input = (
@@ -67,15 +66,15 @@ export default function SimpleForm({ s, record, kind, submit, close, busy }: For
       {["customer", "site", "product", "ingredient", "user"].includes(kind ?? "") && (
         <div className="form-grid">
           {input("name", "Nombre")}
-          {kind === "customer" && <CustomerFields s={s} v={v} set={set} input={input} />}
+          {kind === "customer" && <CustomerFields s={state} v={v} set={set} input={input} />}
           {kind === "product" && <ProductFields v={v} set={set} input={input} />}
           {kind === "ingredient" && <IngredientFields input={input} />}
           {kind === "user" && <UserFields v={v} set={set} input={input} />}
           <Check label="Activo" value={v.is_active} onChange={(x) => set("is_active", x)} />
         </div>
       )}
-      {kind === "expense" && <ExpenseFields s={s} v={v} set={set} input={input} />}
-      {kind === "adjust" && <InventoryAdjustmentFields s={s} v={v} set={set} input={input} />}
+      {kind === "expense" && <ExpenseFields s={state} v={v} set={set} input={input} />}
+      {kind === "adjust" && <InventoryAdjustmentFields s={state} v={v} set={set} input={input} />}
       {kind === "config" && (
         <CompanyFields
           v={v}

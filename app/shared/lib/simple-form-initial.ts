@@ -1,5 +1,4 @@
-import type { FormProps } from "@/shared/types/forms";
-import type { SimpleFields } from "@/shared/types/forms";
+import type { FormProps, SimpleFields } from "@/shared/types/forms";
 import { day } from "@/shared/lib/format";
 export function simpleFormInitial({ s, record, kind }: Pick<FormProps, "s" | "record" | "kind">) {
   const defaults: Record<string, SimpleFields> = {

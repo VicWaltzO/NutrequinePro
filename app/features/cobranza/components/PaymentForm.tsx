@@ -1,40 +1,32 @@
 "use client";
 import { useState } from "react";
-import type { PaymentValues } from "@/shared/types/forms";
-import { saleSummary } from "@/lib/domain.mjs";
-import { paymentSummary } from "@/lib/domain.mjs";
-import { customerSummary } from "@/lib/domain.mjs";
-import { Input } from "@/shared/ui";
-import { Select } from "@/shared/ui";
-import { Table } from "@/shared/ui";
-import { PaymentFields } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { day } from "@/shared/ui";
-import { find } from "@/shared/ui";
+import type { PaymentValues, FormProps } from "@/shared/types/forms";
+import { saleSummary, paymentSummary, customerSummary } from "@/lib/domain.mjs";
+import { Input, Select, Table, PaymentFields, money, day, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
-import type { FormProps } from "@/shared/types/forms";
-export function PaymentForm({ s, record, kind, submit, close, busy }: FormProps) {
-  const usingCredit = kind === "credit",
-    source = s.payments.find((x) => x.id === record?.id),
-    available = source ? paymentSummary(s, source).available : 0;
+
+export function PaymentForm({ s: state, record, kind, submit, close, busy }: FormProps) {
+  const usingCredit = kind === "credit";
+  const source = state.payments.find((x) => x.id === record?.id);
+  const available = source ? paymentSummary(state, source).available : 0;
   const [v, setV] = useState<PaymentValues>({
     customer_id: record?.customer_id ?? "",
     payment_date: day(),
     total_amount: "",
-    payment_method: s.config.default_payment_method ?? "",
+    payment_method: state.config.default_payment_method ?? "",
     reference: "",
     notes: "",
   });
   const [apps, setApps] = useState<Record<string, string>>({});
   const set = (k: string, x: string | boolean) => setV((a) => ({ ...a, [k]: x }));
-  const sales = s.sales.filter(
+  const sales = state.sales.filter(
     (x) =>
       x.customer_id === v.customer_id &&
       !["DRAFT", "CANCELLED"].includes(x.commercial_status) &&
-      saleSummary(s, x).balance > 0,
+      saleSummary(state, x).balance > 0,
   );
-  const applied = Object.values(apps).reduce((a, x) => a + Math.round(Number(x || 0) * 100), 0),
-    received = usingCredit ? available : Math.round(Number(v.total_amount || 0) * 100);
+  const applied = Object.values(apps).reduce((a, x) => a + Math.round(Number(x || 0) * 100), 0);
+  const received = usingCredit ? available : Math.round(Number(v.total_amount || 0) * 100);
   return (
     <form
       onSubmit={async (e) => {
@@ -50,7 +42,7 @@ export function PaymentForm({ s, record, kind, submit, close, busy }: FormProps)
     >
       {usingCredit ? (
         <p className="notice">
-          Saldo a favor de {find(s, "customers", v.customer_id)?.name}: {money(available)} · Pago{" "}
+          Saldo a favor de {find(state, "customers", v.customer_id)?.name}: {money(available)} · Pago{" "}
           {source?.code}. Esta aplicación no registra un cobro nuevo.
         </p>
       ) : (
@@ -63,7 +55,7 @@ export function PaymentForm({ s, record, kind, submit, close, busy }: FormProps)
               set("customer_id", x);
               setApps({});
             }}
-            options={s.customers.filter((x) => x.is_active || customerSummary(s, x.id).debt > 0)}
+            options={state.customers.filter((x) => x.is_active || customerSummary(state, x.id).debt > 0)}
           />
           <Input
             label="Fecha del pago"
@@ -87,12 +79,12 @@ export function PaymentForm({ s, record, kind, submit, close, busy }: FormProps)
       <h3>Aplicar a ventas pendientes</h3>
       <Table heads={["Venta", "Fecha", "Sede", "Saldo", "Aplicar S/"]}>
         {sales.map((x) => {
-          const a = saleSummary(s, x);
+          const a = saleSummary(state, x);
           return (
             <tr key={x.id}>
               <td>{x.code}</td>
               <td>{x.sale_date}</td>
-              <td>{find(s, "sites", x.site_id)?.name}</td>
+              <td>{find(state, "sites", x.site_id)?.name}</td>
               <td>{money(a.balance)}</td>
               <td>
                 <input

@@ -56,10 +56,10 @@ const handlers = {
   USER_SAVE: userSave,
 };
 export function executeCommand(original, command, actor, clock = new Date().toISOString()) {
-  const s = structuredClone(original);
-  const { type, payload: p = {} } = command;
+  const state = structuredClone(original);
+  const { type, payload: payload = {} } = command;
   assertCommandPermission(actor, type);
-  const context = createCommandContext(s, type, p, actor, clock);
+  const context = createCommandContext(state, type, payload, actor, clock);
   Object.assign(
     context,
     createPaymentOperations(context),
@@ -68,24 +68,24 @@ export function executeCommand(original, command, actor, clock = new Date().toIS
   );
   const { add } = context;
   const refresh = () => {
-    for (const sale of s.sales) {
-      sale.financial_status = saleSummary(s, sale).financial_status;
+    for (const sale of state.sales) {
+      sale.financial_status = saleSummary(state, sale).financial_status;
     }
   };
   const handler = Object.hasOwn(handlers, type) ? handlers[type] : null;
   if (!handler) fail("Operación desconocida.");
   const result = handler(context);
   for (const table of TABLES)
-    for (const row of s[table])
+    for (const row of state[table])
       for (const value of Object.values(row)) if (typeof value === "number") safe(value);
   refresh();
   add("audit", {
     action: type,
     entity_id: result,
-    payload: structuredClone(p),
+    payload: structuredClone(payload),
     actor_name: actor.name,
     actor_role: actor.role,
   });
-  s.revision++;
-  return { state: s, result };
+  state.revision++;
+  return { state: state, result };
 }

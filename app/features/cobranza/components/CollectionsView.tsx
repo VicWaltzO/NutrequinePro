@@ -1,18 +1,11 @@
 "use client";
-import type { AppState } from "@/lib/domain-types";
-import type { Sale } from "@/lib/domain-types";
+import type { AppState, Sale, BalanceSummary, OpenModal } from "@/lib/domain-types";
 import { saleSummary } from "@/lib/domain.mjs";
-import { Table } from "@/shared/ui";
-import { Metrics } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { label } from "@/shared/ui";
-import { find } from "@/shared/ui";
-import type { BalanceSummary } from "@/lib/domain-types";
-import type { OpenModal } from "@/lib/domain-types";
+import { Table, Metrics, money, label, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";
 export default function CollectionsView({
-  s,
+  s: state,
   b,
   tab,
   open,
@@ -42,7 +35,7 @@ export default function CollectionsView({
         items={[
           {
             label: "Por cobrar",
-            value: money(pending.reduce((n: number, x) => n + saleSummary(s, x).balance, 0)),
+            value: money(pending.reduce((n: number, x) => n + saleSummary(state, x).balance, 0)),
           },
           { label: "Saldo a favor de clientes", value: money(b.customer_credit) },
           { label: "Clientes con saldo", value: new Set(pending.map((x) => x.customer_id)).size },
@@ -53,7 +46,7 @@ export default function CollectionsView({
       <section className="panel flush">
         {tab === "payments" ? (
           <Table heads={["Pago", "Fecha", "Cliente", "Método", "Monto", "Estado"]}>
-            {s.payments
+            {state.payments
               .filter(match)
               .slice()
               .reverse()
@@ -65,13 +58,13 @@ export default function CollectionsView({
                     </button>
                   </td>
                   <td>{x.payment_date}</td>
-                  <td>{find(s, "customers", x.customer_id)?.name}</td>
+                  <td>{find(state, "customers", x.customer_id)?.name}</td>
                   <td>
                     {label(x.payment_method)} {x.other_method}
                   </td>
                   <td>{money(x.total_amount)}</td>
                   <td>
-                    {s.paymentReversals.some((r) => r.payment_id === x.id) ? "Revertido" : "Registrado"}
+                    {state.paymentReversals.some((r) => r.payment_id === x.id) ? "Revertido" : "Registrado"}
                   </td>
                 </tr>
               ))}

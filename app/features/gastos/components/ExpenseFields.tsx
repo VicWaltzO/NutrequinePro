@@ -2,7 +2,7 @@
 import { Select } from "@/shared/ui";
 import type { SimpleFieldProps } from "@/shared/types/simple-fields";
 export default function ExpenseFields({
-  s,
+  s: state,
   v,
   set,
   input,
@@ -16,7 +16,7 @@ export default function ExpenseFields({
           required
           value={v.category}
           onChange={(x) => set("category", x)}
-          options={s.config.expense_categories}
+          options={state.config.expense_categories}
         />
         {input("description", "Descripción")}
         {input("amount", "Monto pagado S/", "number")}
@@ -24,7 +24,7 @@ export default function ExpenseFields({
           label="Producción (opcional)"
           value={v.production_id}
           onChange={(x) => set("production_id", x)}
-          options={s.productions
+          options={state.productions
             .filter((x) => !["CLOSED", "CANCELLED"].includes(x.status))
             .map((x) => ({ id: x.id, name: x.code }))}
         />
@@ -32,19 +32,19 @@ export default function ExpenseFields({
           label="Venta (opcional)"
           value={v.sale_id}
           onChange={(x) => set("sale_id", x)}
-          options={s.sales.map((x) => ({ id: x.id, name: x.code }))}
+          options={state.sales.map((x) => ({ id: x.id, name: x.code }))}
         />
         <Select
           label="Sede (opcional)"
           value={v.site_id}
           onChange={(x) => set("site_id", x)}
-          options={s.sites}
+          options={state.sites}
         />
         <Select
           label="Insumo (opcional)"
           value={v.ingredient_id}
           onChange={(x) => set("ingredient_id", x)}
-          options={s.ingredients}
+          options={state.ingredients}
         />
         {input("notes", "Notas", "text", false)}
       </div>

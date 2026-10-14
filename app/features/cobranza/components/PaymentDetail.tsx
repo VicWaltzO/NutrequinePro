@@ -1,26 +1,21 @@
 "use client";
 import { paymentSummary } from "@/lib/domain.mjs";
-import { Table } from "@/shared/ui";
-import { Metrics } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { find } from "@/shared/ui";
-import { stamp } from "@/shared/ui";
-import { label } from "@/shared/ui";
+import { Table, Metrics, money, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
-export default function PaymentDetail({ s, actor, id, open }: DetailProps) {
-  const admin = actor.role === "ADMIN",
-    write = actor.role !== "VIEWER";
-  const p = find(s, "payments", id),
-    r = s.paymentReversals.find((x) => x.payment_id === id);
+export default function PaymentDetail({ s: state, actor, id, open }: DetailProps) {
+  const admin = actor.role === "ADMIN";
+  const write = actor.role !== "VIEWER";
+  const p = find(state, "payments", id);
+  const r = state.paymentReversals.find((x) => x.payment_id === id);
   if (!p) return null;
-  const summary = paymentSummary(s, p);
+  const summary = paymentSummary(state, p);
   return (
     <>
       <div className="detail-heading">
         <div>
           <span className="eyebrow">PAGO · {p.payment_date}</span>
           <h2>{p.code}</h2>
-          <p>{find(s, "customers", p.customer_id)?.name}</p>
+          <p>{find(state, "customers", p.customer_id)?.name}</p>
         </div>
         <strong className="large-value">{money(p.total_amount)}</strong>
       </div>
@@ -52,16 +47,16 @@ export default function PaymentDetail({ s, actor, id, open }: DetailProps) {
         )
       )}
       <Table heads={["Venta", "Aplicación"]}>
-        {s.paymentApplications
+        {state.paymentApplications
           .filter((x) => x.payment_id === id)
           .map((x) => (
             <tr key={x.id}>
               <td>
                 <button
                   className="text-button"
-                  onClick={() => open("sale-detail", find(s, "sales", x.sale_id))}
+                  onClick={() => open("sale-detail", find(state, "sales", x.sale_id))}
                 >
-                  {find(s, "sales", x.sale_id)?.code}
+                  {find(state, "sales", x.sale_id)?.code}
                 </button>
               </td>
               <td>{money(x.applied_amount)}</td>
@@ -69,7 +64,7 @@ export default function PaymentDetail({ s, actor, id, open }: DetailProps) {
           ))}
       </Table>
       <p className="metadata">
-        Registrado por {find(s, "users", p.created_by)?.name} · {stamp(p.created_at)}
+        Registrado por {find(state, "users", p.created_by)?.name} · {stamp(p.created_at)}
       </p>
     </>
   );

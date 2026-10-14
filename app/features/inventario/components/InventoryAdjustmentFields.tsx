@@ -2,7 +2,7 @@
 import { Select } from "@/shared/ui";
 import type { SimpleFieldProps } from "@/shared/types/simple-fields";
 export default function InventoryAdjustmentFields({
-  s,
+  s: state,
   v,
   set,
   input,
@@ -15,7 +15,7 @@ export default function InventoryAdjustmentFields({
         required
         value={v.product_id}
         onChange={(x) => set("product_id", x)}
-        options={s.products}
+        options={state.products}
       />
       <Select
         label="Movimiento"

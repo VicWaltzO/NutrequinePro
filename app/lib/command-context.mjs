@@ -1,14 +1,14 @@
 import { text, today } from "../shared/domain/core.mjs";
-export function createCommandContext(s, type, p, actor, clock) {
+export function createCommandContext(state, type, payload, actor, clock) {
   const uid = () => crypto.randomUUID();
   const add = (t, v) => {
     const a = { id: uid(), created_at: clock, created_by: actor.id, ...v };
-    s[t].push(a);
+    state[t].push(a);
     return a;
   };
-  const code = (t, prefix) => `${prefix}-${String(s[t].length + 1).padStart(6, "0")}`;
-  const reason = () => text(p.reason, "Motivo");
-  const movement = (v) => add("inventoryMovements", { date: p.date ?? today(), ...v });
+  const code = (t, prefix) => `${prefix}-${String(state[t].length + 1).padStart(6, "0")}`;
+  const reason = () => text(payload.reason, "Motivo");
+  const movement = (v) => add("inventoryMovements", { date: payload.date ?? today(), ...v });
   const correction = (entity_type, entity_id, old_value, new_value, why) => {
     const c = add("corrections", {
       code: code("corrections", "RC"),
@@ -29,5 +29,5 @@ export function createCommandContext(s, type, p, actor, clock) {
         });
     return c;
   };
-  return { s, type, p, actor, clock, uid, add, code, reason, movement, correction };
+  return { s: state, type, p: payload, actor, clock, uid, add, code, reason, movement, correction };
 }

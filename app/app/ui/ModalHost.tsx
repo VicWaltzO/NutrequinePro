@@ -1,15 +1,10 @@
 "use client";
-import { useEffect } from "react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { recordId } from "@/lib/domain-types";
-import type { AppState } from "@/lib/domain-types";
-import type { User } from "@/lib/domain-types";
-import type { Sale } from "@/lib/domain-types";
+import type { AppState, User, Sale, OpenModal, Submit, TableName } from "@/lib/domain-types";
 import { X } from "lucide-react";
 import { customerSummary } from "@/lib/domain.mjs";
-import { Metrics } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { find } from "@/shared/ui";
+import { Metrics, money, find } from "@/shared/ui";
 import { SaleForm } from "@/features/ventas/components/SaleForm";
 import { PaymentForm } from "@/features/cobranza/components/PaymentForm";
 import { ReturnForm } from "@/features/ventas/components/ReturnForm";
@@ -20,13 +15,11 @@ import { FormulaForm } from "@/features/produccion/components/FormulaForm";
 import { ProductionCorrectionForm } from "@/features/produccion/components/ProductionCorrectionForm";
 import SimpleForm from "@/app/ui/SimpleForm";
 import Details from "@/app/ui/OperationDetails";
-import type { OpenModal } from "@/lib/domain-types";
-import type { Submit } from "@/lib/domain-types";
 import type { ReactNode } from "react";
 import type { Modal } from "@/shared/types/admin";
 import { titles } from "./modal-configuration";
 export default function ModalHost({
-  s,
+  s: state,
   actor,
   write,
   open,
@@ -81,32 +74,23 @@ export default function ModalHost({
         )}
         {modal &&
           (() => {
+            let record = modal.record;
+            if (record?.id) {
+              let table: TableName = "audit";
+              if (modal.type.includes("production") || modal.type === "reconcile") table = "productions";
+              else if (modal.type.includes("sale") || modal.type === "return") table = "sales";
+              else if (modal.type.includes("payment-detail")) table = "payments";
+              else if (modal.type.includes("customer")) table = "customers";
+              else if (modal.type === "site") table = "sites";
+              else if (modal.type === "product") table = "products";
+              else if (modal.type === "ingredient") table = "ingredients";
+              else if (modal.type === "user") table = "users";
+              record = find(state, table, recordId(record)) ?? record;
+            }
             const props: FormProps & { actor: User } = {
-              s,
+              s: state,
               actor,
-              record: modal.record?.id
-                ? (find(
-                    s,
-                    modal.type.includes("production") || modal.type === "reconcile"
-                      ? "productions"
-                      : modal.type.includes("sale") || modal.type === "return"
-                        ? "sales"
-                        : modal.type.includes("payment-detail")
-                          ? "payments"
-                          : modal.type.includes("customer")
-                            ? "customers"
-                            : modal.type === "site"
-                              ? "sites"
-                              : modal.type === "product"
-                                ? "products"
-                                : modal.type === "ingredient"
-                                  ? "ingredients"
-                                  : modal.type === "user"
-                                    ? "users"
-                                    : "audit",
-                    recordId(modal.record),
-                  ) ?? modal.record)
-                : modal.record,
+              record,
               kind: modal.kind,
               submit: run,
               close,
@@ -147,7 +131,7 @@ export default function ModalHost({
             if (["sale-detail", "production-detail", "payment-detail"].includes(modal.type))
               return (
                 <Details
-                  s={s}
+                  s={state}
                   actor={actor}
                   entity={modal.type.split("-")[0]}
                   id={recordId(modal.record)}
@@ -163,11 +147,11 @@ export default function ModalHost({
                   <h2>{c.name}</h2>
                   <Metrics
                     items={[
-                      { label: "Deuda pendiente", value: money(customerSummary(s, recordId(c)).debt) },
-                      { label: "Saldo a favor", value: money(customerSummary(s, recordId(c)).credit) },
+                      { label: "Deuda pendiente", value: money(customerSummary(state, recordId(c)).debt) },
+                      { label: "Saldo a favor", value: money(customerSummary(state, recordId(c)).credit) },
                       {
                         label: "Saldo neto (deuda − a favor)",
-                        value: money(customerSummary(s, recordId(c)).net),
+                        value: money(customerSummary(state, recordId(c)).net),
                       },
                     ]}
                   />
@@ -177,7 +161,7 @@ export default function ModalHost({
                   <p>{c.address}</p>
                   <p>{c.notes}</p>
                   {write && <button onClick={() => open("customer", c)}>Editar cliente</button>}
-                  {saleTable(s.sales.filter((x) => x.customer_id === c.id))}
+                  {saleTable(state.sales.filter((x) => x.customer_id === c.id))}
                 </>
               );
             }

@@ -1,11 +1,9 @@
 "use client";
-import type { AppState } from "@/lib/domain-types";
-import type { User } from "@/lib/domain-types";
+import type { AppState, User, OpenModal } from "@/lib/domain-types";
 import Configuration from "@/features/configuracion/components/Configuration";
-import type { OpenModal } from "@/lib/domain-types";
 import type { ReactNode } from "react";
 export default function ConfigurationView({
-  s,
+  s: state,
   actor,
   tab,
   open,
@@ -28,7 +26,7 @@ export default function ConfigurationView({
         ["audit", "Auditoría"],
         ["appearance", "Apariencia"],
       ])}
-      <Configuration s={s} actor={actor} tab={tab} open={open} theme={theme} />
+      <Configuration s={state} actor={actor} tab={tab} open={open} theme={theme} />
     </>
   );
 }

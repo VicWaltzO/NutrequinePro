@@ -1,21 +1,18 @@
 "use client";
 import { useState } from "react";
 import type { NumericInput } from "@/lib/domain-types";
-import { Input } from "@/shared/ui";
-import { Select } from "@/shared/ui";
-import { Table } from "@/shared/ui";
-import { day } from "@/shared/ui";
+import { Input, Select, Table, day } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import type { FormProps } from "@/shared/types/forms";
-export function FormulaForm({ s, record, submit, close, busy }: FormProps) {
-  const [product, setProduct] = useState(record?.product_id ?? s.products[0]?.id ?? "");
-  const f = s.formulas.find((x) => x.product_id === product && x.is_active);
+export function FormulaForm({ s: state, record, submit, close, busy }: FormProps) {
+  const [product, setProduct] = useState(record?.product_id ?? state.products[0]?.id ?? "");
+  const f = state.formulas.find((x) => x.product_id === product && x.is_active);
   const [rows, setRows] = useState<{ ingredient_id: string; kg_per_nucleus: NumericInput }[]>(
-      s.formulaIngredients
-        .filter((x) => x.formula_id === f?.id)
-        .map((x) => ({ ingredient_id: x.ingredient_id, kg_per_nucleus: x.kg_per_nucleus / 1000 })),
-    ),
-    [valid, setValid] = useState(day());
+    state.formulaIngredients
+      .filter((x) => x.formula_id === f?.id)
+      .map((x) => ({ ingredient_id: x.ingredient_id, kg_per_nucleus: x.kg_per_nucleus / 1000 })),
+  );
+  const [valid, setValid] = useState(day());
   return (
     <form
       onSubmit={async (e) => {
@@ -32,12 +29,12 @@ export function FormulaForm({ s, record, submit, close, busy }: FormProps) {
           required
           empty={false}
           value={product}
-          options={s.products}
+          options={state.products}
           onChange={(id) => {
             setProduct(id);
-            const nf = s.formulas.find((x) => x.product_id === id && x.is_active);
+            const nf = state.formulas.find((x) => x.product_id === id && x.is_active);
             setRows(
-              s.formulaIngredients
+              state.formulaIngredients
                 .filter((x) => x.formula_id === nf?.id)
                 .map((x) => ({ ingredient_id: x.ingredient_id, kg_per_nucleus: x.kg_per_nucleus / 1000 })),
             );
@@ -56,7 +53,7 @@ export function FormulaForm({ s, record, submit, close, busy }: FormProps) {
                   setRows((a) => a.map((r, j) => (i === j ? { ...r, ingredient_id: e.target.value } : r)))
                 }
               >
-                {s.ingredients.map((ing) => (
+                {state.ingredients.map((ing) => (
                   <option key={ing.id} value={ing.id}>
                     {ing.name}
                   </option>
@@ -93,7 +90,7 @@ export function FormulaForm({ s, record, submit, close, busy }: FormProps) {
         type="button"
         className="text-button"
         onClick={() =>
-          setRows((a) => [...a, { ingredient_id: s.ingredients[0]?.id ?? "", kg_per_nucleus: 0 }])
+          setRows((a) => [...a, { ingredient_id: state.ingredients[0]?.id ?? "", kg_per_nucleus: 0 }])
         }
       >
         ＋ Agregar insumo

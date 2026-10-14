@@ -14,7 +14,7 @@ export function emptyState() {
   };
 }
 export function seedState() {
-  const s = emptyState();
+  const state = emptyState();
   const stamp = "2026-10-06T00:00:00-05:00";
   const names = [
     "Torta soya HiPro",
@@ -29,7 +29,7 @@ export function seedState() {
     "Silvafeed Gunny",
   ];
   const prices = [210, 220, 140, 100, 650, 120, 160, 30, 60, 374];
-  s.ingredients = names.map((name, i) => ({
+  state.ingredients = names.map((name, i) => ({
     id: `ing-${i + 1}`,
     name,
     current_price_per_kg: prices[i],
@@ -49,7 +49,7 @@ export function seedState() {
     [40, 20, 0, 840, 15, 25, 30, 12, 8, 1],
     [200, 150, 150, 850, 20, 30, 75, 15, 10, 1],
   ];
-  s.products = products.map(([name, price, weight, bags, commercial, sellable, image], i) => ({
+  state.products = products.map(([name, price, weight, bags, commercial, sellable, image], i) => ({
     id: `prod-${i + 1}`,
     name,
     category: i === 3 ? "STANDARD" : "PREMIUM",
@@ -64,7 +64,7 @@ export function seedState() {
     updated_at: stamp,
   }));
   products.forEach((_, i) => {
-    s.formulas.push({
+    state.formulas.push({
       id: `formula-${i + 1}-1`,
       product_id: `prod-${i + 1}`,
       version: 1,
@@ -74,7 +74,7 @@ export function seedState() {
       created_at: stamp,
     });
     formulas[i].forEach((kg, j) =>
-      s.formulaIngredients.push({
+      state.formulaIngredients.push({
         id: `fi-${i + 1}-${j + 1}`,
         formula_id: `formula-${i + 1}-1`,
         ingredient_id: `ing-${j + 1}`,
@@ -83,8 +83,8 @@ export function seedState() {
     );
   });
   // Historical destinations are reference master data, never logic branches.
-  s.sites = ["Lima Polo Club", "Quilmaná", "Club Hípico Villa", "Hipódromo", "Rancho Los Caballos"].map(
+  state.sites = ["Lima Polo Club", "Quilmaná", "Club Hípico Villa", "Hipódromo", "Rancho Los Caballos"].map(
     (name, i) => ({ id: `site-${i + 1}`, name, is_active: true, created_at: stamp, updated_at: stamp }),
   );
-  return s;
+  return state;
 }

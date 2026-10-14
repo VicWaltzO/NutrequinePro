@@ -1,14 +1,13 @@
 "use client";
 import type { AppState } from "@/lib/domain-types";
 import { stock } from "@/lib/domain.mjs";
-import { ProductImage } from "@/shared/ui";
-import { kg } from "@/shared/ui";
-import { num } from "@/shared/ui";
-export default function ProductCards({ s }: { s: AppState }) {
+import { ProductImage, kg, num } from "@/shared/ui";
+
+export default function ProductCards({ s: state }: { s: AppState }) {
   return (
     <div className="product-grid">
-      {s.products.map((p) => {
-        const a = stock(s, p.id);
+      {state.products.map((p) => {
+        const a = stock(state, p.id);
         return (
           <article className="product-card" key={p.id}>
             <ProductImage image={p.image} name={p.name} />

@@ -1,13 +1,7 @@
 "use client";
-import { ChevronRight } from "lucide-react";
-import { RefreshCw } from "lucide-react";
-import { Menu } from "lucide-react";
-import { Sun } from "lucide-react";
-import { Moon } from "lucide-react";
-import { LogOut } from "lucide-react";
+import { ChevronRight, RefreshCw, Menu, Sun, Moon, LogOut } from "lucide-react";
 import { day } from "@/shared/ui";
-import type { Dispatch } from "react";
-import type { SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { nav } from "./navigation";
 export default function Topbar({
   view,

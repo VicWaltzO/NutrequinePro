@@ -1,13 +1,10 @@
 "use client";
-import type { Dispatch } from "react";
-import type { SetStateAction } from "react";
-import type { AppState } from "@/lib/domain-types";
-import type { CostInput } from "@/lib/domain-types";
-import { Input } from "@/shared/ui";
-import { Select } from "@/shared/ui";
-import { Check } from "@/shared/ui";
+import type { Dispatch, SetStateAction } from "react";
+import type { AppState, CostInput } from "@/lib/domain-types";
+import { Input, Select, Check } from "@/shared/ui";
+
 export function CostRows({
-  s,
+  s: state,
   costs,
   setCosts,
 }: {
@@ -51,7 +48,7 @@ export function CostRows({
                   required
                   value={c.ingredient_id}
                   onChange={(x) => update("ingredient_id", x)}
-                  options={s.ingredients}
+                  options={state.ingredients}
                 />
               )}
               <Check label="Pagado" value={c.is_paid} onChange={(x) => update("is_paid", x)} />

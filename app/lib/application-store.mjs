@@ -1,24 +1,28 @@
 import { TABLES, SQL_NAMES, seedState, executeCommand, DomainError } from "./domain.mjs";
 import { writePlan } from "./persistence.mjs";
-export function createStore(db) {
+export function createStore(getDatabase) {
   async function loadState() {
-    const binding = db();
-    const result = await binding.batch([
+    const binding = getDatabase();
+    const results = await binding.batch([
       binding.prepare("SELECT * FROM settings WHERE id = 'company'"),
-      ...TABLES.map((t) => binding.prepare(`SELECT data FROM ${SQL_NAMES[t]}`)),
+      ...TABLES.map((table) => binding.prepare(`SELECT data FROM ${SQL_NAMES[table]}`)),
     ]);
-    const row = result[0].results[0];
-    if (!row) return null;
+    const settings = results[0].results[0];
+    if (!settings) return null;
     // These documents are written by the validated domain commands and migrations.
     return {
-      config: JSON.parse(row.data),
-      revision: row.revision,
-      ...Object.fromEntries(TABLES.map((t, i) => [t, result[i + 1].results.map((r) => JSON.parse(r.data))])),
+      config: JSON.parse(settings.data),
+      revision: settings.revision,
+      ...Object.fromEntries(
+        TABLES.map((table, index) => [table, results[index + 1].results.map((row) => JSON.parse(row.data))]),
+      ),
     };
   }
   async function persistState(before, after) {
-    const binding = db();
-    const statements = writePlan(before, after).map((x) => binding.prepare(x.sql).bind(...x.args));
+    const binding = getDatabase();
+    const statements = writePlan(before, after).map((statement) =>
+      binding.prepare(statement.sql).bind(...statement.args),
+    );
     try {
       await binding.batch(statements);
     } catch (error) {
@@ -51,7 +55,7 @@ export function createStore(db) {
   }
   async function runCommand(input, identity) {
     const before = await ensureState(identity);
-    const actor = before.users.find((x) => x.id === identity.userId && x.is_active);
+    const actor = before.users.find((user) => user.id === identity.userId && user.is_active);
     if (!actor)
       throw new DomainError("Usuario sin acceso. Solicite al administrador que registre su ID autenticado.");
     if (
@@ -71,7 +75,7 @@ export function createStore(db) {
       throw new DomainError("Datos de operación inválidos.");
     const command = input;
     const duplicate = before.audit.find(
-      (x) => x.request_id === command.request_id && x.created_by === actor.id,
+      (entry) => entry.request_id === command.request_id && entry.created_by === actor.id,
     );
     if (duplicate) return { state: before, result: duplicate.entity_id };
     const outcome = executeCommand(before, command, actor);

@@ -1,8 +1,8 @@
 import { requireValue, pick } from "../../../shared/domain/core.mjs";
 export function customerDelete(context) {
-  const { s, p, actor, clock, correction } = context;
+  const { s: state, p: payload, actor, clock, correction } = context;
   let result = null;
-  const customer = pick(s, "customers", p.id);
+  const customer = pick(state, "customers", payload.id);
   requireValue(!customer.deleted_at, "El cliente ya fue retirado de la lista.");
   const old = structuredClone(customer);
   Object.assign(customer, {

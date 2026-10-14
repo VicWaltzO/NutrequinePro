@@ -1,19 +1,12 @@
 "use client";
 import Image from "next/image";
-import { Moon } from "lucide-react";
-import { Sun } from "lucide-react";
-import type { AppState } from "@/lib/domain-types";
-import type { OpenModal } from "@/lib/domain-types";
-import type { User } from "@/lib/domain-types";
+import { Moon, Sun } from "lucide-react";
+import type { AppState, OpenModal, User } from "@/lib/domain-types";
 import { changeTheme } from "@/lib/browser-preferences.mjs";
-import { Table } from "@/shared/ui";
-import { kg } from "@/shared/ui";
-import { label } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { stamp } from "@/shared/ui";
+import { Table, kg, label, money, stamp } from "@/shared/ui";
 import AuthenticatedId from "@/shared/ui/AuthenticatedId";
 export default function Configuration({
-  s,
+  s: state,
   actor,
   tab,
   open,
@@ -25,8 +18,8 @@ export default function Configuration({
   open: OpenModal;
   theme: "light" | "dark";
 }) {
-  const admin = actor.role === "ADMIN",
-    c = s.config;
+  const admin = actor.role === "ADMIN";
+  const c = state.config;
   if (tab === "products")
     return (
       <>
@@ -44,7 +37,7 @@ export default function Configuration({
               "",
             ]}
           >
-            {s.products.map((p) => (
+            {state.products.map((p) => (
               <tr key={p.id}>
                 <td>{p.name}</td>
                 <td>{money(p.default_sale_price)}</td>
@@ -81,7 +74,7 @@ export default function Configuration({
         <p className="notice">El acceso requiere una identidad autenticada y permiso de acceso al sitio.</p>
         <AuthenticatedId id={actor.id} />
         <Table heads={["Usuario", "ID autenticado", "Rol", "Estado", ""]}>
-          {s.users.map((x) => (
+          {state.users.map((x) => (
             <tr key={x.id}>
               <td>{x.name}</td>
               <td>
@@ -100,7 +93,7 @@ export default function Configuration({
       <section className="settings-section">
         <h2>Historial de acciones</h2>
         <Table heads={["Fecha", "Usuario", "Acción", "Detalle"]}>
-          {s.audit
+          {state.audit
             .slice()
             .reverse()
             .map((x) => (

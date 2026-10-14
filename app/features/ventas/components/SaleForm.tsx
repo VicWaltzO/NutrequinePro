@@ -1,20 +1,13 @@
 "use client";
 import { useSaleFormState } from "../hooks/useSaleFormState";
 import { stock } from "@/lib/domain.mjs";
-import { Input } from "@/shared/ui";
-import { Select } from "@/shared/ui";
-import { Check } from "@/shared/ui";
-import { Table } from "@/shared/ui";
-import { PaymentFields } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { kg } from "@/shared/ui";
-import { find } from "@/shared/ui";
+import { Input, Select, Check, Table, PaymentFields, money, kg, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import type { FormProps } from "@/shared/types/forms";
-export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
+export function SaleForm({ s: state, record, kind, submit, close, busy }: FormProps) {
   const {
     edit,
-    v,
+    v: values,
     set,
     rows,
     setRows,
@@ -31,18 +24,21 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
     total,
     dup,
     paid,
-  } = useSaleFormState({ s, record, kind });
+  } = useSaleFormState({ s: state, record, kind });
+  let submitLabel = "Confirmar venta";
+  if (edit) submitLabel = "Registrar rectificación";
+  else if (kind === "draft") submitLabel = "Guardar borrador";
   return (
     <form
       onSubmit={async (e) => {
         e.preventDefault();
         await submit(edit ? "SALE_CORRECT" : "SALE_SAVE", {
-          ...v,
+          ...values,
           paid_amount: paidAmount ?? total / 100,
           items: rows,
           confirm: kind !== "draft",
-          deliver: v.mode === "immediate",
-          create_production: v.mode === "planned",
+          deliver: values.mode === "immediate",
+          create_production: values.mode === "planned",
         });
       }}
     >
@@ -53,28 +49,28 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
               label="Fecha de venta"
               type="date"
               required
-              value={v.sale_date}
+              value={values.sale_date}
               onChange={(x) => set("sale_date", x)}
             />
             <Select
               label="Cliente"
               required
-              value={v.customer_id}
+              value={values.customer_id}
               onChange={(x) => {
                 set("customer_id", x);
-                const d = s.customerSites.find(
+                const d = state.customerSites.find(
                   (a) => a.customer_id === x && a.is_default && a.is_active !== false,
                 );
                 if (d) set("site_id", d.site_id);
               }}
-              options={s.customers.filter((x) => x.is_active && !x.deleted_at)}
+              options={state.customers.filter((x) => x.is_active && !x.deleted_at)}
             />
             <Select
               label="Sede destino"
               required
-              value={v.site_id}
+              value={values.site_id}
               onChange={(x) => set("site_id", x)}
-              options={s.sites.filter((x) => x.is_active)}
+              options={state.sites.filter((x) => x.is_active)}
             />
           </div>
           <div className="inline-actions">
@@ -132,7 +128,7 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
       <div className="line-editor">
         <Table heads={["Producto", "Sacos", "Kg / saco", "Precio S/", "Subtotal", ""]}>
           {rows.map((r, i) => {
-            const product = find(s, "products", r.product_id);
+            const product = find(state, "products", r.product_id);
             return (
               <tr key={i}>
                 <td>
@@ -143,7 +139,7 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
                     onChange={(e) => update(i, "product_id", e.target.value)}
                   >
                     <option value="">Seleccionar producto</option>
-                    {s.products
+                    {state.products
                       .filter((x) => x.is_active && x.is_sellable)
                       .map((x) => (
                         <option key={x.id} value={x.id}>
@@ -153,7 +149,8 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
                   </select>
                   {product && (
                     <small>
-                      Stock: {stock(s, product.id).quantity} sacos · {kg(stock(s, product.id).weight_kg)} kg
+                      Stock: {stock(state, product.id).quantity} sacos ·{" "}
+                      {kg(stock(state, product.id).weight_kg)} kg
                     </small>
                   )}
                 </td>
@@ -218,7 +215,7 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
               label="Condición"
               required
               empty={false}
-              value={v.payment_condition}
+              value={values.payment_condition}
               onChange={(x) => set("payment_condition", x)}
               options={[
                 { id: "CREDIT", name: "Crédito" },
@@ -229,7 +226,7 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
               label="Entrega"
               required
               empty={false}
-              value={v.mode}
+              value={values.mode}
               onChange={(x) => set("mode", x)}
               options={[
                 { id: "immediate", name: "Entregar ahora" },
@@ -243,25 +240,25 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
               <strong>Stock insuficiente</strong>
               {missing.map(([id, a]) => (
                 <p key={id}>
-                  {find(s, "products", id)?.name}: stock {stock(s, id).quantity}, solicitado {a.q}, faltan{" "}
-                  {Math.max(0, a.q - stock(s, id).quantity)} sacos. Peso disponible:{" "}
-                  {kg(stock(s, id).weight_kg)} kg.
+                  {find(state, "products", id)?.name}: stock {stock(state, id).quantity}, solicitado {a.q},
+                  faltan {Math.max(0, a.q - stock(state, id).quantity)} sacos. Peso disponible:{" "}
+                  {kg(stock(state, id).weight_kg)} kg.
                 </p>
               ))}
               <p>Elija venta futura para continuar. El stock saldrá al entregar.</p>
             </div>
           )}
-          {v.mode !== "immediate" && (
+          {values.mode !== "immediate" && (
             <Select
               label="Asociar a un lote existente (opcional)"
-              value={v.production_id}
+              value={values.production_id}
               onChange={(x) => set("production_id", x)}
-              options={s.productions
+              options={state.productions
                 .filter((x) => x.status !== "CANCELLED")
                 .map((x) => ({ id: x.id, name: x.code }))}
             />
           )}
-          {v.payment_condition === "CASH" && (
+          {values.payment_condition === "CASH" && (
             <div className="inset">
               <h3>Pago inicial</h3>
               <div className="form-grid">
@@ -276,12 +273,12 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
                 />
                 {paid > 0 && (
                   <>
-                    <PaymentFields v={v} set={set} />
+                    <PaymentFields v={values} set={set} />
                     <Input
                       label="Fecha del pago"
                       type="date"
                       required
-                      value={v.payment_date ?? v.sale_date}
+                      value={values.payment_date ?? values.sale_date}
                       onChange={(x) => set("payment_date", x)}
                     />
                   </>
@@ -308,17 +305,17 @@ export function SaleForm({ s, record, kind, submit, close, busy }: FormProps) {
           <Input
             label="Motivo de rectificación"
             required
-            value={v.reason}
+            value={values.reason}
             onChange={(x) => set("reason", x)}
           />
         </>
       )}
-      <Input label="Notas (opcional)" value={v.notes} onChange={(x) => set("notes", x)} />
+      <Input label="Notas (opcional)" value={values.notes} onChange={(x) => set("notes", x)} />
       <Footer
         busy={busy}
-        disabled={!edit && kind !== "draft" && v.mode === "immediate" && missing.length > 0}
+        disabled={!edit && kind !== "draft" && values.mode === "immediate" && missing.length > 0}
         close={close}
-        label={edit ? "Registrar rectificación" : kind === "draft" ? "Guardar borrador" : "Confirmar venta"}
+        label={submitLabel}
       />
     </form>
   );

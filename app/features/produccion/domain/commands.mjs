@@ -12,99 +12,102 @@ import {
 import { stock } from "../../inventario/domain/stock.mjs";
 import { productionSummary } from "./summary.mjs";
 export function formulaSave(context) {
-  const { s, p, add } = context;
+  const { s: state, p: payload, add } = context;
   let result = null;
-  const prod = pick(s, "products", p.product_id);
-  requireValue(p.ingredients?.length > 0, "Agregue insumos.");
+  const product = pick(state, "products", payload.product_id);
+  requireValue(payload.ingredients?.length > 0, "Agregue insumos.");
   requireValue(
-    new Set(p.ingredients.map((x) => x.ingredient_id)).size === p.ingredients.length,
+    new Set(payload.ingredients.map((x) => x.ingredient_id)).size === payload.ingredients.length,
     "Insumo repetido.",
   );
-  const d = date(p.valid_from ?? today());
-  const old = s.formulas.filter((x) => x.product_id === prod.id);
+  const validFrom = date(payload.valid_from ?? today());
+  const old = state.formulas.filter((x) => x.product_id === product.id);
   old
     .filter((x) => x.is_active)
     .forEach((x) => {
       x.is_active = false;
-      x.valid_to = d;
+      x.valid_to = validFrom;
     });
-  const f = add("formulas", {
-    product_id: prod.id,
+  const formula = add("formulas", {
+    product_id: product.id,
     version: Math.max(0, ...old.map((x) => x.version)) + 1,
-    valid_from: d,
+    valid_from: validFrom,
     valid_to: null,
     is_active: true,
   });
-  p.ingredients.forEach((x) => {
-    pick(s, "ingredients", x.ingredient_id);
+  payload.ingredients.forEach((x) => {
+    pick(state, "ingredients", x.ingredient_id);
     add("formulaIngredients", {
-      formula_id: f.id,
+      formula_id: formula.id,
       ingredient_id: x.ingredient_id,
       kg_per_nucleus: scaled(x.kg_per_nucleus, 3),
     });
   });
-  result = f.id;
+  result = formula.id;
   return result;
 }
 export function productionSave(context) {
-  const { s, p, actor, clock, add, code, productionRows, confirmProduction } = context;
+  const { s: state, p: payload, actor, clock, add, code, productionRows, confirmProduction } = context;
   let result = null;
-  let pr = p.id
-    ? pick(s, "productions", p.id)
+  let production = payload.id
+    ? pick(state, "productions", payload.id)
     : add("productions", { code: code("productions", "PR"), status: "DRAFT" });
-  requireValue(pr.status === "DRAFT", "Use rectificación para una producción confirmada.");
-  Object.assign(pr, {
-    production_date: date(p.production_date),
+  requireValue(production.status === "DRAFT", "Use rectificación para una producción confirmada.");
+  Object.assign(production, {
+    production_date: date(payload.production_date),
     responsible_user_id: actor.id,
-    notes: p.notes ?? "",
+    notes: payload.notes ?? "",
     updated_at: clock,
   });
   for (const t of ["productionProducts", "productionIngredients", "productionCosts"])
-    s[t]
+    state[t]
       .filter(
         (x) =>
-          x.production_id === pr.id &&
-          !s.expenses.some((e) => e.production_cost_id === x.id && e.status !== "CANCELLED"),
+          x.production_id === production.id &&
+          !state.expenses.some((e) => e.production_cost_id === x.id && e.status !== "CANCELLED"),
       )
       .forEach((x) => (x.is_current = false));
-  productionRows(pr, p);
-  if (p.confirm) {
+  productionRows(production, payload);
+  if (payload.confirm) {
     requireValue(actor.role === "ADMIN", "Confirmación requiere administrador.");
-    confirmProduction(pr);
+    confirmProduction(production);
   }
-  result = pr.id;
+  result = production.id;
   return result;
 }
 export function productionConfirm(context) {
-  const { s, p, productionRows, confirmProduction } = context;
+  const { s: state, p: payload, productionRows, confirmProduction } = context;
   let result = null;
-  const pr = pick(s, "productions", p.id);
+  const production = pick(state, "productions", payload.id);
   for (const t of ["productionProducts", "productionIngredients", "productionCosts"])
-    s[t]
+    state[t]
       .filter(
         (x) =>
-          x.production_id === pr.id &&
+          x.production_id === production.id &&
           x.is_current !== false &&
-          !s.expenses.some((e) => e.production_cost_id === x.id && e.status !== "CANCELLED"),
+          !state.expenses.some((e) => e.production_cost_id === x.id && e.status !== "CANCELLED"),
       )
       .forEach((x) => (x.is_current = false));
-  requireValue(pr.status === "DRAFT", "Producción ya confirmada.");
-  productionRows(pr, pr.input_snapshot);
-  confirmProduction(pr);
-  result = pr.id;
+  requireValue(production.status === "DRAFT", "Producción ya confirmada.");
+  productionRows(production, production.input_snapshot);
+  confirmProduction(production);
+  result = production.id;
   return result;
 }
 export function productionReconcile(context) {
-  const { s, p, actor, add, reason, correction } = context;
+  const { s: state, p: payload, actor, add, reason, correction } = context;
   let result = null;
   requireValue(actor.role === "ADMIN", "Conciliación requiere administrador.");
-  const pr = pick(s, "productions", p.id);
-  requireValue(["CONFIRMED", "CLOSED"].includes(pr.status), "Confirme primero la producción.");
+  const production = pick(state, "productions", payload.id);
+  requireValue(["CONFIRMED", "CLOSED"].includes(production.status), "Confirme primero la producción.");
   const why = reason();
-  const before = structuredClone(productionSummary(s, pr));
-  for (const row of p.ingredients ?? []) {
-    const x = pick(s, "productionIngredients", row.id);
-    requireValue(x.production_id === pr.id && x.is_current !== false, "Insumo no pertenece a producción.");
+  const before = structuredClone(productionSummary(state, production));
+  for (const row of payload.ingredients ?? []) {
+    const x = pick(state, "productionIngredients", row.id);
+    requireValue(
+      x.production_id === production.id && x.is_current !== false,
+      "Insumo no pertenece a producción.",
+    );
     const discount = scaled(row.discount_amount ?? x.discount_amount / 100);
     requireValue(discount <= x.theoretical_gross_cost, "Descuento supera costo teórico.");
     Object.assign(x, {
@@ -116,21 +119,21 @@ export function productionReconcile(context) {
     });
     x.difference = x.actual_charge === null ? null : x.actual_charge - x.theoretical_net_cost;
   }
-  for (const row of p.costs ?? []) {
-    const x = pick(s, "productionCosts", row.id);
-    requireValue(x.production_id === pr.id, "Costo ajeno a producción.");
+  for (const row of payload.costs ?? []) {
+    const x = pick(state, "productionCosts", row.id);
+    requireValue(x.production_id === production.id, "Costo ajeno a producción.");
     x.amount = scaled(row.amount);
     x.is_paid = !!row.is_paid;
   }
-  for (const row of p.new_costs ?? []) {
+  for (const row of payload.new_costs ?? []) {
     requireValue(
       ["FREIGHT", "HANDLING", "PERSONNEL", "SERVICE", "INGREDIENT_EXTRA", "OTHER"].includes(row.category),
       "Categoría inválida.",
     );
-    if (row.ingredient_id) pick(s, "ingredients", row.ingredient_id);
+    if (row.ingredient_id) pick(state, "ingredients", row.ingredient_id);
     requireValue(row.category !== "INGREDIENT_EXTRA" || row.ingredient_id, "Seleccione insumo.");
     add("productionCosts", {
-      production_id: pr.id,
+      production_id: production.id,
       category: row.category,
       description: text(row.description, "Descripción"),
       amount: scaled(row.amount),
@@ -139,58 +142,70 @@ export function productionReconcile(context) {
       is_current: true,
     });
   }
-  if (pr.status === "CLOSED")
+  if (production.status === "CLOSED")
     requireValue(
-      productionSummary(s, pr).reconciled,
+      productionSummary(state, production).reconciled,
       "Una producción cerrada debe conservar conciliación completa.",
     );
-  correction("PRODUCTION", pr.id, before, productionSummary(s, pr), why);
-  result = pr.id;
+  correction("PRODUCTION", production.id, before, productionSummary(state, production), why);
+  result = production.id;
   return result;
 }
 export function productionCorrectQuantities(context) {
-  const { s, p, actor, clock, uid, add, reason, movement, correction } = context;
+  const { s: state, p: payload, actor, clock, uid, add, reason, movement, correction } = context;
   let result = null;
-  const pr = pick(s, "productions", p.id);
-  requireValue(["CONFIRMED", "CLOSED"].includes(pr.status), "Solo se rectifican producciones confirmadas.");
-  const why = reason(),
-    before = structuredClone(productionSummary(s, pr));
-  requireValue(p.products?.length === before.products.length, "Incluya todos los productos originales.");
-  requireValue(new Set(p.products.map((x) => x.product_id)).size === p.products.length, "Producto repetido.");
+  const production = pick(state, "productions", payload.id);
+  requireValue(
+    ["CONFIRMED", "CLOSED"].includes(production.status),
+    "Solo se rectifican producciones confirmadas.",
+  );
+  const why = reason();
+  const before = structuredClone(productionSummary(state, production));
+  requireValue(
+    payload.products?.length === before.products.length,
+    "Incluya todos los productos originales.",
+  );
+  requireValue(
+    new Set(payload.products.map((x) => x.product_id)).size === payload.products.length,
+    "Producto repetido.",
+  );
   const amounts = {};
-  let totalNuclei = 0,
-    totalBags = 0;
+  let totalNuclei = 0;
+  let totalBags = 0;
   for (const old of before.products) {
-    const input = p.products.find((x) => x.product_id === old.product_id);
+    const input = payload.products.find((x) => x.product_id === old.product_id);
     requireValue(input, "Producto original no incluido.");
-    const n = Number(input.nuclei_count);
-    requireValue(Number.isSafeInteger(n) && n >= 0 && n <= 1e7, "Núcleos debe ser un entero válido.");
-    const bags = multiply(n, old.bags_per_nucleus_snapshot),
-      weight = multiply(n, old.commercial_weight_per_nucleus_snapshot);
-    const deltaBags = bags - old.bags_produced,
-      deltaWeight = weight - old.commercial_weight_kg;
-    const st = stock(s, old.product_id);
+    const nucleiCount = Number(input.nuclei_count);
+    requireValue(
+      Number.isSafeInteger(nucleiCount) && nucleiCount >= 0 && nucleiCount <= 1e7,
+      "Núcleos debe ser un entero válido.",
+    );
+    const bags = multiply(nucleiCount, old.bags_per_nucleus_snapshot);
+    const weight = multiply(nucleiCount, old.commercial_weight_per_nucleus_snapshot);
+    const deltaBags = bags - old.bags_produced;
+    const deltaWeight = weight - old.commercial_weight_kg;
+    const st = stock(state, old.product_id);
     requireValue(
       st.quantity + deltaBags >= 0 && st.weight_kg + deltaWeight >= 0,
       "La reducción supera el stock físico actual. Resuelva las salidas asociadas antes de rectificar.",
     );
-    pick(s, "productionProducts", old.id).is_current = false;
-    if (n > 0)
+    pick(state, "productionProducts", old.id).is_current = false;
+    if (nucleiCount > 0)
       add("productionProducts", {
         ...old,
         id: uid(),
         created_at: clock,
         created_by: actor.id,
-        nuclei_count: n,
+        nuclei_count: nucleiCount,
         bags_produced: bags,
         commercial_weight_kg: weight,
-        formula_weight_kg: sum(old.formula_snapshot, (x) => x.kg_per_nucleus) * n,
+        formula_weight_kg: sum(old.formula_snapshot, (x) => x.kg_per_nucleus) * nucleiCount,
         is_current: true,
       });
-    totalNuclei += n;
+    totalNuclei += nucleiCount;
     totalBags += bags;
     for (const fi of old.formula_snapshot)
-      amounts[fi.ingredient_id] = (amounts[fi.ingredient_id] ?? 0) + fi.kg_per_nucleus * n;
+      amounts[fi.ingredient_id] = (amounts[fi.ingredient_id] ?? 0) + fi.kg_per_nucleus * nucleiCount;
     if (deltaBags || deltaWeight)
       movement({
         item_type: "PRODUCT",
@@ -199,7 +214,7 @@ export function productionCorrectQuantities(context) {
         quantity: deltaBags,
         weight_kg: deltaWeight,
         source_type: "PRODUCTION",
-        source_id: pr.id,
+        source_id: production.id,
         notes: why,
       });
   }
@@ -208,13 +223,13 @@ export function productionCorrectQuantities(context) {
     "Debe quedar al menos un núcleo. Para eliminar toda la producción use anulación.",
   );
   for (const old of before.ingredients) {
-    const total_kg = amounts[old.ingredient_id] ?? 0,
-      gross = roundedProduct(total_kg, old.historical_price_per_kg, 1000);
+    const total_kg = amounts[old.ingredient_id] ?? 0;
+    const gross = roundedProduct(total_kg, old.historical_price_per_kg, 1000);
     requireValue(
       old.discount_amount <= gross,
       "El descuento histórico supera el nuevo costo. Rectifique el descuento primero.",
     );
-    pick(s, "productionIngredients", old.id).is_current = false;
+    pick(state, "productionIngredients", old.id).is_current = false;
     add("productionIngredients", {
       ...old,
       id: uid(),
@@ -234,68 +249,71 @@ export function productionCorrectQuantities(context) {
         quantity: 0,
         weight_kg: old.total_kg - total_kg,
         source_type: "PRODUCTION",
-        source_id: pr.id,
+        source_id: production.id,
         notes: why,
       });
   }
-  for (const input of p.costs ?? []) {
-    const c = pick(s, "productionCosts", input.id);
-    requireValue(c.production_id === pr.id && c.is_current !== false, "Costo ajeno a producción.");
+  for (const input of payload.costs ?? []) {
+    const c = pick(state, "productionCosts", input.id);
+    requireValue(c.production_id === production.id && c.is_current !== false, "Costo ajeno a producción.");
     c.amount = scaled(input.amount);
     if (c.category === "NUCLEUS") c.quantity = totalNuclei;
     if (c.category === "PACKAGING") c.quantity = totalBags;
   }
-  correction("PRODUCTION", pr.id, before, productionSummary(s, pr), why);
-  pr.updated_at = clock;
-  result = pr.id;
+  correction("PRODUCTION", production.id, before, productionSummary(state, production), why);
+  production.updated_at = clock;
+  result = production.id;
   return result;
 }
 export function productionClose(context) {
-  const { s, p, actor, clock } = context;
+  const { s: state, p: payload, actor, clock } = context;
   let result = null;
-  const pr = pick(s, "productions", p.id);
-  requireValue(pr.status === "CONFIRMED", "Solo puede cerrar una producción confirmada.");
-  requireValue(productionSummary(s, pr).reconciled, "Complete los cobros reales de todos los insumos.");
-  pr.status = "CLOSED";
-  pr.closed_at = clock;
-  pr.closed_by = actor.id;
-  result = pr.id;
+  const production = pick(state, "productions", payload.id);
+  requireValue(production.status === "CONFIRMED", "Solo puede cerrar una producción confirmada.");
+  requireValue(
+    productionSummary(state, production).reconciled,
+    "Complete los cobros reales de todos los insumos.",
+  );
+  production.status = "CLOSED";
+  production.closed_at = clock;
+  production.closed_by = actor.id;
+  result = production.id;
   return result;
 }
 export function productionCancel(context) {
-  const { s, p, actor, clock, uid, reason, movement } = context;
+  const { s: state, p: payload, actor, clock, uid, reason, movement } = context;
   let result = null;
-  const pr = pick(s, "productions", p.id);
-  requireValue(pr.status !== "CANCELLED", "Ya anulada.");
+  const production = pick(state, "productions", payload.id);
+  requireValue(production.status !== "CANCELLED", "Ya anulada.");
   const why = reason();
-  const a = productionSummary(s, pr);
-  if (pr.status !== "DRAFT") {
-    for (const x of a.products) {
-      const a = stock(s, x.product_id);
+  const summary = productionSummary(state, production);
+  if (production.status !== "DRAFT") {
+    for (const x of summary.products) {
+      const physicalStock = stock(state, x.product_id);
       requireValue(
-        a.quantity >= x.bags_produced && a.weight_kg >= x.commercial_weight_kg,
+        physicalStock.quantity >= x.bags_produced && physicalStock.weight_kg >= x.commercial_weight_kg,
         "No puede revertir producción cuyo stock ya se consumió.",
       );
     }
-    for (const m of s.inventoryMovements.filter(
-      (x) => x.source_type === "PRODUCTION" && x.source_id === pr.id,
+    for (const m of state.inventoryMovements.filter(
+      (x) => x.source_type === "PRODUCTION" && x.source_id === production.id,
     ))
       movement({
         ...m,
         id: uid(),
         created_at: clock,
         created_by: actor.id,
-        date: date(p.date ?? today()),
+        date: date(payload.date ?? today()),
         movement_type: "CANCELLATION_REVERSAL",
         quantity: -m.quantity,
         weight_kg: -m.weight_kg,
         notes: why,
       });
   }
-  pr.status = "CANCELLED";
-  pr.cancellation_reason = why;
-  pr.cancelled_at = clock;
-  pr.cancelled_by = actor.id;
-  result = pr.id;
+  production.status = "CANCELLED";
+  production.cancellation_reason = why;
+  production.cancelled_at = clock;
+  production.cancelled_by = actor.id;
+  result = production.id;
   return result;
 }

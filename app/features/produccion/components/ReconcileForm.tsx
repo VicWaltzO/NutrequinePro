@@ -1,34 +1,27 @@
 "use client";
 import { useState } from "react";
 import { recordId } from "@/lib/domain-types";
-import type { CostInput } from "@/lib/domain-types";
-import type { NumericInput } from "@/lib/domain-types";
-import type { ProductionCost } from "@/lib/domain-types";
-import type { ReconcileIngredient } from "@/shared/types/forms";
+import type { CostInput, NumericInput, ProductionCost } from "@/lib/domain-types";
+import type { ReconcileIngredient, FormProps } from "@/shared/types/forms";
 import { productionSummary } from "@/lib/domain.mjs";
-import { Input } from "@/shared/ui";
-import { Check } from "@/shared/ui";
-import { Table } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import { find } from "@/shared/ui";
+import { Input, Check, Table, money, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
-import type { FormProps } from "@/shared/types/forms";
 import { CostRows } from "./CostRows";
-export function ReconcileForm({ s, record, submit, close, busy }: FormProps) {
+export function ReconcileForm({ s: state, record, submit, close, busy }: FormProps) {
   const id = recordId(record);
-  const a = productionSummary(s, { id });
+  const a = productionSummary(state, { id });
   const [rows, setRows] = useState<ReconcileIngredient[]>(
-      a.ingredients.map((x) => ({
-        ...x,
-        actual_charge: x.actual_charge === null ? "" : x.actual_charge / 100,
-        discount_amount: x.discount_amount / 100,
-      })),
-    ),
-    [costs, setCosts] = useState<(Omit<ProductionCost, "amount"> & { amount: NumericInput })[]>(
-      a.costs.map((x) => ({ ...x, amount: x.amount / 100 })),
-    ),
-    [newCosts, setNewCosts] = useState<CostInput[]>([]),
-    [reason, setReason] = useState("Conciliación con cobro real");
+    a.ingredients.map((x) => ({
+      ...x,
+      actual_charge: x.actual_charge === null ? "" : x.actual_charge / 100,
+      discount_amount: x.discount_amount / 100,
+    })),
+  );
+  const [costs, setCosts] = useState<(Omit<ProductionCost, "amount"> & { amount: NumericInput })[]>(
+    a.costs.map((x) => ({ ...x, amount: x.amount / 100 })),
+  );
+  const [newCosts, setNewCosts] = useState<CostInput[]>([]);
+  const [reason, setReason] = useState("Conciliación con cobro real");
   return (
     <form
       onSubmit={async (e) => {
@@ -42,7 +35,7 @@ export function ReconcileForm({ s, record, submit, close, busy }: FormProps) {
       <Table heads={["Insumo", "Teórico bruto", "Descuento S/", "Cobro real S/", "Diferencia", "Pagado"]}>
         {rows.map((x, i) => (
           <tr key={x.id}>
-            <td>{find(s, "ingredients", x.ingredient_id)?.name}</td>
+            <td>{find(state, "ingredients", x.ingredient_id)?.name}</td>
             <td>{money(x.theoretical_gross_cost)}</td>
             {(["discount_amount", "actual_charge"] as const).map((k) => (
               <td key={k}>
@@ -100,7 +93,7 @@ export function ReconcileForm({ s, record, submit, close, busy }: FormProps) {
           />
         </div>
       ))}
-      <CostRows s={s} costs={newCosts} setCosts={setNewCosts} />
+      <CostRows s={state} costs={newCosts} setCosts={setNewCosts} />
       <Input label="Motivo" required value={reason} onChange={setReason} />
       <Footer busy={busy} close={close} label="Guardar conciliación" />
     </form>

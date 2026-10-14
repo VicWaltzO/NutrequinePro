@@ -1,10 +1,7 @@
 "use client";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { errorMessage } from "@/lib/domain-types";
-import type { AppState } from "@/lib/domain-types";
-import type { User } from "@/lib/domain-types";
-import type { EditorRecord } from "@/lib/domain-types";
+import type { AppState, User, EditorRecord } from "@/lib/domain-types";
 import { createCommandRequest } from "@/lib/command-request.mjs";
 import type { Modal } from "@/shared/types/admin";
 class StateRequestError extends Error {
@@ -32,7 +29,7 @@ async function fetchState() {
 }
 export function useAdminOperations() {
   const [authenticatedId, setAuthenticatedId] = useState<string | null>(null);
-  const [s, setS] = useState<AppState | null>(null);
+  const [state, setState] = useState<AppState | null>(null);
   const [actor, setActor] = useState<User | null>(null);
   const [modal, setModal] = useState<Modal | null>(null);
   const [error, setError] = useState("");
@@ -41,9 +38,9 @@ export function useAdminOperations() {
   const [requests] = useState(createCommandRequest);
   const reload = async () => {
     try {
-      const j = await fetchState();
-      setS(j.state);
-      setActor(j.actor);
+      const responseBody = await fetchState();
+      setState(responseBody.state);
+      setActor(responseBody.actor);
       setError("");
       setAuthenticatedId(null);
     } catch (e) {
@@ -54,10 +51,10 @@ export function useAdminOperations() {
   useEffect(() => {
     let active = true;
     fetchState()
-      .then((j) => {
+      .then((responseBody) => {
         if (active) {
-          setS(j.state);
-          setActor(j.actor);
+          setState(responseBody.state);
+          setActor(responseBody.actor);
           setError("");
           setAuthenticatedId(null);
         }
@@ -74,8 +71,8 @@ export function useAdminOperations() {
   }, []);
   useEffect(() => {
     if (toast) {
-      const t = setTimeout(() => setToast(""), 5000);
-      return () => clearTimeout(t);
+      const toastTimeout = setTimeout(() => setToast(""), 5000);
+      return () => clearTimeout(toastTimeout);
     }
   }, [toast]);
   const open = (type: string, record?: EditorRecord, kind?: string) => {
@@ -90,34 +87,41 @@ export function useAdminOperations() {
       requests.reset();
     }
   };
-  const run = async (type: string, p: object): Promise<string | true | null> => {
+  const run = async (type: string, operationPayload: object): Promise<string | true | null> => {
     if (busy) return null;
-    const { _keep_open, ...payload } = p as { _keep_open?: boolean };
+    const { _keep_open, ...payload } = operationPayload as { _keep_open?: boolean };
     const fingerprint = JSON.stringify({ type, payload });
     const requestId = requests.begin(fingerprint);
     if (!requestId) return null;
     setBusy(true);
     setError("");
     try {
-      const r = await fetch("/api/command", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type, payload, request_id: requestId }),
-        }),
-        j = (await r.json()) as { state: AppState; result: string | null; error?: string };
-      if (!r.ok) throw Error(j.error);
-      setS(j.state);
+      const response = await fetch("/api/command", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, payload, request_id: requestId }),
+      });
+      const responseBody = (await response.json()) as {
+        state: AppState;
+        result: string | null;
+        error?: string;
+      };
+      if (!response.ok) throw Error(responseBody.error);
+      setState(responseBody.state);
       requests.reset();
       setToast("Operación registrada.");
       if (!_keep_open) {
-        if (type.startsWith("SALE_") && j.result) setModal({ type: "sale-detail", record: { id: j.result } });
-        else if (type.startsWith("PRODUCTION_") && j.result)
-          setModal({ type: "production-detail", record: { id: j.result } });
-        else if (["PAYMENT_CREATE", "PAYMENT_APPLY_CREDIT"].includes(type) && j.result)
-          setModal({ type: "payment-detail", record: { id: j.result } });
-        else setModal(null);
+        if (type.startsWith("SALE_") && responseBody.result) {
+          setModal({ type: "sale-detail", record: { id: responseBody.result } });
+        } else if (type.startsWith("PRODUCTION_") && responseBody.result) {
+          setModal({ type: "production-detail", record: { id: responseBody.result } });
+        } else if (["PAYMENT_CREATE", "PAYMENT_APPLY_CREDIT"].includes(type) && responseBody.result) {
+          setModal({ type: "payment-detail", record: { id: responseBody.result } });
+        } else {
+          setModal(null);
+        }
       }
-      return j.result ?? true;
+      return responseBody.result ?? true;
     } catch (e) {
       setError(errorMessage(e, "No se pudo guardar. Vuelva a intentar."));
       return null;
@@ -126,5 +130,5 @@ export function useAdminOperations() {
       setBusy(false);
     }
   };
-  return { s, actor, modal, error, busy, toast, authenticatedId, reload, open, close, run };
+  return { s: state, actor, modal, error, busy, toast, authenticatedId, reload, open, close, run };
 }

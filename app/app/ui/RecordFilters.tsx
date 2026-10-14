@@ -1,12 +1,11 @@
 "use client";
 import type { AppState } from "@/lib/domain-types";
 import { Search } from "lucide-react";
-import { Input } from "@/shared/ui";
-import { Select } from "@/shared/ui";
-import type { Dispatch } from "react";
-import type { SetStateAction } from "react";
+import { Input, Select } from "@/shared/ui";
+import type { Dispatch, SetStateAction } from "react";
+
 export default function RecordFilters({
-  s,
+  s: state,
   view,
   q,
   setQ,
@@ -36,6 +35,18 @@ export default function RecordFilters({
   to: string;
   setTo: Dispatch<SetStateAction<string>>;
 }) {
+  let statusOptions = [
+    "DRAFT",
+    "CONFIRMED",
+    "RECTIFIED",
+    "PENDING",
+    "PARTIAL",
+    "PAID",
+    "DELIVERED",
+    "CANCELLED",
+  ];
+  if (view === "productions") statusOptions = ["DRAFT", "CONFIRMED", "CLOSED", "CANCELLED"];
+  else if (view === "collections") statusOptions = ["PENDING", "PARTIAL"];
   return (
     <div className="filters">
       <div className="search">
@@ -51,24 +62,18 @@ export default function RecordFilters({
       <Input label="Hasta" type="date" value={to} onChange={setTo} />
       {["sales", "collections"].includes(view) && (
         <>
-          <Select label="Cliente" value={client} onChange={setClient} options={s.customers} empty="Todos" />
-          <Select label="Sede" value={site} onChange={setSite} options={s.sites} empty="Todas" />
+          <Select
+            label="Cliente"
+            value={client}
+            onChange={setClient}
+            options={state.customers}
+            empty="Todos"
+          />
+          <Select label="Sede" value={site} onChange={setSite} options={state.sites} empty="Todas" />
         </>
       )}
       {["sales", "collections", "productions"].includes(view) && (
-        <Select
-          label="Estado"
-          value={filter}
-          onChange={setFilter}
-          empty="Todos"
-          options={
-            view === "productions"
-              ? ["DRAFT", "CONFIRMED", "CLOSED", "CANCELLED"]
-              : view === "collections"
-                ? ["PENDING", "PARTIAL"]
-                : ["DRAFT", "CONFIRMED", "RECTIFIED", "PENDING", "PARTIAL", "PAID", "DELIVERED", "CANCELLED"]
-          }
-        />
+        <Select label="Estado" value={filter} onChange={setFilter} empty="Todos" options={statusOptions} />
       )}
       <button
         className="text-button"

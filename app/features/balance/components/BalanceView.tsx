@@ -1,13 +1,10 @@
 "use client";
-import type { AppState } from "@/lib/domain-types";
+import type { AppState, BalanceSummary } from "@/lib/domain-types";
 import { balanceSummary } from "@/lib/domain.mjs";
-import { Table } from "@/shared/ui";
-import { Metrics } from "@/shared/ui";
-import { money } from "@/shared/ui";
-import type { BalanceSummary } from "@/lib/domain-types";
+import { Table, Metrics, money } from "@/shared/ui";
 import type { ReactNode } from "react";
 export default function BalanceView({
-  s,
+  s: state,
   b,
   filters,
   productionList,
@@ -90,14 +87,14 @@ export default function BalanceView({
         <Table heads={["Mes", "Ventas registradas", "Cobros netos"]}>
           {[
             ...new Set([
-              ...s.sales.map((x) => x.sale_date.slice(0, 7)),
-              ...s.payments.map((x) => x.payment_date.slice(0, 7)),
-              ...s.paymentReversals.map((x) => x.date.slice(0, 7)),
+              ...state.sales.map((x) => x.sale_date.slice(0, 7)),
+              ...state.payments.map((x) => x.payment_date.slice(0, 7)),
+              ...state.paymentReversals.map((x) => x.date.slice(0, 7)),
             ]),
           ]
             .sort()
             .map((m) => {
-              const z = balanceSummary(s, m + "-01", m + "-31");
+              const z = balanceSummary(state, m + "-01", m + "-31");
               return (
                 <tr key={m}>
                   <td>{m}</td>

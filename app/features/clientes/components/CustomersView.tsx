@@ -1,12 +1,10 @@
 "use client";
-import type { AppState } from "@/lib/domain-types";
+import type { AppState, OpenModal } from "@/lib/domain-types";
 import CustomerDirectory from "@/features/clientes/components/CustomerDirectory";
-import type { OpenModal } from "@/lib/domain-types";
-import type { ReactNode } from "react";
-import type { Dispatch } from "react";
-import type { SetStateAction } from "react";
+import type { ReactNode, Dispatch, SetStateAction } from "react";
+
 export default function CustomersView({
-  s,
+  s: state,
   tab,
   write,
   open,
@@ -28,7 +26,7 @@ export default function CustomersView({
         ["all", "Clientes"],
         ["sites", "Sedes"],
       ])}
-      <CustomerDirectory s={s} tab={tab} query={q} onQuery={setQ} write={write} open={open} />
+      <CustomerDirectory s={state} tab={tab} query={q} onQuery={setQ} write={write} open={open} />
     </>
   );
 }

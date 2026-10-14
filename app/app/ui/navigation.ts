@@ -1,12 +1,15 @@
-import { LayoutDashboard } from "lucide-react";
-import { ShoppingBag } from "lucide-react";
-import { Wallet } from "lucide-react";
-import { Users } from "lucide-react";
-import { Factory } from "lucide-react";
-import { Layers } from "lucide-react";
-import { Receipt } from "lucide-react";
-import { ChartNoAxesCombined } from "lucide-react";
-import { Settings } from "lucide-react";
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Wallet,
+  Users,
+  Factory,
+  Layers,
+  Receipt,
+  ChartNoAxesCombined,
+  Settings,
+} from "lucide-react";
+
 export const nav = [
   ["dashboard", "Resumen", LayoutDashboard],
   ["sales", "Ventas", ShoppingBag],
