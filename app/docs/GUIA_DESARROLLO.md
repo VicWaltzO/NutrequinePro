@@ -83,6 +83,10 @@ la aplicación; revisar las exclusiones existentes del código vendorizado.
 
 ## Migraciones
 
+Antes de cambios de arquitectura o esquema, consultar el
+[estado base registrado](ESTADO_BASE_ARQUITECTURA.md) y el
+[procedimiento de respaldo y restauración](RESPALDO_RESTAURACION.md).
+
 Las migraciones aplicadas son inmutables. Modificar el esquema Drizzle, generar una
 migración nueva y revisar SQL y datos afectados antes de incorporarla. Ejecutar
 `db:prepare` sobre una base aislada; volver a ejecutarlo debe no repetir cambios.
