@@ -7,6 +7,8 @@ dist/
 work/
 coverage/
 outputs/
+# Downloaded multimedia tools are generated local artifacts, not application source.
+demo-linkedin/.tools/
 public/
 vendor/
 build/
