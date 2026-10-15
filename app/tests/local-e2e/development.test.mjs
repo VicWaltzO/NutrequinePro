@@ -8,13 +8,20 @@ test(
   { timeout: 150000 },
   async (t) => {
     const server = await localAppFixture({ development: true });
-    t.after(server.stop);
+    let browser;
+    t.after(async () => {
+      try {
+        // Close the HMR WebSocket before waiting for the development server to stop.
+        await browser?.close();
+      } finally {
+        await server.stop();
+      }
+    });
     console.log("Development evidence: " + server.evidence);
-    const browser = await chromium.launch({
+    browser = await chromium.launch({
       channel: process.env.REGRESSION_BROWSER_CHANNEL || undefined,
       headless: true,
     });
-    t.after(() => browser.close());
     const context = await browser.newContext();
     const page = await context.newPage();
     const errors = [];
