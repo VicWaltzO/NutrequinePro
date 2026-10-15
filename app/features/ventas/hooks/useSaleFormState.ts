@@ -1,11 +1,15 @@
 "use client";
 import { useState } from "react";
 import type { SaleFields, SaleLine, FormProps } from "@/shared/types/forms";
-import { stock, saleSummary, normalize } from "@/lib/domain.mjs";
-import { day, find } from "@/shared/ui";
+import type { SaleItem } from "@/lib/domain-types";
+import { saleSummary } from "../domain/summary.mjs";
+import { normalize } from "@/shared/domain/core.mjs";
+import { saleFormPreview } from "./sale-form-preview";
+import { day } from "@/shared/lib/format";
+import { find } from "@/shared/lib/find";
 
 export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s" | "record" | "kind">) {
-  const old = record?.id ? saleSummary(state, { id: record.id }).items : [];
+  const old: SaleItem[] = record?.id ? saleSummary(state, { id: record.id }).items : [];
   const edit = kind === "correct";
   const [values, setValues] = useState<SaleFields>({
     sale_date: record?.sale_date ?? day(),
@@ -49,27 +53,12 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
         return n;
       }),
     );
-  const grouped: Record<string, { q: number; w: number }> = {};
-  rows.forEach((r) => {
-    grouped[r.product_id] ??= { q: 0, w: 0 };
-    grouped[r.product_id].q += Number(r.quantity) || 0;
-    grouped[r.product_id].w += (Number(r.quantity) || 0) * (Number(r.unit_weight_kg) || 0) * 1000;
-  });
-  const missing = Object.entries(grouped).filter(
-    ([id, a]) =>
-      id &&
-      (a.q >
-        stock(state, id).quantity +
-          (edit && record?.fulfillment_status === "DELIVERED"
-            ? old.filter((x) => x.product_id === id).reduce((n: number, x) => n + x.quantity, 0)
-            : 0) ||
-        a.w >
-          stock(state, id).weight_kg +
-            (edit && record?.fulfillment_status === "DELIVERED"
-              ? old.filter((x) => x.product_id === id).reduce((n: number, x) => n + x.total_weight_kg, 0)
-              : 0)),
+  const { missing, total } = saleFormPreview(
+    state,
+    rows,
+    old,
+    edit && record?.fulfillment_status === "DELIVERED",
   );
-  const total = rows.reduce((a, r) => a + Math.round(Number(r.quantity) * Number(r.unit_price) * 100), 0);
   const dup = state.customers.some((x) => normalize(x.name) === normalize(newName));
   const paid = paidAmount === null ? total : Math.round(Number(paidAmount || 0) * 100);
   return {

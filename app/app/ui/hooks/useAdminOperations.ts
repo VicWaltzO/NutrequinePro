@@ -4,29 +4,7 @@ import { errorMessage } from "@/lib/domain-types";
 import type { AppState, User, EditorRecord } from "@/lib/domain-types";
 import { createCommandRequest } from "@/lib/command-request.mjs";
 import type { Modal } from "@/shared/types/admin";
-class StateRequestError extends Error {
-  constructor(
-    message: string,
-    readonly authenticatedId?: string,
-  ) {
-    super(message);
-  }
-}
-async function fetchState() {
-  const response = await fetch("/api/state", { cache: "no-store" });
-  const body = (await response.json()) as {
-    state: AppState;
-    actor: User;
-    error?: string;
-    authenticated_id?: string;
-  };
-  if (!response.ok)
-    throw new StateRequestError(
-      body.error ?? "No se pudieron cargar los datos.",
-      response.status === 403 ? body.authenticated_id : undefined,
-    );
-  return body;
-}
+import { fetchAdminState, submitAdminCommand, StateRequestError } from "../admin-api";
 export function useAdminOperations() {
   const [authenticatedId, setAuthenticatedId] = useState<string | null>(null);
   const [state, setState] = useState<AppState | null>(null);
@@ -38,7 +16,7 @@ export function useAdminOperations() {
   const [requests] = useState(createCommandRequest);
   const reload = async () => {
     try {
-      const responseBody = await fetchState();
+      const responseBody = await fetchAdminState();
       setState(responseBody.state);
       setActor(responseBody.actor);
       setError("");
@@ -50,7 +28,7 @@ export function useAdminOperations() {
   };
   useEffect(() => {
     let active = true;
-    fetchState()
+    fetchAdminState()
       .then((responseBody) => {
         if (active) {
           setState(responseBody.state);
@@ -96,17 +74,7 @@ export function useAdminOperations() {
     setBusy(true);
     setError("");
     try {
-      const response = await fetch("/api/command", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, payload, request_id: requestId }),
-      });
-      const responseBody = (await response.json()) as {
-        state: AppState;
-        result: string | null;
-        error?: string;
-      };
-      if (!response.ok) throw Error(responseBody.error);
+      const responseBody = await submitAdminCommand(type, payload, requestId);
       setState(responseBody.state);
       requests.reset();
       setToast("Operación registrada.");
