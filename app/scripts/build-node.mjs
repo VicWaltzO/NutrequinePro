@@ -4,9 +4,11 @@ import { createRequire } from "node:module";
 import { dirname, join, relative, isAbsolute, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
+import { resetBuildDirectory } from "./build-paths.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const require = createRequire(import.meta.url);
+const destination = resetBuildDirectory("dist-node");
 const result = spawnSync(
   process.execPath,
   [require.resolve("typescript/bin/tsc"), "-p", "server/tsconfig.build.json"],
@@ -14,7 +16,6 @@ const result = spawnSync(
 );
 if (result.error) throw result.error;
 if (result.status !== 0) process.exit(result.status ?? 1);
-const destination = join(root, "dist-node");
 // Declaration files can satisfy TypeScript without emitting their adjacent .mjs runtime.
 const runtimeFiles = new Set();
 function includeRuntime(target) {
@@ -34,7 +35,13 @@ function includeRuntime(target) {
 }
 for (const file of readdirSync(join(destination, "server")))
   if (file.endsWith(".mjs")) includeRuntime(join(destination, "server", file));
+includeRuntime(join(destination, "scripts/sqlite-admin.mjs"));
 cpSync(join(root, "drizzle"), join(destination, "drizzle"), { recursive: true });
+for (const file of readdirSync(join(root, "vendor")))
+  if (/LICENSE|NOTICE/i.test(file)) {
+    mkdirSync(join(destination, "vendor"), { recursive: true });
+    cpSync(join(root, "vendor", file), join(destination, "vendor", file));
+  }
 const project = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 writeFileSync(
   join(destination, "package.json"),
@@ -69,7 +76,25 @@ function copyDependency(name, parentRequire) {
     throw new Error("Dependencia fuera del árbol instalado.");
   const target = join(destination, "node_modules", location);
   mkdirSync(dirname(target), { recursive: true });
-  cpSync(dirname(manifest), target, { recursive: true });
+  const developmentDirectories = new Set([
+    "test",
+    "tests",
+    "__tests__",
+    "docs",
+    "examples",
+    "benchmarks",
+    ".github",
+    "node_modules",
+  ]);
+  cpSync(dirname(manifest), target, {
+    recursive: true,
+    filter: (source) =>
+      source === dirname(manifest) ||
+      (!source.endsWith(".map") &&
+        !relative(dirname(manifest), source)
+          .split(sep)
+          .some((part) => developmentDirectories.has(part))),
+  });
   const metadata = JSON.parse(readFileSync(manifest, "utf8"));
   const dependencyRequire = createRequire(manifest);
   for (const dependency of Object.keys(metadata.dependencies ?? {}))

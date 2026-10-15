@@ -1,4 +1,3 @@
-import Image from "@/shared/ui/LocalImage";
 import type { User } from "@/lib/domain-types";
 import { ChevronRight } from "lucide-react";
 import { label } from "@/shared/ui";
@@ -17,7 +16,7 @@ export default function Sidebar({
   return (
     <aside className={"sidebar " + (menu ? "visible" : "")}>
       <a className="brand" href="#dashboard" onClick={() => go("dashboard")}>
-        <Image width={150} height={150} unoptimized src="/brand/logo.jpg" alt="Nutrequine Pro" />
+        <img width={150} height={150} src="/brand/logo.jpg" alt="Nutrequine Pro" />
         <span>
           NUTREQUINE<span>PRO / ADMINISTRACIÓN</span>
         </span>

@@ -1,4 +1,3 @@
-import Image from "@/shared/ui/LocalImage";
 import { Moon, Sun } from "lucide-react";
 import type { AppState, OpenModal, User } from "@/lib/domain-types";
 import { changeTheme } from "@/lib/browser-preferences.mjs";
@@ -52,10 +51,9 @@ export default function Configuration({
         </section>
         <details className="settings-section">
           <summary>Presentación original de productos</summary>
-          <Image
+          <img
             width={1440}
             height={1728}
-            unoptimized
             className="catalog-image"
             src="/brand/productos.jpg"
             alt="Presentación real de Nutrelin, Hi-Performance y Potripregnant"

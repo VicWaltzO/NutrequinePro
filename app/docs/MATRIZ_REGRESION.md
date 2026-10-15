@@ -1,5 +1,10 @@
 # Matriz de regresión — Tarea 02
 
+Estado vigente: ver [Tarea 09](REPORTE_09_CONSOLIDACION.md). El objetivo operativo
+es React/Node/SQLite y `npm run test:e2e` ejecuta sus flujos. Las tablas de Tareas
+02–08 conservan sus resultados históricos; no representan requisitos de plataforma
+ni pendientes ya resueltos de la arquitectura actual.
+
 Base anterior: `36d8cb3`, 55 pruebas. Fecha: 14/10/2026, America/Bogota.
 Esta matriz compara comportamientos, no porcentajes de cobertura de líneas. Los IDs R/H/B/N son referencias estables para repetir escenarios en el destino.
 La columna de migración permanece pendiente: no hay autenticación local, adaptador de disco o servidor Node nuevos en esta tarea.
@@ -207,3 +212,15 @@ para resultados finales, capturas y condiciones de la prueba de red.
 
 Continúan pendientes P04/P05/P07/P08 y los límites de carga/entorno descritos en
 los reportes; esta ampliación no representa migración de datos reales.
+
+## Consolidación — Tarea 09
+
+| Referencia anterior      | Verificación principal actual                                                                                                                                                                                                                                     |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BASE, R01–R24            | Escenarios comerciales conservados, puerto SQLite de referencia y adaptador real en disco. No cambian expectativas de céntimos, gramos, caja o historial.                                                                                                         |
+| H01–H10                  | Tests Node HTTP reales de Tarea 07: autenticación local, idempotencia, permisos, Host/Origin/CSRF, bytes, formato y errores seguros. Se retiran los handlers de la plataforma anterior. JSON malformado 400 y permisos 403 son contratos vigentes desde Tarea 07. |
+| N01–N04 / B01–B08        | Sustituidos por L01–L14 sobre React y backend real; no se ejecuta ya un servidor de plataforma para la regresión principal.                                                                                                                                       |
+| P03 / SQLITE-DISK-01     | L15 añade respaldo, manifiesto, restauración nueva y reinicio desde la distribución compilada, conservando estado completo. Recuperación organizacional de credenciales continúa pendiente.                                                                       |
+| UI                       | 66 escenarios independientes capturados antes de consolidar; referencia anterior conservada sin cambios.                                                                                                                                                          |
+| NODE-OFFLINE-01          | Distribución copiada fuera del checkout y bloqueo instrumentado de conexiones externas, incluido CLI de recuperación. No certifica firewall del SO.                                                                                                               |
+| Instalación y artefactos | npm ci, build independiente y auditoría de dependencias/archivos; los resultados finales y el ensayo desde checkout limpio se registran en el reporte 09.                                                                                                         |

@@ -1,5 +1,10 @@
 # Demostración operativa para LinkedIn
 
+> Material multimedia histórico de la arquitectura anterior. Sus scripts de captura
+> requieren recuperar el commit correspondiente y bases sintéticas; no se utilizan
+> para operar, compilar o probar la aplicación actual. Consultar la
+> [instalación local](../docs/INSTALACION_LOCAL.md). Los medios y resultados QA se conservan como antecedentes.
+
 Video de Nutrequine Pro: producción y costos, registro de una venta a crédito y aplicación de un pago parcial. El panel Resumen abre y cierra la pieza. Los datos son ficticios; los formularios, cálculos, estados y persistencia son los de la aplicación existente.
 
 Entregables principales: `showcase_final.mp4`, `showcase_source.webm`, `record_demo.mjs`, `render_demo.mjs`, `FEATURE_AUDIT.md`, `STORYBOARD.md` y `QA_REPORT.md`. Las evidencias estructuradas quedan en `qa/`. Los PNG de inspección se generan localmente y se excluyen de Git. Ambos videos caben en Git normal; no se requiere LFS ni una publicación externa.

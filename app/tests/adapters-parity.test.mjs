@@ -1,11 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Miniflare } from "miniflare";
-import { join } from "node:path";
-import { createD1Adapter } from "../lib/adapters/d1.ts";
+import { memoryPersistence } from "./helpers/memory-persistence.mjs";
 import { createStore } from "../lib/application-store.mjs";
 import { TABLES, seedState, productionSummary, saleSummary, balanceSummary, stock } from "../lib/domain.mjs";
-import { diskFixture, historicalSchema, temporaryDataDirectory } from "./helpers/persistence-fixtures.mjs";
+import { diskFixture } from "./helpers/persistence-fixtures.mjs";
 import {
   adminIdentity,
   cashCreditScenario,
@@ -138,34 +136,13 @@ function canonicalState(state, initial) {
 }
 
 test(
-  "D1 real en Miniflare y SQLite en disco conservan resultados e historial comercial equivalentes",
+  "Puerto SQLite de referencia y adaptador SQLite en disco conservan resultados e historial comercial equivalentes",
   { timeout: 180000 },
   async (t) => {
-    let miniflare;
-    const directory = temporaryDataDirectory(t, async () => {
-      await miniflare?.dispose();
-    });
-    miniflare = new Miniflare({
-      modules: true,
-      script: 'export default { fetch() { return new Response("synthetic"); } };',
-      compatibilityDate: "2026-05-15",
-      host: "127.0.0.1",
-      port: 0,
-      inspectorPort: 0,
-      cf: false,
-      d1Databases: { DB: "synthetic-parity-05" },
-      d1Persist: join(directory, "d1"),
-    });
-    const native = await miniflare.getD1Database("DB");
-    await native.batch(
-      historicalSchema
-        .split("--> statement-breakpoint")
-        .map((sql) => sql.trim())
-        .filter(Boolean)
-        .map((sql) => native.prepare(sql)),
-    );
+    const memory = memoryPersistence();
+    t.after(memory.close);
     const disk = diskFixture(t);
-    const d1Store = createStore(() => createD1Adapter(native));
+    const referenceStore = createStore(() => memory.binding);
     const sqliteStore = createStore(() => disk.binding);
     const initial = seedState();
     initial.users.push({
@@ -176,14 +153,14 @@ test(
       created_at: "2026-10-14T00:00:00.000Z",
       created_by: adminIdentity.userId,
     });
-    await d1Store.persistState(null, initial);
+    await referenceStore.persistState(null, initial);
     await sqliteStore.persistState(null, initial);
-    const d1 = await historyScenario(d1Store);
+    const reference = await historyScenario(referenceStore);
     const sqlite = await historyScenario(sqliteStore);
-    assert.deepEqual(canonicalState(sqlite, initial), canonicalState(d1, initial));
-    assert.deepEqual(balanceSummary(sqlite), balanceSummary(d1));
-    assert.deepEqual(stock(sqlite, "prod-1"), stock(d1, "prod-1"));
-    assert.deepEqual(await d1Store.loadState(), d1);
+    assert.deepEqual(canonicalState(sqlite, initial), canonicalState(reference, initial));
+    assert.deepEqual(balanceSummary(sqlite), balanceSummary(reference));
+    assert.deepEqual(stock(sqlite, "prod-1"), stock(reference, "prod-1"));
+    assert.deepEqual(await referenceStore.loadState(), reference);
     assert.deepEqual(await sqliteStore.loadState(), sqlite);
     assert.equal(sqlite.customers[0].deleted_by, adminIdentity.userId);
     assert.ok(sqlite.corrections.length > 0 && sqlite.correctionFields.length > 0 && sqlite.audit.length > 0);

@@ -1,5 +1,7 @@
 # Tarea 02 — Ampliación de regresión
 
+> Documento histórico: describe el estado de su tarea y commit de origen. Para operar la aplicación actual, consultar [instalación local](INSTALACION_LOCAL.md) y [arquitectura consolidada](ARQUITECTURA.md).
+
 Fecha: 14/10/2026, America/Bogota. Rama: `codex/reestructuracion-arquitectonica`.
 Base anterior: `36d8cb3`. La tarea amplía pruebas y documentación, sin modificar
 reglas comerciales, arquitectura, autenticación, dependencias ni producción.

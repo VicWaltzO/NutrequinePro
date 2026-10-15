@@ -13,10 +13,6 @@ outputs/
 demo-linkedin/.tools/
 public/
 vendor/
-build/
-examples/
-components/ui/
-hooks/use-mobile.ts
 drizzle/
 docs/ESPECIFICACION_MAESTRA_MVP.md
 next-env.d.ts

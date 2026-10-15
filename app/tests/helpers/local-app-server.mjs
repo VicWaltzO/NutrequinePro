@@ -5,7 +5,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import net from "node:net";
-import { createRequire } from "node:module";
 import { createPrivateDirectory } from "../../lib/sqlite/files.mjs";
 import { initializeDatabase } from "../../lib/sqlite/migrations.mjs";
 import { openSqliteDatabase } from "../../lib/adapters/node-sqlite.mjs";
@@ -13,23 +12,6 @@ import { createStore } from "../../lib/application-store.mjs";
 import { provisionAuthentication } from "../../server/provision.mts";
 
 export const appRoot = fileURLToPath(new URL("../../", import.meta.url));
-export function browserTools() {
-  const require = createRequire(import.meta.url);
-  for (const candidate of [
-    "playwright",
-    join(appRoot, "demo-linkedin/node_modules/playwright"),
-    join(appRoot, "../showcase/node_modules/playwright"),
-  ]) {
-    try {
-      return require(candidate);
-    } catch (error) {
-      if (error.code !== "MODULE_NOT_FOUND") throw error;
-    }
-  }
-  throw new Error(
-    "Instale la herramienta Playwright existente para ejecutar E2E; no se instala automáticamente.",
-  );
-}
 export async function localAppFixture({ development = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "nutrequine-08-test-"));
   const directory = createPrivateDirectory(join(root, "private"));

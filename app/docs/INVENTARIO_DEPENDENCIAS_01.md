@@ -1,5 +1,7 @@
 # Inventario de dependencias — Tarea 01
 
+> Documento histórico: describe el estado de su tarea y commit de origen. Para operar la aplicación actual, consultar [instalación local](INSTALACION_LOCAL.md) y [arquitectura consolidada](ARQUITECTURA.md).
+
 Fecha: 14/10/2026. Base auditada: `a832579f2afa87594c37e35d2b4d9d363789bb9a`.
 
 Inventario de 313 archivos versionados; barrido de 248 archivos de fuente/configuración.

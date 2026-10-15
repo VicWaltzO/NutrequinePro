@@ -1,4 +1,3 @@
-import Image from "@/shared/ui/LocalImage";
 import type { AppState, Sale, BalanceSummary } from "@/lib/domain-types";
 import { Package, Factory, ChevronRight, ArrowUpRight } from "lucide-react";
 import { Metrics, money } from "@/shared/ui";
@@ -33,7 +32,7 @@ export default function DashboardView({
             lotes a producir
           </p>
         </div>
-        <Image width={150} height={150} unoptimized src="/brand/logo.jpg" alt="Logo Nutrequine Pro" />
+        <img width={150} height={150} src="/brand/logo.jpg" alt="Logo Nutrequine Pro" />
       </div>
       <Metrics
         items={[

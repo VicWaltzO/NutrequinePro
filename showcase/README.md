@@ -1,5 +1,10 @@
 # Nutrequine Pro · showcase de 45 segundos
 
+> Material multimedia histórico de la arquitectura anterior. Sus instrucciones de
+> captura describen ese entorno y requieren recuperar su commit, por ejemplo
+> `a229671`, usando datos sintéticos. Este paquete no forma parte de la instalación,
+> las pruebas ni la distribución actuales. Consultar la [instalación local](../app/docs/INSTALACION_LOCAL.md).
+
 Subproyecto audiovisual independiente para LinkedIn y portafolio. La interfaz procede de la WebApp existente: Resumen, Producción, Inventario, Ventas, Cobranza, Gastos, Balance, Clientes y Configuración. Se conservan la aplicación productiva y la demo anterior de 30 segundos.
 
 ## Decisiones de implementación

@@ -11,7 +11,7 @@ for (const script of [
   "lint",
   "format:check",
   "build",
-  "build:local",
+  "check:distribution",
 ]) {
   console.log(`\nVerificando ${script}…`);
   const result = spawnSync(process.execPath, [npmCli, "run", script], { stdio: "inherit" });

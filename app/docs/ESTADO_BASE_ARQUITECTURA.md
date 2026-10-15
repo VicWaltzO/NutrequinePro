@@ -1,5 +1,7 @@
 # Estado base para la reestructuración arquitectónica
 
+> Documento histórico: describe el estado de su tarea y commit de origen. Para operar la aplicación actual, consultar [instalación local](INSTALACION_LOCAL.md) y [arquitectura consolidada](ARQUITECTURA.md).
+
 Registro del 14/10/2026, zona America/Bogota. Esta entrega prepara una rama y
 documentación; no cambia funcionalidades, esquema, migraciones ni despliegue.
 

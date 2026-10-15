@@ -14,7 +14,7 @@ function sources(directory) {
     return /\.(?:tsx?|m?js|mts)$/.test(file) && !/\.d\.(?:ts|mts)$/.test(file) ? [file] : [];
   });
 }
-const files = ["app", "client", "features", "shared", "lib"].flatMap((folder) =>
+const files = ["client", "features", "shared", "lib"].flatMap((folder) =>
   sources(path.join(root, folder)),
 );
 const graph = new Map(files.map((file) => [file, []]));
@@ -88,7 +88,7 @@ test("dominio puro y componentes compartidos conservan sus límites de dependenc
   }
 });
 
-test("el contrato del store es neutral y la aplicación Cloudflare no carga el driver Node", () => {
+test("el store es neutral y el frontend no carga persistencia ni comandos autoritativos", () => {
   for (const file of [
     "lib/application-store.mjs",
     "lib/application-store.d.mts",
@@ -103,12 +103,22 @@ test("el contrato del store es neutral y la aplicación Cloudflare no carga el d
   function visit(file) {
     if (visited.has(file)) return;
     visited.add(file);
-    assert.notEqual(
-      relative(file),
-      "lib/adapters/node-sqlite.mjs",
-      "El driver Node debe quedar fuera del grafo de Workers",
-    );
+    assert.doesNotMatch(relative(file), /^(?:server|db|lib\/(?:adapters|sqlite))\/|^lib\/(?:application-store|persistence|store|execute-command|seed-state)\.|\/domain\/(?:commands|operations)\.mjs$/);
     for (const dependency of graph.get(file) ?? []) visit(dependency);
   }
-  visit(path.join(root, "lib/store.ts"));
+  visit(path.join(root, "client/main.tsx"));
+  assert.ok(visited.has(path.join(root, "lib/domain-preview.mjs")));
+  assert.ok(!visited.has(path.join(root, "lib/domain.mjs")));
+});
+
+test("manifiesto y lockfile no conservan paquetes de la plataforma retirada", () => {
+  const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
+  const lock = JSON.parse(readFileSync(path.join(root, "package-lock.json"), "utf8"));
+  const forbidden = /^(?:next$|vinext$|wrangler$|miniflare$|workerd$|react-server-dom-webpack$|eslint-config-next$|@cloudflare\/|@next\/|@vitejs\/plugin-rsc$)/;
+  for (const name of Object.keys({ ...manifest.dependencies, ...manifest.devDependencies }))
+    assert.doesNotMatch(name, forbidden);
+  for (const location of Object.keys(lock.packages)) {
+    if (!location) continue;
+    assert.doesNotMatch(location.split("node_modules/").at(-1), forbidden);
+  }
 });

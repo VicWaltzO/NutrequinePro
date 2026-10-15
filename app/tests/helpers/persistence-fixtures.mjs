@@ -5,8 +5,7 @@ import { mkdtempSync, readFileSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative, isAbsolute, basename } from "node:path";
 import { openSqliteDatabase } from "../../lib/adapters/node-sqlite.mjs";
-import { createD1Adapter } from "../../lib/adapters/d1.ts";
-import { memoryD1 } from "./d1-memory.mjs";
+import { memoryPersistence } from "./memory-persistence.mjs";
 
 const adapterContext = new AsyncLocalStorage();
 export const historicalSchema = readFileSync(
@@ -54,13 +53,13 @@ export function diskFixture(t) {
 
 export function testDatabase(t) {
   if (adapterContext.getStore() === "sqlite") return diskFixture(t);
-  const database = memoryD1();
+  const database = memoryPersistence();
   t.after(database.close);
-  return { ...database, binding: createD1Adapter(database.binding) };
+  return { ...database, binding: database.binding };
 }
 
-/** Register exactly the same assertions for D1 compatibility and real SQLite files. */
+/** Register the same business assertions for the reference port and real SQLite files. */
 export function persistenceTest(name, callback) {
-  test(name, (t) => adapterContext.run("d1", () => callback(t)));
+  test(name, (t) => adapterContext.run("memory", () => callback(t)));
   test("SQLite disco: " + name, (t) => adapterContext.run("sqlite", () => callback(t)));
 }

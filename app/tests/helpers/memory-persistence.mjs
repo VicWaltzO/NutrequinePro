@@ -1,8 +1,8 @@
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 
-/** The D1 methods used by the real store, backed by SQLite with atomic batches and foreign keys. */
-export function memoryD1() {
+/** Reference persistence port backed by SQLite in memory; no external runtime. */
+export function memoryPersistence() {
   const database = new DatabaseSync(":memory:");
   database.exec("PRAGMA foreign_keys = ON");
   database.exec(readFileSync(new URL("../../drizzle/0000_nervous_silver_fox.sql", import.meta.url), "utf8"));
@@ -13,7 +13,6 @@ export function memoryD1() {
       database.exec("BEGIN");
       try {
         const results = statements.map(({ sql, args }) => ({
-          success: true,
           results: database.prepare(sql).all(...args),
         }));
         database.exec("COMMIT");

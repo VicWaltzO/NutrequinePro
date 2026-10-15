@@ -1,5 +1,7 @@
 # Resultados de la refactorización integral
 
+> Documento histórico: describe el estado de su tarea y commit de origen. Para operar la aplicación actual, consultar [instalación local](INSTALACION_LOCAL.md) y [arquitectura consolidada](ARQUITECTURA.md).
+
 Fecha: 09/10/2026. Base original: `87c6c5e`. Rama independiente:
 `codex/refactorizacion-integral`. Este informe describe lo implementado y las
 verificaciones ejecutadas; la [auditoría inicial](AUDITORIA_INICIAL.md) conserva

@@ -1,5 +1,7 @@
 # Tarea 07 — Backend Node y autenticación local
 
+> Documento histórico: describe el estado de su tarea y commit de origen. Para operar la aplicación actual, consultar [instalación local](INSTALACION_LOCAL.md) y [arquitectura consolidada](ARQUITECTURA.md).
+
 Fecha: 15/10/2026, America/Bogota. Rama: `codex/reestructuracion-arquitectonica`.
 Base: `7153060`.
 

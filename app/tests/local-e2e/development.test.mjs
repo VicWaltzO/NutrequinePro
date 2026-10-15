@@ -1,6 +1,7 @@
+import { chromium } from "playwright";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { localAppFixture, appRoot, browserTools } from "../helpers/local-app-server.mjs";
+import { localAppFixture, appRoot } from "../helpers/local-app-server.mjs";
 
 test(
   "Frontend 08 desarrollo: Vite detrás de Fastify conserva Host, Origin, cookie y CSRF",
@@ -9,9 +10,8 @@ test(
     const server = await localAppFixture({ development: true });
     t.after(server.stop);
     console.log("Development evidence: " + server.evidence);
-    const { chromium } = browserTools();
     const browser = await chromium.launch({
-      channel: process.env.REGRESSION_BROWSER_CHANNEL || "chrome",
+      channel: process.env.REGRESSION_BROWSER_CHANNEL || undefined,
       headless: true,
     });
     t.after(() => browser.close());

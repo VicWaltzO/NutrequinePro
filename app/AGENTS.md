@@ -2,6 +2,12 @@
 
 Estas reglas se aplican a todas las tareas de desarrollo en este repositorio.
 
+La aplicación operativa es React/Vite en `client/` y Fastify/Node en `server/`.
+Las funcionalidades permanecen en `features/`, contratos y utilidades en `shared/`,
+y persistencia SQLite en `lib/`. No reintroducir entradas Next, Workers ni identidades
+simuladas. Consultar `docs/INSTALACION_LOCAL.md` para preparar bases privadas.
+El servidor nunca crea datos o credenciales al arrancar.
+
 ## Al finalizar cada tarea
 
 1. **Verificar el funcionamiento del código.** Revisar el diff y ejecutar las pruebas, la comprobación de tipos, el lint y la compilación que correspondan. El repositorio Git está en la carpeta padre; ejecutar los comandos de Git desde allí. Para cambios de código en esta aplicación, ejecutar los siguientes comandos desde `app/`:
@@ -11,9 +17,19 @@ Estas reglas se aplican a todas las tareas de desarrollo en este repositorio.
    npm.cmd run check
    npm.cmd run lint
    npm.cmd run build
+   npm.cmd run format:check
+   npm.cmd run test:e2e
    ```
 
    En otros sistemas se puede usar `npm` en lugar de `npm.cmd`. Verificar también los flujos afectados cuando las pruebas automatizadas no los cubran. En cambios exclusivamente de documentación o configuración de Git, revisar el contenido, las exclusiones y `git diff --check`.
+
+   `npm.cmd run verify` reúne pruebas, los tres chequeos TypeScript, lint, formato,
+   build completo y auditoría de distribución. Ejecutar E2E después del build;
+   preparar Playwright con `npx.cmd playwright install chromium` o seleccionar
+   Chrome instalado mediante `REGRESSION_BROWSER_CHANNEL=chrome`.
+   Las pruebas y los procedimientos de respaldo/restauración usan datos sintéticos
+   externos al código. No incluir bases, configuración privada ni evidencias locales
+   en `dist-node/`; los scripts reemplazan únicamente los directorios de build.
 
 2. **Crear un commit descriptivo.** Incluir únicamente los archivos de la tarea, revisar lo preparado con `git diff --cached` y describir el cambio y su propósito. Respetar los cambios previos del usuario.
 

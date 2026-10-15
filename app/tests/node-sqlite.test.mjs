@@ -6,11 +6,9 @@ import { existsSync, readFileSync, renameSync } from "node:fs";
 import { join } from "node:path";
 import { openSqliteDatabase } from "../lib/adapters/node-sqlite.mjs";
 import { PersistenceBusyError } from "../lib/persistence-errors.mjs";
-import { createD1Adapter } from "../lib/adapters/d1.ts";
 import { createStore } from "../lib/application-store.mjs";
 import { TABLES, SQL_NAMES, executeCommand } from "../lib/domain.mjs";
 import { diskFixture, temporaryDataDirectory } from "./helpers/persistence-fixtures.mjs";
-import { memoryD1 } from "./helpers/d1-memory.mjs";
 import { adminIdentity, scenarioSession, cashCreditScenario } from "./helpers/regression-scenarios.mjs";
 
 function databaseProcess(filename, action) {
@@ -148,20 +146,17 @@ test("SQLite mantiene control exclusivo del batch y se recupera tras errores SQL
   assert.equal((await f.binding.batch([f.binding.prepare("SELECT 1 AS n")]))[0].results[0].n, 1);
 });
 
-test("adaptadores rechazan sentencias ajenas sin ejecutar escrituras", async (t) => {
+test("SQLite rechaza sentencias de otra conexión o base sin ejecutar escrituras", async (t) => {
   const f = diskFixture(t);
   const other = openSqliteDatabase(f.filename);
-  const d1 = memoryD1();
+  const third = diskFixture(t);
   try {
-    const first = createD1Adapter(d1.binding);
-    const second = createD1Adapter(d1.binding);
-    await assert.rejects(first.batch([second.prepare("SELECT 1")]), /otra conexión/);
     await assert.rejects(f.binding.batch([other.prepare("SELECT 1")]), /otra conexión/);
-    await assert.rejects(first.batch([f.binding.prepare("SELECT 1")]), /otra conexión/);
-    assert.deepEqual(await first.batch([]), []);
+    await assert.rejects(f.binding.batch([third.binding.prepare("SELECT 1")]), /otra conexión/);
+    await assert.rejects(f.binding.batch([{ sql: "SELECT 1" }]), /otra conexión/);
+    assert.deepEqual(await f.binding.batch([]), []);
   } finally {
     other.close();
-    d1.close();
   }
 });
 

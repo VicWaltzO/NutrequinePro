@@ -20,7 +20,7 @@ limpia. No realizar push directo a `main` ni push forzado.
 ## Convenciones y commits
 
 - Implementar dentro de `features/<funcionalidad>`; usar `shared` solo para piezas
-  reutilizables. Dominio puro sin React/D1; persistencia sin presentación.
+  reutilizables. Dominio puro sin React, HTTP ni controladores SQLite; persistencia sin presentación.
 - Mantener TypeScript estricto y contratos explícitos. No duplicar cálculos de
   céntimos, gramos, deuda o stock en los formularios.
 - Ejecutar Prettier; separar formato masivo de cambios funcionales.
@@ -38,6 +38,7 @@ Desde `app/`, antes de enviar código:
 ```powershell
 npm.cmd run format
 npm.cmd run verify
+npm.cmd run test:e2e
 ```
 
 Después, desde la raíz, crear el commit revisado y ejecutar

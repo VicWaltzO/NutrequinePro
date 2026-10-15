@@ -1,5 +1,7 @@
 # Tarea 06 — Migraciones y recuperación SQLite autónomas
 
+> Documento histórico: describe el estado de su tarea y commit de origen. Para operar la aplicación actual, consultar [instalación local](INSTALACION_LOCAL.md) y [arquitectura consolidada](ARQUITECTURA.md).
+
 Fecha: 14/10/2026, America/Bogota. Rama: `codex/reestructuracion-arquitectonica`.
 Base: `de51f25`.
 

@@ -2,13 +2,13 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createStore } from "../lib/application-store.mjs";
 import { DomainError, executeCommand, saleSummary, balanceSummary, stock } from "../lib/domain.mjs";
-import { memoryD1 } from "./helpers/d1-memory.mjs";
+import { memoryPersistence } from "./helpers/memory-persistence.mjs";
 
 const admin = { userId: "test-admin", displayName: "Administrador de prueba" };
 const command = (type, payload, request_id) => ({ type, payload, request_id });
 
 test("inicialización concurrente conserva un solo administrador y no reinicia la base", async (t) => {
-  const database = memoryD1();
+  const database = memoryPersistence();
   t.after(database.close);
   const store = createStore(() => database.binding);
   assert.equal(await store.loadState(), null);
@@ -24,7 +24,7 @@ test("inicialización concurrente conserva un solo administrador y no reinicia l
 });
 
 test("un reintento idempotente no duplica registros ni auditoría; otra identidad no puede escribir", async (t) => {
-  const database = memoryD1();
+  const database = memoryPersistence();
   t.after(database.close);
   const store = createStore(() => database.binding);
   const input = command("CUSTOMER_SAVE", { name: "Cliente de prueba" }, "unique-request");
@@ -41,7 +41,7 @@ test("un reintento idempotente no duplica registros ni auditoría; otra identida
 });
 
 test("comandos simultáneos con revisión obsoleta no sobrescriben cambios y pueden reintentarse", async (t) => {
-  const database = memoryD1();
+  const database = memoryPersistence();
   t.after(database.close);
   const store = createStore(() => database.binding);
   await store.ensureState(admin);
@@ -63,7 +63,7 @@ test("comandos simultáneos con revisión obsoleta no sobrescriben cambios y pue
 });
 
 test("casos de uso reales guardan venta, entrega, cobro y crédito juntos y sobreviven a la recarga", async (t) => {
-  const database = memoryD1();
+  const database = memoryPersistence();
   t.after(database.close);
   const store = createStore(() => database.binding);
   let sequence = 0;
@@ -125,7 +125,7 @@ test("casos de uso reales guardan venta, entrega, cobro y crédito juntos y sobr
 });
 
 test("el store revierte un batch inválido completo y el dispatcher rechaza propiedades heredadas", async (t) => {
-  const database = memoryD1();
+  const database = memoryPersistence();
   t.after(database.close);
   const store = createStore(() => database.binding),
     before = await store.ensureState(admin),

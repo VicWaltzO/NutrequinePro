@@ -1,5 +1,7 @@
 # Auditoría inicial de la refactorización
 
+> Documento histórico: describe el estado de su tarea y commit de origen. Para operar la aplicación actual, consultar [instalación local](INSTALACION_LOCAL.md) y [arquitectura consolidada](ARQUITECTURA.md).
+
 Fecha: 09/10/2026. Base: `87c6c5e`. Rama: `codex/refactorizacion-integral`.
 
 ## Alcance y estado previo

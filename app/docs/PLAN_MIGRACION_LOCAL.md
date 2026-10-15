@@ -1,5 +1,11 @@
 # Plan técnico de migración a aplicación local
 
+Estado actual: la [Tarea 09](REPORTE_09_CONSOLIDACION.md) consolida React/Vite,
+Fastify/Node y SQLite como entradas principales y retira la infraestructura
+reemplazada. Los pasos siguientes conservan la propuesta histórica. La transferencia
+real de datos, la integración corporativa y los límites indicados en el reporte
+siguen pendientes; no son parte de esta consolidación.
+
 Estado de implementación: [Tarea 05](REPORTE_05_PERSISTENCIA.md) aporta el puerto
 neutral y adaptador SQLite Node; [Tarea 06](REPORTE_06_MIGRACIONES_SQLITE.md)
 aporta administración, migraciones, respaldo y recuperación independientes.

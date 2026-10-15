@@ -1,5 +1,7 @@
 # Tarea 03 — Normalización del código fuente
 
+> Documento histórico: describe el estado de su tarea y commit de origen. Para operar la aplicación actual, consultar [instalación local](INSTALACION_LOCAL.md) y [arquitectura consolidada](ARQUITECTURA.md).
+
 Fecha: 14/10/2026, America/Bogota. Rama: `codex/reestructuracion-arquitectonica`.
 Base: `d717a2204836a38e41bb6eeb8b64d0ce6fdf667d`.
 

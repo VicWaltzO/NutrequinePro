@@ -1,10 +1,12 @@
+import { chromium, request } from "playwright";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID, createHash, randomBytes } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { localAppFixture, browserTools } from "../helpers/local-app-server.mjs";
+import { spawnSync } from "node:child_process";
+import { localAppFixture } from "../helpers/local-app-server.mjs";
 import { cashCreditScenario, scenarioDate } from "../helpers/regression-scenarios.mjs";
 import { saleSummary, paymentSummary, stock, balanceSummary } from "../../lib/domain.mjs";
 
@@ -15,9 +17,8 @@ test(
     const server = await localAppFixture();
     t.after(server.stop);
     console.log("Evidence: " + server.evidence);
-    const { chromium, request } = browserTools();
     const browser = await chromium.launch({
-      channel: process.env.REGRESSION_BROWSER_CHANNEL || "chrome",
+      channel: process.env.REGRESSION_BROWSER_CHANNEL || undefined,
       headless: true,
       args: ["--disable-background-networking", "--disable-component-update"],
     });
@@ -509,6 +510,81 @@ test(
         await page.locator(".sidebar-footer").waitFor();
         assert.deepEqual(await state(), before);
         assert.ok(before.audit.every((entry) => before.users.some((user) => user.id === entry.created_by)));
+        assert.deepEqual(pageErrors, []);
+        assert.deepEqual(external, []);
+      },
+    );
+    await step(
+      "L15",
+      "respaldo y restauración desde la CLI distribuida recuperan el mismo negocio",
+      async () => {
+        const before = await state();
+        await server.stop();
+        const cli = join(server.distribution, "scripts/sqlite-admin.mjs");
+        const guard = new URL("../helpers/deny-external-network.mjs", import.meta.url).href;
+        const run = (...args) => {
+          const result = spawnSync(process.execPath, ["--import", guard, cli, ...args], {
+            cwd: server.root,
+            env: { ...process.env, NODE_OPTIONS: "", NODE_PATH: "" },
+            encoding: "utf8",
+            windowsHide: true,
+            timeout: 60000,
+          });
+          assert.equal(result.status, 0, result.stderr + result.stdout);
+          assert.match(result.stdout, /TEST_NETWORK_GUARD_ACTIVE/);
+          const body = JSON.parse(result.stdout.slice(result.stdout.indexOf("{")));
+          assert.equal(body.ok, true);
+        };
+        const backup = join(server.directory, "backup-09.sqlite");
+        const restored = join(server.directory, "restored-09.sqlite");
+        run("backup", "--database", server.database, "--destination", backup);
+        run("verify-backup", "--backup", backup);
+        run("restore", "--backup", backup, "--destination", restored);
+        run("verify", "--database", restored);
+        const config = JSON.parse(readFileSync(server.configFile, "utf8"));
+        config.database = restored;
+        writeFileSync(server.configFile, JSON.stringify(config));
+        // Access is deliberately bound to the canonical business path. A different copy needs authorized provisioning.
+        await assert.rejects(server.start(), /Servidor terminó 1/);
+        const restoredAccess = join(server.directory, "access-restored-09.sqlite");
+        const provision = spawnSync(
+          process.execPath,
+          [
+            "--import",
+            guard,
+            join(server.distribution, "server/admin.mjs"),
+            "--database",
+            restored,
+            "--auth-database",
+            restoredAccess,
+            "--mode",
+            "link",
+            "--authorize-link",
+          ],
+          {
+            cwd: server.root,
+            env: { ...process.env, NODE_OPTIONS: "", NODE_PATH: "" },
+            input: JSON.stringify({
+              user_id: server.admin.userId,
+              login: "admin.local",
+              password: server.password,
+            }),
+            encoding: "utf8",
+            windowsHide: true,
+            timeout: 60000,
+          },
+        );
+        assert.equal(provision.status, 0, provision.stderr + provision.stdout);
+        assert.match(provision.stdout, /TEST_NETWORK_GUARD_ACTIVE/);
+        config.auth_database = restoredAccess;
+        writeFileSync(server.configFile, JSON.stringify(config));
+        await server.start();
+        await page.reload();
+        await page.getByRole("heading", { name: "Iniciar sesión", exact: true }).waitFor();
+        await loginPage();
+        await page.locator(".sidebar-footer").waitFor();
+        await apiLogin();
+        assert.deepEqual(await state(), before);
         assert.deepEqual(pageErrors, []);
         assert.deepEqual(external, []);
       },

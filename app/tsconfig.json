@@ -14,23 +14,25 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
       "@/*": ["./*"]
     },
-    "types": ["node", "@cloudflare/workers-types"]
+    "types": ["node"]
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "client/**/*.ts",
+    "client/**/*.tsx",
+    "client/**/*.mts",
+    "server/**/*.mts",
+    "features/**/*.ts",
+    "features/**/*.tsx",
+    "shared/**/*.ts",
+    "shared/**/*.tsx",
+    "lib/**/*.ts",
+    "lib/**/*.mts",
+    "db/**/*.ts",
+    "scripts/**/*.mts",
+    "drizzle.config.ts"
   ],
-  "exclude": ["node_modules", "examples", "dist-node", "dist-client"]
+  "exclude": ["node_modules", "dist-node", "dist-client", "work", "outputs", "demo-linkedin"]
 }
