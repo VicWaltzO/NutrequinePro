@@ -371,7 +371,13 @@ test("Node seguridad HTTP: Host, Origin, DNS rebinding, CSRF, cookies ambiguas e
   const app = await logged(f);
   const before = await app.client.state();
   // fetch/Undici rewrites Host; node:http sends the actual forged wire header.
-  for (const host of ["evil.invalid", "localhost:" + new URL(app.url).port, "127.0.0.1.evil.invalid"]) {
+  for (const host of [
+    "evil.invalid",
+    "localhost:" + new URL(app.url).port,
+    "127.0.0.1.evil.invalid",
+    "%31%32%37.0.0.1:" + new URL(app.url).port,
+    "127%2e0%2e0%2e1:" + new URL(app.url).port,
+  ]) {
     const status = await new Promise((resolve, reject) => {
       const request = httpRequest(
         app.url + "/api/state",

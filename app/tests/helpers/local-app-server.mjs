@@ -12,7 +12,7 @@ import { createStore } from "../../lib/application-store.mjs";
 import { provisionAuthentication } from "../../server/provision.mts";
 
 export const appRoot = fileURLToPath(new URL("../../", import.meta.url));
-export async function localAppFixture({ development = false } = {}) {
+export async function localAppFixture({ development = false, minimalEnvironment = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "nutrequine-08-test-"));
   const directory = createPrivateDirectory(join(root, "private"));
   const database = join(directory, "business.sqlite");
@@ -54,6 +54,14 @@ export async function localAppFixture({ development = false } = {}) {
   mkdirSync(evidence, { recursive: true });
   let child;
   let log = "";
+  const startDurations = [];
+  const runtimeEnvironment = minimalEnvironment
+    ? Object.fromEntries(
+        Object.entries(process.env).filter(([name]) =>
+          /^(?:SystemRoot|WINDIR|TEMP|TMP|PATH|PATHEXT|COMSPEC)$/i.test(name),
+        ),
+      )
+    : { ...process.env, NODE_OPTIONS: "", NODE_PATH: "" };
   async function stop() {
     if (child?.exitCode === null) {
       const exited = new Promise((resolve) => child.once("exit", resolve));
@@ -69,6 +77,7 @@ export async function localAppFixture({ development = false } = {}) {
   }
   async function start() {
     const logStart = log.length;
+    const started = performance.now();
     const args = development
       ? [join(appRoot, "scripts/dev-local.mts"), "--config", configFile]
       : [
@@ -82,7 +91,7 @@ export async function localAppFixture({ development = false } = {}) {
       cwd: development ? appRoot : root,
       windowsHide: true,
       stdio: ["ignore", "pipe", "pipe"],
-      env: { ...process.env, NODE_OPTIONS: "", NODE_PATH: "" },
+      env: runtimeEnvironment,
     });
     await new Promise((resolve, reject) => {
       const timeout = setTimeout(() => reject(new Error("No inició: " + log.slice(-2000))), 60000);
@@ -104,6 +113,7 @@ export async function localAppFixture({ development = false } = {}) {
     });
     if (!development && !log.includes("TEST_NETWORK_GUARD_ACTIVE"))
       throw new Error("No se activó el bloqueo de red del proceso.");
+    startDurations.push(performance.now() - started);
   }
   try {
     await start();
@@ -122,6 +132,10 @@ export async function localAppFixture({ development = false } = {}) {
     admin,
     evidence,
     baseURL: "http://127.0.0.1:" + port,
+    get pid() {
+      return child?.pid;
+    },
+    startDurations,
     start,
     stop,
   };

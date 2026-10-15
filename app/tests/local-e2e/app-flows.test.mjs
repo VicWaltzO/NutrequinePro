@@ -38,7 +38,16 @@ test(
     const page = await context.newPage();
     page.setDefaultTimeout(20000);
     const pageErrors = [];
+    const requestFailures = [];
+    const httpErrors = [];
+    const measurements = {};
     page.on("pageerror", (error) => pageErrors.push(error.message));
+    page.on("requestfailed", (req) =>
+      requestFailures.push({ url: req.url(), error: req.failure()?.errorText }),
+    );
+    page.on("response", (response) => {
+      if (response.status() >= 400) httpErrors.push({ url: response.url(), status: response.status() });
+    });
     const checks = [];
     const api = await request.newContext({ baseURL: server.baseURL });
     let csrf;
@@ -131,6 +140,10 @@ test(
             runAt: new Date().toISOString(),
             checks,
             pageErrors,
+            requestFailures,
+            httpErrors,
+            measurements,
+            startup_ms: server.startDurations,
             blockedExternalRequests: external,
             screenshots,
           },
@@ -521,8 +534,10 @@ test(
         const before = await state();
         await server.stop();
         const cli = join(server.distribution, "scripts/sqlite-admin.mjs");
+        const originalHash = createHash("sha256").update(readFileSync(server.database)).digest("hex");
         const guard = new URL("../helpers/deny-external-network.mjs", import.meta.url).href;
         const run = (...args) => {
+          const start = performance.now();
           const result = spawnSync(process.execPath, ["--import", guard, cli, ...args], {
             cwd: server.root,
             env: { ...process.env, NODE_OPTIONS: "", NODE_PATH: "" },
@@ -534,13 +549,16 @@ test(
           assert.match(result.stdout, /TEST_NETWORK_GUARD_ACTIVE/);
           const body = JSON.parse(result.stdout.slice(result.stdout.indexOf("{")));
           assert.equal(body.ok, true);
+          return performance.now() - start;
         };
         const backup = join(server.directory, "backup-09.sqlite");
         const restored = join(server.directory, "restored-09.sqlite");
-        run("backup", "--database", server.database, "--destination", backup);
-        run("verify-backup", "--backup", backup);
-        run("restore", "--backup", backup, "--destination", restored);
-        run("verify", "--database", restored);
+        measurements.recovery = {
+          backup_ms: run("backup", "--database", server.database, "--destination", backup),
+          verify_backup_ms: run("verify-backup", "--backup", backup),
+          restore_ms: run("restore", "--backup", backup, "--destination", restored),
+          verify_restored_ms: run("verify", "--database", restored),
+        };
         const config = JSON.parse(readFileSync(server.configFile, "utf8"));
         config.database = restored;
         writeFileSync(server.configFile, JSON.stringify(config));
@@ -585,6 +603,25 @@ test(
         await page.locator(".sidebar-footer").waitFor();
         await apiLogin();
         assert.deepEqual(await state(), before);
+        await navigate("customers", "Clientes");
+        await page.getByRole("button", { name: "Nuevo cliente", exact: true }).click();
+        await dialog().getByLabel("Nombre", { exact: true }).fill("Cliente posterior a recuperación 11");
+        const recoveredWrite = await submit(
+          dialog().getByRole("button", { name: "Guardar", exact: true }),
+          "CUSTOMER_SAVE",
+        );
+        const afterRecovery = await state();
+        assert.equal(afterRecovery.customers.length, before.customers.length + 1);
+        assert.equal(afterRecovery.audit.length, before.audit.length + 1);
+        assert.ok(afterRecovery.customers.some((row) => row.id === recoveredWrite.result));
+        await server.stop();
+        await server.start();
+        await page.reload();
+        await page
+          .getByRole("button", { name: "Cliente posterior a recuperación 11", exact: true })
+          .waitFor();
+        assert.deepEqual(await state(), afterRecovery);
+        assert.equal(createHash("sha256").update(readFileSync(server.database)).digest("hex"), originalHash);
         assert.deepEqual(pageErrors, []);
         assert.deepEqual(external, []);
       },

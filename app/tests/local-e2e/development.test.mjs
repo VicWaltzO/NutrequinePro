@@ -36,11 +36,21 @@ test(
     assert.equal((await saved).status(), 200);
     await page.reload();
     await page.getByRole("button", { name: "Cliente Vite sintético 08", exact: true }).waitFor();
-    const privateSource = await context.request.get(
-      server.baseURL + "/@fs/" + appRoot.replaceAll("\\", "/") + "server/passwords.mts",
-    );
-    assert.ok([403, 404].includes(privateSource.status()));
-    assert.doesNotMatch(await privateSource.text(), /scrypt-N131072|hashPassword/);
+    for (const suffix of ["", "::$DATA?raw", "%3A%3A%24DATA?raw"]) {
+      const privateSource = await context.request.get(
+        server.baseURL + "/@fs/" + appRoot.replaceAll("\\", "/") + "server/passwords.mts" + suffix,
+      );
+      const body = await privateSource.text();
+      if (suffix.startsWith("%") && privateSource.status() === 200) {
+        // Vite may answer an unknown encoded URL with the SPA document, never the private module.
+        assert.match(privateSource.headers()["content-type"], /^text\/html/);
+        assert.match(body, /<!doctype html>/i);
+        assert.match(body, /\/@vite\/client/);
+      } else {
+        assert.ok([400, 403, 404].includes(privateSource.status()), "Fuente privada: " + suffix);
+      }
+      assert.doesNotMatch(body, /scrypt-N131072|hashPassword/);
+    }
     const foreign = await context.request.post(server.baseURL + "/api/command", {
       headers: { Origin: "https://outside.invalid" },
       data: {},
