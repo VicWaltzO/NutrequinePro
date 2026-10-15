@@ -14,9 +14,7 @@ function sources(directory) {
     return /\.(?:tsx?|m?js|mts)$/.test(file) && !/\.d\.(?:ts|mts)$/.test(file) ? [file] : [];
   });
 }
-const files = ["client", "features", "shared", "lib"].flatMap((folder) =>
-  sources(path.join(root, folder)),
-);
+const files = ["client", "features", "shared", "lib"].flatMap((folder) => sources(path.join(root, folder)));
 const graph = new Map(files.map((file) => [file, []]));
 
 for (const file of files) {
@@ -103,7 +101,10 @@ test("el store es neutral y el frontend no carga persistencia ni comandos autori
   function visit(file) {
     if (visited.has(file)) return;
     visited.add(file);
-    assert.doesNotMatch(relative(file), /^(?:server|db|lib\/(?:adapters|sqlite))\/|^lib\/(?:application-store|persistence|store|execute-command|seed-state)\.|\/domain\/(?:commands|operations)\.mjs$/);
+    assert.doesNotMatch(
+      relative(file),
+      /^(?:server|db|lib\/(?:adapters|sqlite))\/|^lib\/(?:application-store|persistence|store|execute-command|seed-state)\.|\/domain\/(?:commands|operations)\.mjs$/,
+    );
     for (const dependency of graph.get(file) ?? []) visit(dependency);
   }
   visit(path.join(root, "client/main.tsx"));
@@ -114,7 +115,8 @@ test("el store es neutral y el frontend no carga persistencia ni comandos autori
 test("manifiesto y lockfile no conservan paquetes de la plataforma retirada", () => {
   const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
   const lock = JSON.parse(readFileSync(path.join(root, "package-lock.json"), "utf8"));
-  const forbidden = /^(?:next$|vinext$|wrangler$|miniflare$|workerd$|react-server-dom-webpack$|eslint-config-next$|@cloudflare\/|@next\/|@vitejs\/plugin-rsc$)/;
+  const forbidden =
+    /^(?:next$|vinext$|wrangler$|miniflare$|workerd$|react-server-dom-webpack$|eslint-config-next$|@cloudflare\/|@next\/|@vitejs\/plugin-rsc$)/;
   for (const name of Object.keys({ ...manifest.dependencies, ...manifest.devDependencies }))
     assert.doesNotMatch(name, forbidden);
   for (const location of Object.keys(lock.packages)) {
