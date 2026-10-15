@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { createStore } from "../../lib/application-store.mjs";
 import { saleSummary, paymentSummary, stock, balanceSummary } from "../../lib/domain.mjs";
-import { memoryD1 } from "./d1-memory.mjs";
+import { testDatabase } from "./persistence-fixtures.mjs";
 
 export const scenarioDate = "2026-10-14";
 export const adminIdentity = { userId: "regression-admin", displayName: "Administrador sintético" };
@@ -16,8 +16,7 @@ export function scenarioSession(store, identity = adminIdentity) {
 }
 
 export async function regressionFixture(t) {
-  const database = memoryD1();
-  t.after(database.close);
+  const database = testDatabase(t);
   const store = createStore(() => database.binding);
   await store.ensureState(adminIdentity);
   const session = scenarioSession(store);

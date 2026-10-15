@@ -1,4 +1,4 @@
-import { test } from "node:test";
+import { persistenceTest as test } from "./helpers/persistence-fixtures.mjs";
 import assert from "node:assert/strict";
 import {
   regressionFixture,

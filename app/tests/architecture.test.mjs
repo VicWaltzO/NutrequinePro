@@ -85,3 +85,28 @@ test("dominio puro y componentes compartidos conservan sus límites de dependenc
     }
   }
 });
+
+test("el contrato del store es neutral y la aplicación Cloudflare no carga el driver Node", () => {
+  for (const file of [
+    "lib/application-store.mjs",
+    "lib/application-store.d.mts",
+    "lib/persistence.mjs",
+    "lib/persistence-port.ts",
+  ])
+    assert.doesNotMatch(
+      readFileSync(path.join(root, file), "utf8"),
+      /cloudflare:workers|\bD1Database\b|\bD1PreparedStatement\b/,
+    );
+  const visited = new Set();
+  function visit(file) {
+    if (visited.has(file)) return;
+    visited.add(file);
+    assert.notEqual(
+      relative(file),
+      "lib/adapters/node-sqlite.mjs",
+      "El driver Node debe quedar fuera del grafo de Workers",
+    );
+    for (const dependency of graph.get(file) ?? []) visit(dependency);
+  }
+  visit(path.join(root, "lib/store.ts"));
+});

@@ -1,4 +1,5 @@
 import type { AppState, CommandResult } from "./domain-types";
+import type { PersistenceDatabase } from "./persistence-port";
 export interface Identity {
   userId: string;
   displayName: string;
@@ -9,4 +10,4 @@ export interface ApplicationStore {
   ensureState: (identity: Identity) => Promise<AppState>;
   runCommand: (input: unknown, identity: Identity) => Promise<CommandResult>;
 }
-export function createStore(binding: () => D1Database): ApplicationStore;
+export function createStore(binding: () => PersistenceDatabase): ApplicationStore;

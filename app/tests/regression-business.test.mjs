@@ -1,4 +1,4 @@
-import { test } from "node:test";
+import { persistenceTest as test } from "./helpers/persistence-fixtures.mjs";
 import assert from "node:assert/strict";
 import { createStore } from "../lib/application-store.mjs";
 import { saleSummary, productionSummary, stock, balanceSummary, paymentSummary } from "../lib/domain.mjs";
