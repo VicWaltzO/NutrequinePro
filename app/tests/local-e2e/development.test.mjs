@@ -48,13 +48,18 @@ test(
         server.baseURL + "/@fs/" + appRoot.replaceAll("\\", "/") + "server/passwords.mts" + suffix,
       );
       const body = await privateSource.text();
-      if (suffix.startsWith("%") && privateSource.status() === 200) {
-        // Vite may answer an unknown encoded URL with the SPA document, never the private module.
+      const canReturnPublicDocument =
+        suffix.startsWith("%") || (process.platform !== "win32" && suffix === "::$DATA?raw");
+      if (canReturnPublicDocument && privateSource.status() === 200) {
+        // Unknown URLs may fall back to the SPA; raw NTFS streams must remain denied on Windows.
         assert.match(privateSource.headers()["content-type"], /^text\/html/);
         assert.match(body, /<!doctype html>/i);
         assert.match(body, /\/@vite\/client/);
       } else {
-        assert.ok([400, 403, 404].includes(privateSource.status()), "Fuente privada: " + suffix);
+        assert.ok(
+          [400, 403, 404].includes(privateSource.status()),
+          `Fuente privada: ${suffix}, HTTP ${privateSource.status()}`,
+        );
       }
       assert.doesNotMatch(body, /scrypt-N131072|hashPassword/);
     }
