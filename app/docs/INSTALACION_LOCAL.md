@@ -11,7 +11,8 @@ el servidor y el cliente compilados operan por loopback sin descargas al arranca
 Desde la raíz del repositorio:
 
 ```powershell
-git switch codex/reestructuracion-arquitectonica
+git switch main
+git pull --ff-only origin main
 cd app
 npm.cmd ci
 npm.cmd run verify
@@ -20,6 +21,125 @@ npm.cmd run verify
 En Linux/macOS usar `npm`. Las rutas siguientes son ejemplos que debe seleccionar
 el responsable de la instalación; no apuntan a bases operativas predeterminadas.
 Los comandos rechazan destinos existentes o inseguros en lugar de sobrescribirlos.
+
+## Inicio rápido de demostración en Windows 11
+
+Instalar previamente Git, Google Chrome y Node.js **24.18 o superior** (incluye npm).
+Abrir PowerShell normal; no hace falta ejecutarlo como administrador. Estos bloques
+son compatibles con Windows PowerShell 5.1 y PowerShell 7. La instalación descarga
+dependencias; la aplicación compilada funciona después por loopback.
+
+### 1. Descargar y compilar desde main
+
+Usar una carpeta nueva; `git clone` no sobrescribe un clon existente:
+
+```powershell
+$ErrorActionPreference = 'Stop'
+$codigo = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'NutrequinePro'
+git clone --branch main https://github.com/VicWaltzO/NutrequinePro.git $codigo
+if ($LASTEXITCODE -ne 0) { throw 'No se pudo clonar. No continúe.' }
+Set-Location -LiteralPath (Join-Path $codigo 'app')
+npm.cmd ci
+if ($LASTEXITCODE -ne 0) { throw 'Falló la instalación de dependencias.' }
+npm.cmd run build
+if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación.' }
+```
+
+### 2. Crear una base de demostración y su administrador
+
+Continuar en la misma ventana, dentro de `app/`. Se crea una instalación **nueva**
+en LocalAppData; no apunta a bases empresariales. Si el directorio ya existe,
+detenerse y usar las instrucciones de reinicio, sin volver a ejecutar init/new.
+
+```powershell
+$ErrorActionPreference = 'Stop'
+$datos = Join-Path $env:LOCALAPPDATA 'NutrequinePro-Demo'
+if (Test-Path -LiteralPath $datos) { throw 'La demostración ya existe. Use las instrucciones de reinicio.' }
+node scripts/sqlite-admin.mjs directory --directory $datos
+if ($LASTEXITCODE -ne 0) { throw 'No se pudo crear el directorio privado.' }
+$base = Join-Path $datos 'negocio.sqlite'
+$acceso = Join-Path $datos 'acceso.sqlite'
+node scripts/sqlite-admin.mjs init --database $base
+if ($LASTEXITCODE -ne 0) { throw 'No se pudo preparar SQLite.' }
+$secreto = Read-Host 'Elija una contraseña de al menos 15 caracteres para admin.local' -AsSecureString
+$credencial = [System.Management.Automation.PSCredential]::new('admin.local', $secreto)
+$encodingAnterior = $OutputEncoding
+try {
+    $OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+    $provision = @{
+        user_id = [guid]::NewGuid().ToString()
+        name = 'Administrador de demostración'
+        login = 'admin.local'
+        password = $credencial.GetNetworkCredential().Password
+    } | ConvertTo-Json -Compress
+    $provision | node server/admin.mts --database $base --auth-database $acceso --mode new
+    if ($LASTEXITCODE -ne 0) { throw 'No se creó el administrador. Conserve el intento para diagnóstico; no use otra base por accidente.' }
+} finally {
+    $provision = $null
+    $credencial = $null
+    $secreto = $null
+    $OutputEncoding = $encodingAnterior
+}
+$config = Join-Path $datos 'servidor.json'
+$ajustes = @{
+    database = $base
+    auth_database = $acceso
+    port = 4317
+    frontend_directory = (Join-Path (Get-Location).Path 'dist-node/public-client')
+} | ConvertTo-Json
+[IO.File]::WriteAllText($config, $ajustes, [Text.UTF8Encoding]::new($false))
+Write-Host 'Administrador: admin.local. La contraseña es la que acaba de elegir.'
+```
+
+La contraseña pasa por stdin y no se escribe en un archivo, argumentos o Git.
+UTF-8 explícito evita alterar contraseñas con acentos en PowerShell 5.1.
+La configuración no lleva BOM y hereda los permisos del directorio privado.
+No hay contraseña predeterminada. Si la provisión falla, conservar los archivos
+parciales y el diagnóstico; no borrar bases ni repetir new sobre una existente.
+
+### 3. Ejecutar y abrir Google Chrome
+
+```powershell
+npm.cmd start -- --config $config
+```
+
+Dejar esa terminal abierta. Tras el mensaje LISTENING, abrir Google Chrome y pegar
+**http://127.0.0.1:4317/**. Entrar como **admin.local** con la contraseña elegida.
+No usar localhost ni una dirección LAN. Si el puerto está ocupado, no detener otro
+servicio: elegir un puerto libre en el JSON privado y usarlo también en la URL.
+
+La base nueva empieza sin clientes, ventas ni fórmulas inventadas. Para guardar
+datos sintéticos con los formularios reales: **Clientes → Nuevo cliente**, nombre
+**Cliente demostración**, Guardar. En **Gastos → Registrar gasto**, registrar
+**Gasto de demostración**, categoría Otros y **Monto pagado S/** de **0.01**
+(un céntimo), con la fecha actual.
+Las vistas y navegación están disponibles; producción/ventas requieren configurar
+sus productos, sedes e insumos mediante los flujos existentes. No se cargan bases
+de terceros ni se activa un modo de usuario simulado.
+
+### 4. Reiniciar sin perder datos
+
+Ctrl+C en la terminal del servidor y esperar a que termine. En una nueva ventana:
+
+```powershell
+$codigo = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'NutrequinePro'
+Set-Location -LiteralPath (Join-Path $codigo 'app')
+$config = Join-Path $env:LOCALAPPDATA 'NutrequinePro-Demo/servidor.json'
+npm.cmd start -- --config $config
+```
+
+Recargar Chrome y comprobar el cliente y el gasto. No repetir clone, init ni new.
+Los datos/configuración están fuera del repositorio, pero conviene conservar el
+clon en su ruta: el JSON apunta a su frontend compilado. Respaldar antes de cualquier
+actualización; no copiar datos privados al código ni a dist-node.
+
+Comprobación del procedimiento (15 de octubre de 2026): Windows PowerShell 5.1,
+Chrome, provisión new sobre una base vacía y contraseña aleatoria con acento;
+nueve vistas accesibles, cliente y gasto de un céntimo guardados por formulario,
+estado idéntico tras reiniciar el proceso, sesión recuperada y logout con 401.
+La prueba usó un directorio temporal privado y un puerto loopback libre en lugar
+del nombre/puerto de ejemplo. No solicitó recursos externos durante la navegación.
+Las evidencias y bases sintéticas se conservaron fuera de los archivos publicados.
 
 ## Crear una instalación nueva
 
@@ -43,7 +163,14 @@ JSON con `user_id`, `name`, `login` y `password`. La contraseña necesita al men
 capturas o logs. Enviar ese archivo exclusivamente por stdin:
 
 ```powershell
-Get-Content -Raw -LiteralPath "D:\NutrequinePrivado\provision.json" | npm.cmd run auth:prepare -- --database "D:\NutrequinePrivado\negocio.sqlite" --auth-database "D:\NutrequinePrivado\acceso.sqlite" --mode new
+$encodingAnterior = $OutputEncoding
+try {
+    $OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+    Get-Content -Raw -Encoding UTF8 -LiteralPath "D:\NutrequinePrivado\provision.json" | npm.cmd run auth:prepare -- --database "D:\NutrequinePrivado\negocio.sqlite" --auth-database "D:\NutrequinePrivado\acceso.sqlite" --mode new
+    if ($LASTEXITCODE -ne 0) { throw 'Falló la provisión del administrador.' }
+} finally {
+    $OutputEncoding = $encodingAnterior
+}
 ```
 
 El modo `new` requiere un negocio vacío; no crea maestros ficticios ni usuarios
