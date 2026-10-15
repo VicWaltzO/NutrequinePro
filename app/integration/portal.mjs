@@ -21,6 +21,8 @@ function localModuleUrl(value) {
 }
 
 function fail(response, status, message) {
+  response.removeHeader("Content-Length");
+  response.removeHeader("Set-Cookie");
   response.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
   response.end(JSON.stringify({ error: message }));
 }

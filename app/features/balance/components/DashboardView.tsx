@@ -32,7 +32,7 @@ export default function DashboardView({
             lotes a producir
           </p>
         </div>
-        <img width={150} height={150} src="/brand/logo.jpg" alt="Logo Nutrequine Pro" />
+        <img width={150} height={150} src={frontendPath("/brand/logo.jpg")} alt="Logo Nutrequine Pro" />
       </div>
       <Metrics
         items={[
@@ -123,3 +123,4 @@ export default function DashboardView({
     </>
   );
 }
+import { frontendPath } from "@/client/paths";

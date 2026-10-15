@@ -36,6 +36,7 @@ async function browserFor(t, server, mode) {
   const context = await browser.newContext({ serviceWorkers: "block" });
   const errors = [];
   const external = [];
+  const failedResources = [];
   const allowed = new Set(mode === "A" ? [url, server.baseURL] : [url]);
   await context.route("**/*", (route) => {
     if (allowed.has(new URL(route.request().url()).origin)) return route.continue();
@@ -44,6 +45,16 @@ async function browserFor(t, server, mode) {
   });
   const page = await context.newPage();
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("requestfailed", (req) =>
+    failedResources.push({ url: req.url(), error: req.failure()?.errorText }),
+  );
+  page.on("response", (response) => {
+    if (
+      ["script", "stylesheet", "image"].includes(response.request().resourceType()) &&
+      response.status() >= 400
+    )
+      failedResources.push({ url: response.url(), status: response.status() });
+  });
   await page.goto(url);
   await page.screenshot({ path: join(server.evidence, `portal-${mode}.png`) });
   await page.getByRole("link", { name: "Abrir Nutrequine Pro" }).click();
@@ -71,7 +82,19 @@ async function browserFor(t, server, mode) {
     assert.equal(result.status(), 200, await result.text());
     return (await result.json()).result;
   }
-  return { page, context, origin, apiRoot, csrf, state, run, errors, external, portalUrl: url };
+  return {
+    page,
+    context,
+    origin,
+    apiRoot,
+    csrf,
+    state,
+    run,
+    errors,
+    external,
+    failedResources,
+    portalUrl: url,
+  };
 }
 
 test(
@@ -116,6 +139,7 @@ test(
     assert.deepEqual(await state(), afterWrite);
     assert.deepEqual(browser.errors, []);
     assert.deepEqual(browser.external, []);
+    assert.deepEqual(browser.failedResources, []);
     writeFileSync(
       join(server.evidence, "integration-a.json"),
       JSON.stringify(
@@ -183,7 +207,22 @@ test(
     assert.deepEqual(await state(), beforeRestart);
     await page.reload();
     await page.getByRole("heading", { name: "Resumen", exact: true, level: 1 }).waitFor();
+    await page.getByAltText("Logo Nutrequine Pro", { exact: true }).waitFor();
+    await page.waitForFunction(() =>
+      [...document.images].every((image) => image.complete && image.naturalWidth > 0),
+    );
+    assert.equal(
+      await page
+        .getByAltText("Logo Nutrequine Pro", { exact: true })
+        .evaluate((image) => image.complete && image.naturalWidth > 0),
+      true,
+    );
     await page.screenshot({ path: join(server.evidence, "module-b-dashboard.png") });
+    await page.locator("nav").getByRole("button", { name: "Configuración", exact: true }).click();
+    await page.waitForFunction(() =>
+      [...document.images].every((image) => image.complete && image.naturalWidth > 0),
+    );
+    await page.screenshot({ path: join(server.evidence, "module-b-configuration.png") });
     const logout = await context.request.post(apiRoot + "api/auth/logout", {
       headers: { Origin: origin, "X-CSRF-Token": csrf },
       data: {},
@@ -192,6 +231,7 @@ test(
     assert.equal((await context.request.get(apiRoot + "api/state")).status(), 401);
     assert.deepEqual(browser.errors, []);
     assert.deepEqual(browser.external, []);
+    assert.deepEqual(browser.failedResources, []);
     writeFileSync(
       join(server.evidence, "integration-b.json"),
       JSON.stringify(

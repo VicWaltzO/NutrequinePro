@@ -42,7 +42,10 @@ test("portal local: valida perímetro antes de adaptar Host/Origin, limita cuerp
     res.writeHead(422, {
       "Content-Type": "application/json",
       "Set-Cookie":
-        "nutrequine_0123456789abcdef=synthetic; Path=/api; HttpOnly; SameSite=Strict; Max-Age=28800",
+        req.url === "/malformed"
+          ? "erp_session=NEVER_FORWARD"
+          : "nutrequine_0123456789abcdef=synthetic; Path=/api; HttpOnly; SameSite=Strict; Max-Age=28800",
+      "Content-Length": String(Buffer.byteLength(JSON.stringify({ error: "SYNTHETIC_BUSINESS_ERROR" }))),
     });
     res.end(JSON.stringify({ error: "SYNTHETIC_BUSINESS_ERROR" }));
   });
@@ -121,4 +124,8 @@ test("portal local: valida perímetro antes de adaptar Host/Origin, limita cuerp
   assert.equal(seen[0].headers.origin, new URL(moduleUrl).origin);
   assert.equal(seen[0].headers["x-csrf-token"], "opaque-csrf");
   assert.doesNotMatch(seen[0].headers.cookie, /erp_session/);
+  const malformed = await call("/modulos/nutrequine/malformed");
+  assert.equal(malformed.status, 502);
+  assert.equal(malformed.headers["set-cookie"], undefined);
+  assert.equal(JSON.parse(malformed.body).error, "Respuesta del módulo inválida.");
 });

@@ -55,7 +55,7 @@ export default function Configuration({
             width={1440}
             height={1728}
             className="catalog-image"
-            src="/brand/productos.jpg"
+            src={frontendPath("/brand/productos.jpg")}
             alt="Presentación real de Nutrelin, Hi-Performance y Potripregnant"
           />
         </details>
@@ -199,3 +199,4 @@ export default function Configuration({
     </>
   );
 }
+import { frontendPath } from "@/client/paths";
