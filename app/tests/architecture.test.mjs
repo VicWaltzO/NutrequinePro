@@ -14,7 +14,9 @@ function sources(directory) {
     return /\.(?:tsx?|m?js|mts)$/.test(file) && !/\.d\.(?:ts|mts)$/.test(file) ? [file] : [];
   });
 }
-const files = ["app", "features", "shared", "lib"].flatMap((folder) => sources(path.join(root, folder)));
+const files = ["app", "client", "features", "shared", "lib"].flatMap((folder) =>
+  sources(path.join(root, folder)),
+);
 const graph = new Map(files.map((file) => [file, []]));
 
 for (const file of files) {

@@ -1,6 +1,5 @@
-"use client";
 import type { AppState } from "@/lib/domain-types";
-import { stock } from "@/lib/domain.mjs";
+import { stock } from "@/lib/domain-preview.mjs";
 import { ProductImage, kg, num } from "@/shared/ui";
 
 export default function ProductCards({ s: state }: { s: AppState }) {

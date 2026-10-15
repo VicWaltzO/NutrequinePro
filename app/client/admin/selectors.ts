@@ -1,6 +1,6 @@
 import type { AppState } from "@/lib/domain-types";
 import type { Searchable } from "@/shared/types/admin";
-import { saleSummary, normalize } from "@/lib/domain.mjs";
+import { saleSummary, normalize } from "@/lib/domain-preview.mjs";
 import { find } from "@/shared/lib/find";
 export function adminSelectors(
   state: AppState,

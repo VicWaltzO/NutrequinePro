@@ -1,5 +1,4 @@
-"use client";
-import Image from "next/image";
+import Image from "@/shared/ui/LocalImage";
 import type { User } from "@/lib/domain-types";
 import { ChevronRight } from "lucide-react";
 import { label } from "@/shared/ui";

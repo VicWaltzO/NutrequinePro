@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import AdminApp from "../app/ui/AdminApp";
+import AdminApp from "./admin/AdminApp";
 import { ApiError, login, onSessionRequired, recoverSession } from "./session-api";
 import type { LocalSession } from "./session-api";
 

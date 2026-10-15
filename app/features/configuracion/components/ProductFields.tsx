@@ -1,4 +1,3 @@
-"use client";
 import { Check } from "@/shared/ui";
 import type { SimpleFieldProps } from "@/shared/types/simple-fields";
 export default function ProductFields({ v, set, input }: Pick<SimpleFieldProps, "v" | "set" | "input">) {

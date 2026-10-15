@@ -1,4 +1,3 @@
-"use client";
 import type { Dispatch, SetStateAction } from "react";
 import type { AppState } from "@/lib/domain-types";
 import type { SaleLine } from "@/shared/types/forms";

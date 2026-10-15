@@ -1,5 +1,4 @@
-"use client";
-import { paymentSummary } from "@/lib/domain.mjs";
+import { paymentSummary } from "@/lib/domain-preview.mjs";
 import { Table, Metrics, money, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
 export default function PaymentDetail({ s: state, actor, id, open }: DetailProps) {

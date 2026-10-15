@@ -1,7 +1,6 @@
-"use client";
 import { useSaleFormState } from "../hooks/useSaleFormState";
 import { SaleLineEditor } from "./SaleLineEditor";
-import { stock } from "@/lib/domain.mjs";
+import { stock } from "@/lib/domain-preview.mjs";
 import { Input, Select, Check, PaymentFields, money, kg, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import type { FormProps } from "@/shared/types/forms";

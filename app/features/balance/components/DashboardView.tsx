@@ -1,5 +1,4 @@
-"use client";
-import Image from "next/image";
+import Image from "@/shared/ui/LocalImage";
 import type { AppState, Sale, BalanceSummary } from "@/lib/domain-types";
 import { Package, Factory, ChevronRight, ArrowUpRight } from "lucide-react";
 import { Metrics, money } from "@/shared/ui";

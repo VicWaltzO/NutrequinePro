@@ -1,7 +1,6 @@
-"use client";
 import { useState } from "react";
 import type { PaymentValues, FormProps } from "@/shared/types/forms";
-import { saleSummary, paymentSummary, customerSummary } from "@/lib/domain.mjs";
+import { saleSummary, paymentSummary, customerSummary } from "@/lib/domain-preview.mjs";
 import { Input, Select, Table, PaymentFields, money, day, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 

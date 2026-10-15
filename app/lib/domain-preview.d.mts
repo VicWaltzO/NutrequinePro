@@ -8,4 +8,4 @@ export {
   deliveryAvailability,
   productionSummary,
   balanceSummary,
-} from "../lib/domain.mjs";
+} from "./domain.mjs";

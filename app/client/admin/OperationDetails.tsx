@@ -1,4 +1,3 @@
-"use client";
 import SaleDetail from "@/features/ventas/components/SaleDetail";
 import ProductionDetail from "@/features/produccion/components/ProductionDetail";
 import PaymentDetail from "@/features/cobranza/components/PaymentDetail";

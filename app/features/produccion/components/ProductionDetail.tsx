@@ -1,5 +1,4 @@
-"use client";
-import { productionSummary } from "@/lib/domain.mjs";
+import { productionSummary } from "@/lib/domain-preview.mjs";
 import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
 export default function ProductionDetail({ s: state, actor, id, open, run }: DetailProps) {

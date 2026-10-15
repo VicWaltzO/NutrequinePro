@@ -1,4 +1,3 @@
-"use client";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { Badge, Table, Empty, money, label, find } from "@/shared/ui";
 import type { ReactNode } from "react";

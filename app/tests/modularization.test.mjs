@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { seedState } from "../lib/domain.mjs";
-import { fetchAdminState, submitAdminCommand, StateRequestError } from "../app/ui/admin-api.ts";
+import { fetchAdminState, submitAdminCommand } from "../client/admin/admin-api.ts";
+import { recoverSession, ApiError } from "../client/session-api.ts";
 import { saleFormPreview } from "../features/ventas/hooks/sale-form-preview.ts";
 import { productionFormPreview } from "../features/produccion/hooks/production-form-preview.ts";
 
@@ -14,43 +15,51 @@ test("el cliente HTTP conserva rutas, no-cache, payload e ID de reintento", asyn
     return Response.json(url === "/api/state" ? { state, actor } : { state, result: "venta-sintetica" });
   });
   assert.deepEqual(await fetchAdminState(), { state, actor });
-  assert.deepEqual(calls[0], { url: "/api/state", options: { cache: "no-store" } });
+  assert.equal(calls[0].url, "/api/state");
+  assert.equal(calls[0].options.cache, "no-store");
+  assert.equal(calls[0].options.credentials, "same-origin");
   const payload = { id: "venta-sintetica" };
   assert.deepEqual(await submitAdminCommand("SALE_DELIVER", payload, "reintento-sintetico"), {
     state,
     result: "venta-sintetica",
   });
-  assert.deepEqual(calls[1], {
-    url: "/api/command",
-    options: {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "SALE_DELIVER", payload, request_id: "reintento-sintetico" }),
-    },
-  });
+  assert.equal(calls[1].url, "/api/command");
+  assert.equal(calls[1].options.method, "POST");
+  assert.equal(calls[1].options.headers.get("Content-Type"), "application/json");
+  assert.equal(calls[1].options.credentials, "same-origin");
+  assert.equal(
+    calls[1].options.body,
+    JSON.stringify({ type: "SALE_DELIVER", payload, request_id: "reintento-sintetico" }),
+  );
 });
 
-test("el cliente HTTP conserva identidad solo en 403 y propaga los errores actuales", async (t) => {
+test("el cliente HTTP conserva los errores locales sin exponer una identidad de plataforma", async (t) => {
+  const session = { actor: { id: "admin-sintetico", role: "ADMIN" }, csrf_token: "a".repeat(64) };
   const responses = [
+    Response.json(session),
     Response.json({ error: "Sin acceso", authenticated_id: "usuario-sintetico" }, { status: 403 }),
+    Response.json(session),
     Response.json({ authenticated_id: "no-exponer" }, { status: 503 }),
     Response.json({ error: "Stock físico insuficiente." }, { status: 422 }),
     new Response("JSON inválido", { status: 503 }),
   ];
   t.mock.method(globalThis, "fetch", async () => responses.shift());
+  await recoverSession();
   await assert.rejects(fetchAdminState, (error) => {
-    assert.ok(error instanceof StateRequestError);
+    assert.ok(error instanceof ApiError);
     assert.equal(error.message, "Sin acceso");
-    assert.equal(error.authenticatedId, "usuario-sintetico");
+    assert.equal(error.status, 403);
+    assert.equal(error.authenticatedId, undefined);
     return true;
   });
   await assert.rejects(fetchAdminState, (error) => {
-    assert.equal(error.message, "No se pudieron cargar los datos.");
+    assert.equal(error.status, 503);
+    assert.match(error.message, /servicio no está disponible/);
     assert.equal(error.authenticatedId, undefined);
     return true;
   });
   await assert.rejects(submitAdminCommand("SALE_DELIVER", {}, "retry"), /Stock físico insuficiente/);
-  await assert.rejects(fetchAdminState, SyntaxError);
+  await assert.rejects(fetchAdminState, (error) => error instanceof ApiError && error.status === 503);
 });
 
 test("previsualización de venta agrupa sacos y gramos y restaura solo la entrega rectificada", () => {

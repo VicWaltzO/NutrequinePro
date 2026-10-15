@@ -1,6 +1,5 @@
-"use client";
 import type { AppState, Sale, BalanceSummary, OpenModal } from "@/lib/domain-types";
-import { saleSummary } from "@/lib/domain.mjs";
+import { saleSummary } from "@/lib/domain-preview.mjs";
 import { Table, Metrics, money, label, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";

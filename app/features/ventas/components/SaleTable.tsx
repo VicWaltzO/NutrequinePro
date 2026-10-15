@@ -1,6 +1,5 @@
-"use client";
 import type { AppState, Sale, OpenModal } from "@/lib/domain-types";
-import { saleSummary } from "@/lib/domain.mjs";
+import { saleSummary } from "@/lib/domain-preview.mjs";
 import { Badge, Table, Empty, money, find } from "@/shared/ui";
 
 export default function SaleTable({

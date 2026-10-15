@@ -76,7 +76,7 @@ export async function logout() {
   requireSession("Sesión cerrada.", true);
 }
 
-/** Explicit fetch port injected only into the existing admin-api module by the standalone Vite build. */
+/** Commercial HTTP transport: browser cookies, in-memory CSRF and no automatic command retries. */
 export async function adminFetch(input: RequestInfo | URL, init: RequestInit = {}) {
   if (typeof input !== "string" || !["/api/state", "/api/command"].includes(input))
     throw new ApiError(400, "Ruta comercial inválida.");

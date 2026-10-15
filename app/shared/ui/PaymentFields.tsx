@@ -1,4 +1,3 @@
-"use client";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 export function PaymentFields({

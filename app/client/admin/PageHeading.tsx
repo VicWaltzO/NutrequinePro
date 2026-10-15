@@ -1,4 +1,3 @@
-"use client";
 import { Plus } from "lucide-react";
 import type { OpenModal } from "@/lib/domain-types";
 import { nav } from "./navigation";

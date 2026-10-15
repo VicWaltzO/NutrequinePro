@@ -1,4 +1,3 @@
-"use client";
 import type { AppState } from "@/lib/domain-types";
 import { Search } from "lucide-react";
 import { Input, Select } from "@/shared/ui";

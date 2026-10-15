@@ -1,12 +1,10 @@
-"use client";
 import { useEffect, useState } from "react";
 import { errorMessage } from "@/lib/domain-types";
 import type { AppState, User, EditorRecord } from "@/lib/domain-types";
 import { createCommandRequest } from "@/lib/command-request.mjs";
 import type { Modal } from "@/shared/types/admin";
-import { fetchAdminState, submitAdminCommand, StateRequestError } from "../admin-api";
+import { fetchAdminState, submitAdminCommand } from "../admin-api";
 export function useAdminOperations() {
-  const [authenticatedId, setAuthenticatedId] = useState<string | null>(null);
   const [state, setState] = useState<AppState | null>(null);
   const [actor, setActor] = useState<User | null>(null);
   const [modal, setModal] = useState<Modal | null>(null);
@@ -20,10 +18,8 @@ export function useAdminOperations() {
       setState(responseBody.state);
       setActor(responseBody.actor);
       setError("");
-      setAuthenticatedId(null);
     } catch (e) {
       setError(errorMessage(e, "No se pudieron cargar los datos."));
-      setAuthenticatedId(e instanceof StateRequestError ? (e.authenticatedId ?? null) : null);
     }
   };
   useEffect(() => {
@@ -34,13 +30,11 @@ export function useAdminOperations() {
           setState(responseBody.state);
           setActor(responseBody.actor);
           setError("");
-          setAuthenticatedId(null);
         }
       })
       .catch((e) => {
         if (active) {
           setError(errorMessage(e, "No se pudieron cargar los datos."));
-          setAuthenticatedId(e instanceof StateRequestError ? (e.authenticatedId ?? null) : null);
         }
       });
     return () => {
@@ -98,5 +92,5 @@ export function useAdminOperations() {
       setBusy(false);
     }
   };
-  return { s: state, actor, modal, error, busy, toast, authenticatedId, reload, open, close, run };
+  return { s: state, actor, modal, error, busy, toast, reload, open, close, run };
 }

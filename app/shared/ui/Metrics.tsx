@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 export function Metrics({ items }: { items: { label: string; value: React.ReactNode; note?: string }[] }) {
   return (

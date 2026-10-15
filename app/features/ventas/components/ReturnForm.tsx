@@ -1,8 +1,7 @@
-"use client";
 import { useState } from "react";
 import { recordId } from "@/lib/domain-types";
 import type { ReturnValues, FormProps } from "@/shared/types/forms";
-import { saleSummary } from "@/lib/domain.mjs";
+import { saleSummary } from "@/lib/domain-preview.mjs";
 import { Input, Table, day, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 

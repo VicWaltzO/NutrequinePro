@@ -1,4 +1,3 @@
-"use client";
 import { label } from "@/shared/lib/format";
 import { Field } from "@/shared/ui/Field";
 type SelectProps = {

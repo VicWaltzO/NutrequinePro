@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import type { CostInput, IngredientInput, NumericInput } from "@/lib/domain-types";
 import type { ProductionValues, FormProps } from "@/shared/types/forms";

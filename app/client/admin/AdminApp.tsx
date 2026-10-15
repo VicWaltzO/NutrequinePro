@@ -1,31 +1,17 @@
-"use client";
 import type { Sale } from "@/lib/domain-types";
-import LoadingScreen from "@/shared/ui/LoadingScreen";
+import LoadingScreen from "../LoadingScreen";
 import SaleTable from "@/features/ventas/components/SaleTable";
-import Sidebar from "@/app/ui/Sidebar";
-import Topbar from "@/app/ui/Topbar";
-import ModalHost from "@/app/ui/ModalHost";
+import Sidebar from "@/client/admin/Sidebar";
+import Topbar from "@/client/admin/Topbar";
+import ModalHost from "@/client/admin/ModalHost";
 import { useAdminOperations } from "./hooks/useAdminOperations";
 import { useAdminNavigation } from "./hooks/useAdminNavigation";
 import AdminWorkspace from "./AdminWorkspace";
 export default function AdminApp() {
-  const {
-    s: state,
-    actor,
-    modal,
-    error,
-    busy,
-    toast,
-    authenticatedId,
-    reload,
-    open,
-    close,
-    run,
-  } = useAdminOperations();
+  const { s: state, actor, modal, error, busy, toast, reload, open, close, run } = useAdminOperations();
   const navigation = useAdminNavigation();
   const { view, go, menu, theme, setMenu, toggleTheme } = navigation;
-  if (!state || !actor)
-    return <LoadingScreen reload={reload} error={error} authenticatedId={authenticatedId} />;
+  if (!state || !actor) return <LoadingScreen reload={reload} error={error} />;
   const write = actor.role !== "VIEWER";
   const saleTable = (rows: Sale[]) => <SaleTable s={state} write={write} open={open} rows={rows} />;
   return (

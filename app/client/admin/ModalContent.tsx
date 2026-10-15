@@ -1,4 +1,3 @@
-"use client";
 import { recordId } from "@/lib/domain-types";
 import type { AppState, User, Sale, OpenModal, Submit } from "@/lib/domain-types";
 import { SaleForm } from "@/features/ventas/components/SaleForm";
@@ -9,8 +8,8 @@ import { ProductionForm } from "@/features/produccion/components/ProductionForm"
 import { ReconcileForm } from "@/features/produccion/components/ReconcileForm";
 import { FormulaForm } from "@/features/produccion/components/FormulaForm";
 import { ProductionCorrectionForm } from "@/features/produccion/components/ProductionCorrectionForm";
-import SimpleForm from "@/app/ui/SimpleForm";
-import Details from "@/app/ui/OperationDetails";
+import SimpleForm from "@/client/admin/SimpleForm";
+import Details from "@/client/admin/OperationDetails";
 import type { ReactNode } from "react";
 import type { Modal } from "@/shared/types/admin";
 

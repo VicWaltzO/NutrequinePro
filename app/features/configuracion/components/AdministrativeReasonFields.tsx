@@ -1,4 +1,3 @@
-"use client";
 import type { SimpleFieldProps } from "@/shared/types/simple-fields";
 export default function AdministrativeReasonFields({
   record,

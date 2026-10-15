@@ -1,10 +1,9 @@
-"use client";
 import { adminSelectors } from "./selectors";
 import { Tabs } from "@/shared/ui/Tabs";
 import type { AppState, User, OpenModal, Sale } from "@/lib/domain-types";
-import { balanceSummary } from "@/lib/domain.mjs";
+import { balanceSummary } from "@/lib/domain-preview.mjs";
 import ProductCards from "@/features/inventario/components/ProductCards";
-import RecordFilters from "@/app/ui/RecordFilters";
+import RecordFilters from "@/client/admin/RecordFilters";
 import SaleTable from "@/features/ventas/components/SaleTable";
 import ProductionList from "@/features/produccion/components/ProductionList";
 import DashboardView from "@/features/balance/components/DashboardView";
@@ -16,7 +15,7 @@ import InventoryView from "@/features/inventario/components/InventoryView";
 import ExpensesView from "@/features/gastos/components/ExpensesView";
 import BalanceView from "@/features/balance/components/BalanceView";
 import ConfigurationView from "@/features/configuracion/components/ConfigurationView";
-import PageHeading from "@/app/ui/PageHeading";
+import PageHeading from "@/client/admin/PageHeading";
 import type { useAdminNavigation } from "./hooks/useAdminNavigation";
 
 export default function AdminWorkspace({

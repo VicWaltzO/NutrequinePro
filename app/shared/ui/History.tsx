@@ -1,4 +1,3 @@
-"use client";
 import type { AppState } from "@/lib/domain-types";
 import { stamp } from "@/shared/lib/format";
 import { find } from "@/shared/lib/find";

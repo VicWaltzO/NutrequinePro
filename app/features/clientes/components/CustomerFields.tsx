@@ -1,5 +1,4 @@
-"use client";
-import { normalize } from "@/lib/domain.mjs";
+import { normalize } from "@/lib/domain-preview.mjs";
 import { Field, Check } from "@/shared/ui";
 import type { SimpleFieldProps } from "@/shared/types/simple-fields";
 export default function CustomerFields({

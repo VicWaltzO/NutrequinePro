@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import type { SaleFields, SaleLine, FormProps } from "@/shared/types/forms";
 import type { SaleItem } from "@/lib/domain-types";

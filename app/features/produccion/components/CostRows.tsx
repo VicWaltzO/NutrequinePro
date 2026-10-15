@@ -1,4 +1,3 @@
-"use client";
 import type { Dispatch, SetStateAction } from "react";
 import type { AppState, CostInput } from "@/lib/domain-types";
 import { Input, Select, Check } from "@/shared/ui";

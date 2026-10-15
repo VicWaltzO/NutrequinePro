@@ -1,4 +1,3 @@
-"use client";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import CustomerDirectory from "@/features/clientes/components/CustomerDirectory";
 import type { ReactNode, Dispatch, SetStateAction } from "react";

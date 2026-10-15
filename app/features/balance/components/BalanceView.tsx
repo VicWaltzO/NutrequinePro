@@ -1,6 +1,5 @@
-"use client";
 import type { AppState, BalanceSummary } from "@/lib/domain-types";
-import { balanceSummary } from "@/lib/domain.mjs";
+import { balanceSummary } from "@/lib/domain-preview.mjs";
 import { Table, Metrics, money } from "@/shared/ui";
 import type { ReactNode } from "react";
 export default function BalanceView({

@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import { Field } from "@/shared/ui/Field";
 type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> & {

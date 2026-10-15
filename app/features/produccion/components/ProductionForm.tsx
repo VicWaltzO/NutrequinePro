@@ -1,4 +1,3 @@
-"use client";
 import { useProductionFormState } from "../hooks/useProductionFormState";
 import { Input, Select, Check, Table, money, kg } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";

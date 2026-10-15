@@ -36,14 +36,14 @@ export function createUiHarness(readSource = (file) => readFileSync(path.join(ap
     useState(initial) {
       const index = hookIndex++;
       let value =
-        injectAdminState && index === 1
+        injectAdminState && index === 0
           ? activeState
-          : injectAdminState && index === 2
+          : injectAdminState && index === 1
             ? activeActor
             : typeof initial === "function"
               ? initial()
               : initial;
-      if (injectAdminState && index > 2 && initial === null && !modalInjected) {
+      if (injectAdminState && index > 1 && initial === null && !modalInjected) {
         value = activeModal;
         modalInjected = true;
       }
@@ -85,12 +85,6 @@ export function createUiHarness(readSource = (file) => readFileSync(path.join(ap
     cache.set(file, moduleRecord);
     const localRequire = (specifier) => {
       if (specifier === "react") return react;
-      if (specifier === "next/image")
-        return function TestImage(props) {
-          const imageProps = { ...props };
-          delete imageProps.unoptimized;
-          return React.createElement("img", imageProps);
-        };
       if (!specifier.startsWith(".") && !specifier.startsWith("@/")) return require(specifier);
       const base = specifier.startsWith("@/")
         ? specifier.slice(2)
@@ -195,7 +189,7 @@ export function createUiHarness(readSource = (file) => readFileSync(path.join(ap
     activeModal = modal;
     modalInjected = false;
     location.hash = "#" + route;
-    return renderToStaticMarkup(React.createElement(load("app/ui/AdminApp.tsx").default));
+    return renderToStaticMarkup(React.createElement(load("client/admin/AdminApp.tsx").default));
   }
   const routes = [
     "dashboard",

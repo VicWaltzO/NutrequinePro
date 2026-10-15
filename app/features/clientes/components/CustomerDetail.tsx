@@ -1,4 +1,3 @@
-"use client";
 import { recordId } from "@/lib/domain-types";
 import type { AppState, EditorRecord, OpenModal, Sale } from "@/lib/domain-types";
 import type { ReactNode } from "react";

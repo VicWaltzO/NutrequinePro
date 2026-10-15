@@ -20,7 +20,7 @@ const eslintConfig = defineConfig([
     "coverage/**",
   ]),
   {
-    files: ["client/**/*.{ts,tsx,mts,mjs}"],
+    files: ["client/**/*.{ts,tsx,mts,mjs}", "shared/ui/LocalImage.tsx"],
     rules: { "@next/next/no-img-element": "off" },
   },
   {

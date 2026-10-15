@@ -1,9 +1,8 @@
-"use client";
 import { useState } from "react";
 import { recordId } from "@/lib/domain-types";
 import type { CostInput, NumericInput, ProductionCost } from "@/lib/domain-types";
 import type { ReconcileIngredient, FormProps } from "@/shared/types/forms";
-import { productionSummary } from "@/lib/domain.mjs";
+import { productionSummary } from "@/lib/domain-preview.mjs";
 import { Input, Check, Table, money, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import { CostRows } from "./CostRows";

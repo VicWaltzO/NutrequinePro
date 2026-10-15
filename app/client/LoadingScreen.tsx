@@ -1,13 +1,6 @@
 import { logout } from "./session-api";
 import { useState } from "react";
-export default function LoadingScreen({
-  reload,
-  error,
-}: {
-  reload: () => Promise<void>;
-  error: string;
-  authenticatedId: string | null;
-}) {
+export default function LoadingScreen({ reload, error }: { reload: () => Promise<void>; error: string }) {
   const [logoutError, setLogoutError] = useState("");
   return (
     <div className="loading">

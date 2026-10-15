@@ -1,8 +1,10 @@
-"use client";
-import { ChevronRight, RefreshCw, Menu, Sun, Moon, LogOut } from "lucide-react";
-import { day } from "@/shared/ui";
+import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { ChevronRight, RefreshCw, Menu, Sun, Moon, LogOut } from "lucide-react";
+import { day } from "@/shared/lib/format";
 import { nav } from "./navigation";
+import { logout } from "../session-api";
+
 export default function Topbar({
   view,
   reload,
@@ -18,6 +20,19 @@ export default function Topbar({
   setMenu: Dispatch<SetStateAction<boolean>>;
   toggleTheme: () => void;
 }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const signout = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      await logout();
+    } catch {
+      setError("No se pudo cerrar la sesión. Vuelva a intentar.");
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <header className="topbar">
       <button
@@ -29,7 +44,7 @@ export default function Topbar({
       </button>
       <div className="breadcrumb">
         Nutrequine Pro <ChevronRight size={14} />
-        <strong>{nav.find((x) => x[0] === view)?.[1]}</strong>
+        <strong>{nav.find((item) => item[0] === view)?.[1]}</strong>
       </div>
       <div className="topbar-right">
         <span>PEN · {day()}</span>
@@ -41,15 +56,15 @@ export default function Topbar({
         >
           {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
         </button>
-        <a
+        <button
           className="account-signout"
-          href="/signout-with-chatgpt?return_to=%2F"
-          target="_top"
           title="Salir de la cuenta actual"
+          disabled={busy}
+          onClick={signout}
         >
           <LogOut size={17} />
-          Salir
-        </a>
+          {busy ? "Saliendo…" : "Salir"}
+        </button>
         <button
           className="icon-button"
           title="Actualizar datos"
@@ -58,6 +73,7 @@ export default function Topbar({
         >
           <RefreshCw size={17} />
         </button>
+        {error && <span role="alert">{error}</span>}
       </div>
     </header>
   );

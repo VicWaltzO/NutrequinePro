@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useRef } from "react";
 import type { AppState, User, Sale, OpenModal, Submit } from "@/lib/domain-types";
 import type { ReactNode } from "react";

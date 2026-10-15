@@ -1,4 +1,3 @@
-"use client";
 import CustomerFields from "@/features/clientes/components/CustomerFields";
 import ProductFields from "@/features/configuracion/components/ProductFields";
 import IngredientFields from "@/features/produccion/components/IngredientFields";

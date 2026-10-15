@@ -1,5 +1,4 @@
-"use client";
-import Image from "next/image";
+import Image from "@/shared/ui/LocalImage";
 import { Moon, Sun } from "lucide-react";
 import type { AppState, OpenModal, User } from "@/lib/domain-types";
 import { changeTheme } from "@/lib/browser-preferences.mjs";

@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import type { NumericInput } from "@/lib/domain-types";
 import { Input, Select, Table, day } from "@/shared/ui";

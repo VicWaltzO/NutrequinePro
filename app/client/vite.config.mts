@@ -10,23 +10,15 @@ export default defineConfig({
   root: client(""),
   publicDir: resolve(root, "public"),
   resolve: {
-    alias: [
-      { find: "next/image", replacement: client("LocalImage.tsx") },
-      { find: "@/lib/domain.mjs", replacement: client("domain.mjs") },
-      { find: "@/app/ui/Topbar", replacement: client("Topbar.tsx") },
-      { find: "@/shared/ui/LoadingScreen", replacement: client("LoadingScreen.tsx") },
-      { find: "@", replacement: root },
-    ],
+    alias: [{ find: "@", replacement: root }],
   },
   plugins: [
     {
       name: "nutrequine-client-boundary",
       enforce: "pre",
-      transform(source, id) {
+      load(id) {
         const path = id.split("?")[0].replaceAll("\\", "/");
         const sourcePath = path.startsWith(sourcePrefix) ? path.slice(sourcePrefix.length) : "";
-        if (path === resolve(root, "app/ui/admin-api.ts").replaceAll("\\", "/"))
-          return 'import { adminFetch as fetch } from "@/client/session-api";\n' + source;
         if (
           !sourcePath.startsWith("node_modules/") &&
           (/^(?:server|db|lib\/(?:adapters|sqlite))\//.test(sourcePath) ||
@@ -71,8 +63,6 @@ export default defineConfig({
       strict: true,
       allow: [
         client(""),
-        resolve(root, "app/ui"),
-        resolve(root, "app/globals.css"),
         resolve(root, "features"),
         resolve(root, "shared"),
         resolve(root, "lib"),

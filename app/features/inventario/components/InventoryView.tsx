@@ -1,6 +1,5 @@
-"use client";
 import type { AppState, OpenModal } from "@/lib/domain-types";
-import { stock } from "@/lib/domain.mjs";
+import { stock } from "@/lib/domain-preview.mjs";
 import { Table, kg, num, label, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";

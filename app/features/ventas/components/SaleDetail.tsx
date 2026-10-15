@@ -1,5 +1,4 @@
-"use client";
-import { saleSummary, deliveryAvailability } from "@/lib/domain.mjs";
+import { saleSummary, deliveryAvailability } from "@/lib/domain-preview.mjs";
 import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
 export default function SaleDetail({ s: state, actor, id, open, run }: DetailProps) {

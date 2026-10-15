@@ -1,5 +1,4 @@
-"use client";
-import Image from "next/image";
+import Image from "@/shared/ui/LocalImage";
 import AuthenticatedId from "@/shared/ui/AuthenticatedId";
 export default function LoadingScreen({
   reload,

@@ -1,4 +1,3 @@
-"use client";
 import type { AppState, User, OpenModal } from "@/lib/domain-types";
 import Configuration from "@/features/configuracion/components/Configuration";
 import type { ReactNode } from "react";

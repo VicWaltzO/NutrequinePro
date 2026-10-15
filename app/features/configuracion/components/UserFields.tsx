@@ -1,4 +1,3 @@
-"use client";
 import { Select } from "@/shared/ui";
 import type { SimpleFieldProps } from "@/shared/types/simple-fields";
 export default function UserFields({ v, set, input }: Pick<SimpleFieldProps, "v" | "set" | "input">) {

@@ -1,6 +1,5 @@
-"use client";
 import type { AppState, Production, OpenModal } from "@/lib/domain-types";
-import { productionSummary } from "@/lib/domain.mjs";
+import { productionSummary } from "@/lib/domain-preview.mjs";
 import { Badge, Table, Empty, money, num } from "@/shared/ui";
 
 export default function ProductionList({

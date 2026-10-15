@@ -1,4 +1,3 @@
-"use client";
 import { recordId } from "@/lib/domain-types";
 import type { EditorRecord, Submit } from "@/lib/domain-types";
 
