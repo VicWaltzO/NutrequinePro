@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "artifact": "showcase_final.mp4",
+  "ended": true,
+  "duration": 30,
+  "currentTime": 30,
+  "width": 1920,
+  "height": 1080,
+  "elapsedSeconds": 29.95760000002384,
+  "callbacks": 899,
+  "lastPresentedTime": 29.966667,
+  "monotonic": true,
+  "samples": [
+    0.033333, 1.033333, 2.066667, 3.066667, 4.066667, 5.066667, 6.066667, 7.066667, 8.066667, 9.066667,
+    10.066667, 11.066667, 12.066667, 13.066667, 14.066667, 15.066667, 16.1, 17.1, 18.1, 19.1, 20.1, 21.1,
+    22.1, 23.1, 24.1, 25.1, 26.1, 27.1, 28.1, 29.1
+  ],
+  "totalVideoFrames": 900,
+  "droppedVideoFrames": 0,
+  "playbackRate": 1,
+  "muted": true,
+  "error": null,
+  "errors": []
+}

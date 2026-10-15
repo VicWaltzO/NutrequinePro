@@ -9,7 +9,11 @@ export function createCommandRequest() {
       if (request?.fingerprint !== fingerprint) request = { fingerprint, id: crypto.randomUUID() };
       return request.id;
     },
-    reset() { request = null; },
-    finish() { pending = false; },
+    reset() {
+      request = null;
+    },
+    finish() {
+      pending = false;
+    },
   };
 }

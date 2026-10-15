@@ -1,0 +1,234 @@
+{
+  "runId": "1791740172281-rehearsal",
+  "mode": "rehearsal",
+  "localOnly": true,
+  "externalRequestsBlocked": true,
+  "viewport": [1920, 1080],
+  "locale": "es-PE",
+  "timezone": "America/Lima",
+  "browser": "146.0.7680.180",
+  "checks": [
+    {
+      "name": "Base nueva: sin operaciones",
+      "actual": [0, 0, 0, 0],
+      "expected": [0, 0, 0, 0],
+      "passed": true
+    },
+    {
+      "name": "Venta de preparación",
+      "actual": 666000,
+      "expected": 666000,
+      "passed": true
+    },
+    {
+      "name": "Stock inicial Hi-Performance",
+      "actual": 10,
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "name": "Resumen inicial sin deuda",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "name": "HTTP PRODUCTION_CONFIRM",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "name": "Lote confirmado",
+      "actual": "CONFIRMED",
+      "expected": "CONFIRMED",
+      "passed": true
+    },
+    {
+      "name": "Producción aumenta stock en 40 sacos",
+      "actual": 50,
+      "expected": 50,
+      "passed": true
+    },
+    {
+      "name": "Producción: sacos y kg",
+      "actual": [40, 1000000],
+      "expected": [40, 1000000],
+      "passed": true
+    },
+    {
+      "name": "Costos conciliados",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "Precio autocompletado",
+      "actual": "72",
+      "expected": "72",
+      "passed": true
+    },
+    {
+      "name": "Peso autocompletado",
+      "actual": "25",
+      "expected": "25",
+      "passed": true
+    },
+    {
+      "name": "HTTP SALE_SAVE",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "name": "Venta crédito entregada",
+      "actual": ["CREDIT", "CONFIRMED", "DELIVERED"],
+      "expected": ["CREDIT", "CONFIRMED", "DELIVERED"],
+      "passed": true
+    },
+    {
+      "name": "Venta: total y deuda",
+      "actual": [72000, 0, 72000],
+      "expected": [72000, 0, 72000],
+      "passed": true
+    },
+    {
+      "name": "Venta descuenta 10 sacos",
+      "actual": 40,
+      "expected": 40,
+      "passed": true
+    },
+    {
+      "name": "HTTP PAYMENT_CREATE",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "name": "Pago reduce saldo",
+      "actual": [72000, 30000, 42000, "PARTIAL"],
+      "expected": [72000, 30000, 42000, "PARTIAL"],
+      "passed": true
+    },
+    {
+      "name": "Pago auténtico aplicado a venta",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "Resumen final ventas/cobros/deuda",
+      "actual": [738000, 696000, 42000],
+      "expected": [738000, 696000, 42000],
+      "passed": true
+    },
+    {
+      "name": "Resumen final stock",
+      "actual": [10, 40, 10],
+      "expected": [10, 40, 10],
+      "passed": true
+    },
+    {
+      "name": "Recarga conserva sin duplicar",
+      "actual": [2, 2, 2],
+      "expected": [2, 2, 2],
+      "passed": true
+    },
+    {
+      "name": "Persistencia del saldo",
+      "actual": 42000,
+      "expected": 42000,
+      "passed": true
+    },
+    {
+      "name": "Errores de navegador",
+      "actual": [],
+      "expected": [],
+      "passed": true
+    },
+    {
+      "name": "Fallos de red",
+      "actual": [],
+      "expected": [],
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "failedRequests": [],
+  "shots": [
+    {
+      "name": "01-resumen",
+      "start": 1.281,
+      "end": 4.641,
+      "seconds": 3,
+      "speed": 1.12,
+      "highlights": []
+    },
+    {
+      "name": "02-produccion",
+      "start": 4.745,
+      "end": 12.103,
+      "seconds": 7,
+      "speed": 1.0511428571428572,
+      "highlights": [
+        {
+          "at": 1.1529999999999996,
+          "duration": 0.7,
+          "box": {
+            "x": 568.59375,
+            "y": 436.875,
+            "width": 159.5,
+            "height": 39.90625
+          }
+        }
+      ]
+    },
+    {
+      "name": "03-ventas",
+      "start": 12.406,
+      "end": 19.771,
+      "seconds": 7,
+      "speed": 1.0521428571428573,
+      "highlights": [
+        {
+          "at": 1.2489999999999988,
+          "duration": 0.7,
+          "box": {
+            "x": 1363.453125,
+            "y": 657.875,
+            "width": 88.546875,
+            "height": 30
+          }
+        }
+      ]
+    },
+    {
+      "name": "04-cobranza",
+      "start": 19.972,
+      "end": 28.337,
+      "seconds": 8,
+      "speed": 1.0456249999999998,
+      "highlights": [
+        {
+          "at": 1.504999999999999,
+          "duration": 0.7,
+          "box": {
+            "x": 1156.328125,
+            "y": 343.7734375,
+            "width": 272.65625,
+            "height": 34.09375
+          }
+        }
+      ]
+    },
+    {
+      "name": "05-resumen-final",
+      "start": 28.567,
+      "end": 33.927,
+      "seconds": 5,
+      "speed": 1.0719999999999998,
+      "highlights": []
+    }
+  ],
+  "elapsedSeconds": 54.378
+}

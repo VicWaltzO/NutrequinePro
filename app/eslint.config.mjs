@@ -1,26 +1,66 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import react from "eslint-plugin-react";
+import hooks from "eslint-plugin-react-hooks";
+import accessibility from "eslint-plugin-jsx-a11y";
+import globals from "globals";
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
+    "node_modules/**",
+    "outputs/**",
+    "work/**",
+    "demo-linkedin/**",
+    "vendor/**",
     ".next/**",
+    ".vinext/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "dist/**",
+    "dist-node/**",
+    "dist-client/**",
+    ".wrangler/**",
+    ".sites-runtime/**",
+    "coverage/**",
   ]),
   {
-    files: ["components/ui/**/*.{ts,tsx}", "hooks/use-mobile.ts"],
+    files: ["**/*.{js,mjs,ts,mts,tsx,jsx}"],
+    extends: [js.configs.recommended],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    rules: { "no-unused-vars": ["error", { argsIgnorePattern: "^_", caughtErrors: "none" }] },
+  },
+  {
+    files: ["**/*.{ts,mts,tsx}"],
+    extends: [tseslint.configs.recommended],
     rules: {
-      // These files are vendored verbatim from shadcn@4.17.0. Keep the
-      // registry source intact while applying the stricter rules to Site code.
-      "@typescript-eslint/no-unused-vars": "off",
-      "react-hooks/purity": "off",
-      "react-hooks/set-state-in-effect": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", caughtErrors: "none" }],
+    },
+  },
+  {
+    files: ["**/*.{tsx,jsx}"],
+    extends: [
+      react.configs.flat.recommended,
+      react.configs.flat["jsx-runtime"],
+      hooks.configs.flat.recommended,
+      accessibility.flatConfigs.recommended,
+    ],
+    settings: { react: { version: "19.2" } },
+    rules: { "react/prop-types": "off" },
+  },
+  { files: ["**/*.{ts,mts}"], extends: [hooks.configs.flat.recommended] },
+  {
+    files: ["{client,features,shared,lib,db,server}/**/*.{ts,tsx,mts,mjs,js,jsx}"],
+    rules: {
+      "one-var": ["error", "never"],
+      "no-duplicate-imports": ["error", { allowSeparateTypeImports: true }],
+    },
+  },
+  {
+    files: ["{client,features,shared,lib,db,server}/**/*.{ts,mts,mjs,js}"],
+    rules: {
+      "no-nested-ternary": "error",
     },
   },
 ]);

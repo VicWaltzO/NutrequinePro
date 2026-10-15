@@ -1,38 +1,43 @@
 # Nutrequine Pro
 
-## 🧠 Mapa semántico
+Aplicación empresarial local de producción, ventas, inventario y cobranza.
+Usa React 19, TypeScript, Vite, Node.js, Fastify y SQLite. Cliente y API comparten
+un origen restringido a `127.0.0.1`; las credenciales y los datos residen fuera
+del código. No requiere una cuenta de plataforma para operar.
 
-[![Mapa neuronal de Nutrequine Pro](docs/diagramas/nutrequine-pro-mapa-neuronal.svg)](docs/diagramas/nutrequine-pro-mapa-neuronal.svg)
+El código está en [`app/`](app/README.md). Git se ejecuta desde esta raíz y npm
+desde `app/`. Se requiere Node.js **24.18 o superior**.
 
-[Mapa editable en tldraw](https://www.tldraw.com/f/CComDt22S96zp9KBMtEng) · [SVG vectorial](docs/diagramas/nutrequine-pro-mapa-neuronal.svg)
+## Preparación y ejecución
 
-Red visual de procesos, relaciones N:M, arquitectura y evolución propuesta. Basado en la rama `codex/reestructuracion-arquitectonica` (commit `5f950fd`). Las integraciones futuras aparecen diferenciadas de las funcionalidades actuales.
-
-El código de la aplicación, sus dependencias, migraciones, pruebas y documentación técnica se encuentran en [`app/`](app/README.md).
-
-## Desarrollo
-
-Se requiere Node.js 22.13 o posterior. Desde la raíz del proyecto:
+Seguir la [instalación local](app/docs/INSTALACION_LOCAL.md) para crear un directorio
+privado, preparar SQLite, provisionar credenciales y seleccionar la configuración.
+El arranque no crea bases ni usuarios de forma silenciosa.
 
 ```powershell
 cd app
 npm.cmd ci
-npm.cmd run dev
-```
-
-Abrir http://127.0.0.1:5173 e iniciar sesión con la identidad de prueba local. `npm.cmd run dev` prepara la base y aplica las migraciones pendientes antes de arrancar. No requiere Docker ni una compilación previa. Los datos SQLite se conservan en `app/.wrangler/state/`, separados de producción. Consultar `app/README.md` para más detalles.
-
-## Verificación
-
-Desde `app/`:
-
-```powershell
-npm.cmd test
-npm.cmd run check
-npm.cmd run lint
 npm.cmd run build
+npm.cmd start -- --config "D:\NutrequinePrivado\servidor.json"
 ```
 
-## Git
+Para desarrollar: `npm.cmd run dev -- --config RUTA_PRIVADA_ABSOLUTA`.
+Vite funciona como middleware de Fastify, con HMR y API en el mismo puerto.
 
-El repositorio Git está en la raíz del proyecto y el remoto `origin` es `https://github.com/VicWaltzO/NutrequinePro.git`. Seguir `AGENTS.md` antes de crear commits y sincronizar. Las credenciales y los datos locales deben configurarse por separado y no versionarse.
+## Verificación y colaboración
+
+`npm.cmd run verify` ejecuta pruebas, TypeScript de cliente y servidor, ESLint,
+Prettier, compilación completa y auditoría de la distribución. Después ejecutar
+`npm.cmd run test:e2e`; preparar Chromium con `npx.cmd playwright install chromium`
+o seleccionar Chrome instalado mediante `REGRESSION_BROWSER_CHANNEL=chrome`.
+
+Consultar [arquitectura](app/docs/ARQUITECTURA.md),
+[desarrollo](app/docs/GUIA_DESARROLLO.md),
+[respaldo y restauración](app/docs/RESPALDO_RESTAURACION.md),
+[consolidación y evidencias](app/docs/REPORTE_09_CONSOLIDACION.md) y
+[colaboración](CONTRIBUTING.md). Los informes 01–08 describen antecedentes históricos.
+
+Trabajar en `codex/reestructuracion-arquitectonica`; seguir ambos `AGENTS.md`.
+No versionar contraseñas, bases, configuración privada, capturas o distribuciones.
+El remoto es `https://github.com/VicWaltzO/NutrequinePro.git`. La historia permanece
+recuperable; esta consolidación no publica cambios en producción.

@@ -1,0 +1,21 @@
+node_modules/
+dist/
+dist-node/
+dist-client/
+.next/
+.vinext/
+.wrangler/
+.sites-runtime/
+work/
+coverage/
+outputs/
+# Downloaded multimedia tools are generated local artifacts, not application source.
+demo-linkedin/.tools/
+public/
+vendor/
+drizzle/
+docs/ESPECIFICACION_MAESTRA_MVP.md
+next-env.d.ts
+package-lock.json
+*.tsbuildinfo
+.env*

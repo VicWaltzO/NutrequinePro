@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-11",
+  "artifact": "dist/nutrequine-pro-showcase-45s-1080p.mp4",
+  "artifactSha256": "eb3aa0513c8c77cec5d6718eaaab243c56e8bcb668f7f8bd66519407b79f48bc",
+  "technicalAndFullPlaybackEvidence": "qa/verification.json",
+  "scope": "Manual inspection of selected frames, sheets, poster and native capture evidence; full-video playback is checked separately by scripts/verify.mjs.",
+  "passed": true,
+  "wholeFinalVideoViewedManually": false,
+  "inspected": {
+    "sceneImages": [
+      "qa/scene-01.png",
+      "qa/scene-02.png",
+      "qa/scene-03.png",
+      "qa/scene-04.png",
+      "qa/scene-05.png",
+      "qa/scene-06.png",
+      "qa/scene-07.png",
+      "qa/scene-08.png",
+      "qa/scene-09.png",
+      "qa/scene-10.png",
+      "qa/scene-11.png"
+    ],
+    "sheets": ["qa/contact-sheet.png", "qa/transitions.png"],
+    "finalFrame": "qa/last-frame.png",
+    "poster": "dist/nutrequine-pro-poster.png",
+    "extraFinalFrameIndices": [244, 249, 259, 588, 592, 606, 768, 774, 798],
+    "extraFinalFrameImages": [
+      "qa/interaction-02.png",
+      "qa/interaction-03.png",
+      "qa/interaction-04.png",
+      "qa/interaction-09.png",
+      "qa/interaction-10.png",
+      "qa/interaction-11.png",
+      "qa/interaction-14.png",
+      "qa/interaction-15.png",
+      "qa/interaction-17.png"
+    ],
+    "mobileMainFrameIndices": [278, 408, 606, 810, 1038],
+    "mobileSize": [480, 270],
+    "mobileMainImages": [
+      "qa/mobile-main-01.png",
+      "qa/mobile-main-02.png",
+      "qa/mobile-main-03.png",
+      "qa/mobile-main-04.png",
+      "qa/mobile-main-05.png"
+    ],
+    "sourceEvidence": [
+      "qa/production-confirmed.png",
+      "qa/production-costs.png",
+      "qa/sales-total.png",
+      "qa/collections.png",
+      "qa/balance-estimated.png",
+      "qa/configuration-safe.png",
+      "qa/real-click-pulse-detail.png"
+    ]
+  },
+  "findings": {
+    "allNineModulesAppear": true,
+    "brandAndPosterApproved": true,
+    "threeAuthenticInteractionSequencesSupported": true,
+    "interactionEvidence": [
+      {
+        "module": "production",
+        "evidence": "Real pointer/pulse over Confirmar producción; final scene-03 shows Confirmada and 40 sacos. API/state confirmation passed in e2e.json."
+      },
+      {
+        "module": "sales",
+        "evidence": "Real pointer over Confirmar venta, brief native Guardando…, then V-000002 detail with total/balance 720. API/state creation passed in e2e.json."
+      },
+      {
+        "module": "collections",
+        "evidence": "Real pointer/pulse over Registrar pago, then PG-000002 for 300 and sale detail with total720/paid300/balance420. Payment application passed in e2e.json."
+      }
+    ],
+    "labelsOutsideProductData": true,
+    "simulatedDataNoticeVisible": true,
+    "noPrivateDataFoundInInspectedFrames": true,
+    "configurationContactAndTaxFieldsEmpty": true,
+    "estimatedBalanceQualifierPreserved": true,
+    "noBlackFramesSeenInInspectedSheets": true,
+    "finalFrameRecognizable": true,
+    "mobilePrimaryTitlesAndAmountsRecognizable": true
+  },
+  "limitations": [
+    "Selected-frame review does not claim a human watched the complete MP4; full decode, CFR, blackdetect and 45-second real browser playback are documented by the independent verification report.",
+    "At 480px width, titles and principal amounts/quantities are recognizable; fine ingredient-table rows, field labels and secondary metadata need 1080p/fullscreen. No claim of complete table readability on mobile.",
+    "Authentic brief native Guardando… button state remains during sale confirmation; no full loading/error screen was found in the inspected montage frames.",
+    "During 0.30-second crossfades, outgoing/incoming labels and UI temporarily overlap; stable scene labels remain clear and do not cover important product data.",
+    "The immediate sale consumes consolidated product inventory; it is not exclusively assigned to the shown production batch."
+  ],
+  "actionableIssues": []
+}

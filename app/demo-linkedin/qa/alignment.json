@@ -1,0 +1,13 @@
+{
+  "method": "First authentic Producción navigation activation, sampled at native 8×8 background region",
+  "pixel": {
+    "x": 177,
+    "y": 344
+  },
+  "wallBefore": 6.062,
+  "wallAfter": 6.18,
+  "videoCueTime": 6.08,
+  "sourceFrame": 152,
+  "offsetSeconds": -0.04100000000000037,
+  "toleranceSeconds": 0.09899999999999973
+}

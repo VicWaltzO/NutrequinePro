@@ -1,0 +1,166 @@
+{
+  "passed": true,
+  "artifact": "dist/nutrequine-pro-showcase-45s-1080p.mp4",
+  "bytes": 8220309,
+  "sha256": "eb3aa0513c8c77cec5d6718eaaab243c56e8bcb668f7f8bd66519407b79f48bc",
+  "ffprobe": {
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High",
+        "codec_type": "video",
+        "codec_tag_string": "avc1",
+        "codec_tag": "0x31637661",
+        "mime_codec_string": "avc1.640028",
+        "width": 1920,
+        "height": 1080,
+        "coded_width": 1920,
+        "coded_height": 1088,
+        "has_b_frames": 2,
+        "pix_fmt": "yuv420p",
+        "level": 40,
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "refs": 4,
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "id": "0x1",
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "time_base": "1/15360",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "duration_ts": 691200,
+        "duration": "45.000000",
+        "bit_rate": "1458370",
+        "bits_per_raw_sample": "8",
+        "nb_frames": "1350",
+        "nb_read_frames": "1350",
+        "extradata_size": 47,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "VideoHandler",
+          "encoder": "Lavc63.1.102 libx264"
+        }
+      }
+    ],
+    "format": {
+      "filename": "nutrequine-pro-showcase-45s-1080p.mp4",
+      "nb_streams": 1,
+      "nb_programs": 0,
+      "nb_stream_groups": 0,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "start_time": "0.000000",
+      "duration": "45.000000",
+      "size": "8220309",
+      "bit_rate": "1461388",
+      "probe_score": 100,
+      "tags": {
+        "major_brand": "isom",
+        "minor_version": "512",
+        "compatible_brands": "isomiso2avc1mp41",
+        "encoder": "Lavf63.1.102"
+      }
+    }
+  },
+  "frameCount": 1350,
+  "maxTimestampErrorSeconds": 3.3333333604446125e-7,
+  "faststart": true,
+  "atoms": [
+    {
+      "type": "ftyp",
+      "offset": 0,
+      "size": 32
+    },
+    {
+      "type": "moov",
+      "offset": 32,
+      "size": 16927
+    },
+    {
+      "type": "free",
+      "offset": 16959,
+      "size": 8
+    },
+    {
+      "type": "mdat",
+      "offset": 16967,
+      "size": 8203342
+    }
+  ],
+  "blackdetect": {
+    "filter": "blackdetect=d=0.01:pix_th=0.10:pic_th=0.98",
+    "segments": []
+  },
+  "fullDecodePassed": true,
+  "silent": true,
+  "poster": {
+    "artifact": "nutrequine-pro-poster.png",
+    "width": 1920,
+    "height": 1080,
+    "bytes": 267007
+  },
+  "modules": [
+    "summary",
+    "production",
+    "inventory",
+    "sales",
+    "collections",
+    "expenses",
+    "balance",
+    "customers",
+    "configuration"
+  ],
+  "realCaptureE2EPassed": true,
+  "sceneFrames": [59, 149, 278, 408, 587, 797, 929, 1038, 1139, 1209, 1308],
+  "contactFrames": [
+    0, 90, 180, 270, 360, 450, 540, 630, 720, 810, 900, 990, 1080, 1170, 1260,
+    1349
+  ],
+  "transitionFrames": [
+    89, 90, 91, 179, 180, 181, 329, 330, 331, 449, 450, 451, 659, 660, 661, 869,
+    870, 871, 959, 960, 961, 1079, 1080, 1081, 1169, 1170, 1171, 1229, 1230,
+    1231
+  ],
+  "playback": {
+    "passed": true,
+    "ended": true,
+    "duration": 45,
+    "currentTime": 45,
+    "width": 1920,
+    "height": 1080,
+    "playbackRate": 1,
+    "elapsedSeconds": 44.9685,
+    "lastPresentedTime": 44.966667,
+    "callbacks": 1349,
+    "monotonic": true,
+    "totalVideoFrames": 1350,
+    "droppedVideoFrames": 0,
+    "error": null,
+    "errors": []
+  }
+}

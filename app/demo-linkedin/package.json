@@ -1,0 +1,18 @@
+{
+  "name": "nutrequine-pro-demo-linkedin",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "tools": "node prepare_tools.mjs",
+    "rehearse": "node record_demo.mjs --rehearse",
+    "record": "node record_demo.mjs",
+    "render": "node render_demo.mjs",
+    "playback": "node verify_playback.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

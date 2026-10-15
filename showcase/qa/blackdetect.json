@@ -1,0 +1,5 @@
+{
+  "filter": "blackdetect=d=0.01:pix_th=0.10:pic_th=0.98",
+  "passed": true,
+  "segments": []
+}

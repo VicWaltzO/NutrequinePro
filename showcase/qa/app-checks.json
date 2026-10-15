@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-11",
+  "cwd": "app/",
+  "scope": "Application verification for the 45-second audiovisual subproject; no production source changes.",
+  "commands": [
+    {
+      "command": "npm.cmd test",
+      "exitCode": 0,
+      "status": "APROBADO",
+      "tests": 55,
+      "passed": 55,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "npm.cmd run check",
+      "exitCode": 0,
+      "status": "APROBADO"
+    },
+    {
+      "command": "npm.cmd run lint",
+      "exitCode": 0,
+      "status": "APROBADO"
+    },
+    {
+      "command": "npm.cmd run build",
+      "exitCode": 0,
+      "status": "APROBADO",
+      "buildStagesCompleted": 5,
+      "notes": "Vinext reported non-blocking plugin timing information."
+    }
+  ],
+  "allPassed": true,
+  "rawLogsIncluded": false
+}

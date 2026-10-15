@@ -1,0 +1,15 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createUiHarness } from "./helpers/ui-harness.mjs";
+
+test("vistas por rol, rutas antiguas y formularios conservan el HTML independiente previo a consolidación", () => {
+  const baseline = JSON.parse(
+    readFileSync(new URL("./fixtures/ui-independent-08.json", import.meta.url), "utf8"),
+  );
+  const current = createUiHarness().snapshots();
+  assert.deepEqual(Object.keys(current), Object.keys(baseline.snapshots));
+  for (const [scenario, expected] of Object.entries(baseline.snapshots)) {
+    assert.equal(current[scenario], expected, `Cambió el HTML del escenario ${scenario}`);
+  }
+});

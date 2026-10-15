@@ -13,7 +13,7 @@
 # testing
 /coverage
 
-# next.js
+# Historical local outputs remain excluded; they are not runtime requirements.
 /.next/
 /.vinext/
 /out/
@@ -37,8 +37,10 @@ yarn-error.log*
 # typescript
 next-env.d.ts
 /dist/
+/dist-node/
+/dist-client/
 /.wrangler/
-# Checkout-local execution profile and tool state; never publish them.
+# Historical local profiles and tool state; never publish them.
 /.sites-runtime/
 /.agents/
 /.codex/

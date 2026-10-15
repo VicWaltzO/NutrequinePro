@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["vite/client"],
+    "incremental": false,
+    "paths": {
+      "@/*": ["../*"]
+    }
+  },
+  "include": [
+    "*.ts",
+    "*.tsx",
+    "../features/**/*.ts",
+    "../features/**/*.tsx",
+    "../shared/**/*.ts",
+    "../shared/**/*.tsx",
+    "admin/**/*.ts",
+    "admin/**/*.tsx"
+  ],
+  "exclude": ["../node_modules", "../dist-node", "vite.config.mts"]
+}
