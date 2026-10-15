@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import AdminApp from "./admin/AdminApp";
 import { ApiError, login, onSessionRequired, recoverSession } from "./session-api";
 import type { LocalSession } from "./session-api";
+import { frontendPath } from "./paths";
 
 export default function App() {
   const loginDialog = useRef<HTMLDialogElement>(null);
@@ -61,7 +62,7 @@ export default function App() {
   if (checking)
     return (
       <div className="loading">
-        <img src="/brand/logo.jpg" width={150} height={150} alt="Nutrequine Pro" />
+        <img src={frontendPath("/brand/logo.jpg")} width={150} height={150} alt="Nutrequine Pro" />
         <p>Recuperando sesión…</p>
       </div>
     );
@@ -75,7 +76,7 @@ export default function App() {
           onCancel={(event) => event.preventDefault()}
         >
           <form onSubmit={signIn} aria-label="Inicio de sesión local">
-            <img src="/brand/logo.jpg" width={100} height={100} alt="Nutrequine Pro" />
+            <img src={frontendPath("/brand/logo.jpg")} width={100} height={100} alt="Nutrequine Pro" />
             <span className="eyebrow">NUTREQUINE PRO</span>
             <h1>Iniciar sesión</h1>
             <p>Administración local · Producción, ventas e inventario</p>

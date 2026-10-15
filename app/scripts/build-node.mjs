@@ -42,6 +42,12 @@ for (const file of readdirSync(join(root, "vendor")))
     mkdirSync(join(destination, "vendor"), { recursive: true });
     cpSync(join(root, "vendor", file), join(destination, "vendor", file));
   }
+for (const name of ["react", "react-dom", "lucide-react", "scheduler", "tailwindcss"]) {
+  cpSync(join(root, "node_modules", name, "LICENSE"), join(destination, "vendor", name + ".LICENSE"));
+}
+mkdirSync(join(destination, "integration"), { recursive: true });
+for (const file of ["README.md", "CONTRATO_INTEGRACION.md", "EJEMPLO_PORTAL.md", "portal.mjs", "paths.mjs"])
+  cpSync(join(root, "integration", file), join(destination, "integration", file));
 const project = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 writeFileSync(
   join(destination, "package.json"),

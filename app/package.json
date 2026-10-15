@@ -23,7 +23,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "verify": "node scripts/verify.mjs",
-    "check:distribution": "node scripts/check-distribution.mjs"
+    "check:distribution": "node scripts/check-distribution.mjs",
+    "package:module": "node scripts/package-module.mjs"
   },
   "dependencies": {
     "fastify": "5.12.7",

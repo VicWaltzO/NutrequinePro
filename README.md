@@ -37,7 +37,11 @@ Consultar [arquitectura](app/docs/ARQUITECTURA.md),
 [consolidación y evidencias](app/docs/REPORTE_09_CONSOLIDACION.md) y
 [colaboración](CONTRIBUTING.md). Los informes 01–08 describen antecedentes históricos.
 
-Trabajar en `codex/reestructuracion-arquitectonica`; seguir ambos `AGENTS.md`.
+Para incorporar el módulo a otro repositorio, seguir la
+[guía de integración](app/integration/README.md): enlace independiente prioritario,
+proxy local opcional, paquete verificable y mantenimiento con datos externos.
+
+Trabajar en la rama indicada para cada tarea; seguir ambos `AGENTS.md`.
 No versionar contraseñas, bases, configuración privada, capturas o distribuciones.
 El remoto es `https://github.com/VicWaltzO/NutrequinePro.git`. La historia permanece
 recuperable; esta consolidación no publica cambios en producción.

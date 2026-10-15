@@ -2,6 +2,7 @@ import type { User } from "@/lib/domain-types";
 import { ChevronRight } from "lucide-react";
 import { label } from "@/shared/ui";
 import { nav } from "./navigation";
+import { frontendPath } from "../paths";
 export default function Sidebar({
   actor,
   view,
@@ -16,7 +17,7 @@ export default function Sidebar({
   return (
     <aside className={"sidebar " + (menu ? "visible" : "")}>
       <a className="brand" href="#dashboard" onClick={() => go("dashboard")}>
-        <img width={150} height={150} src="/brand/logo.jpg" alt="Nutrequine Pro" />
+        <img width={150} height={150} src={frontendPath("/brand/logo.jpg")} alt="Nutrequine Pro" />
         <span>
           NUTREQUINE<span>PRO / ADMINISTRACIÓN</span>
         </span>

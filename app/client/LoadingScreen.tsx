@@ -1,10 +1,11 @@
 import { logout } from "./session-api";
 import { useState } from "react";
+import { frontendPath } from "./paths";
 export default function LoadingScreen({ reload, error }: { reload: () => Promise<void>; error: string }) {
   const [logoutError, setLogoutError] = useState("");
   return (
     <div className="loading">
-      <img width={150} height={150} src="/brand/logo.jpg" alt="Nutrequine Pro" />
+      <img width={150} height={150} src={frontendPath("/brand/logo.jpg")} alt="Nutrequine Pro" />
       <h1>Nutrequine Pro</h1>
       {error ? (
         <>

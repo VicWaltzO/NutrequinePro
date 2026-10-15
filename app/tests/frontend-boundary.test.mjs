@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import ts from "typescript";
 
-function apiHarness() {
+function apiHarness(basePath = "/") {
   const calls = [];
   const replies = [];
   const source = readFileSync(new URL("../client/session-api.ts", import.meta.url), "utf8");
@@ -14,6 +14,21 @@ function apiHarness() {
     module: compiledModule,
     Headers,
     Response,
+    document: { querySelector: () => ({ content: basePath }) },
+    require: (name) => {
+      assert.equal(name, "./paths.ts");
+      const pathsModule = { exports: {} };
+      vm.runInContext(
+        ts.transpileModule(readFileSync(new URL("../client/paths.ts", import.meta.url), "utf8"), {
+          compilerOptions: { module: ts.ModuleKind.CommonJS },
+        }).outputText,
+        vm.createContext({
+          exports: pathsModule.exports,
+          document: { querySelector: () => ({ content: basePath }) },
+        }),
+      );
+      return pathsModule.exports;
+    },
     fetch: async (url, options) => {
       calls.push({ url, options });
       const response = replies.shift();
@@ -56,6 +71,20 @@ test("cliente local: cookies del navegador, CSRF en memoria y request_id origina
   replies.push(Response.json({ result: "customer" }));
   await api.adminFetch("/api/command", { method: "POST", body });
   assert.equal(calls[2].options.body, body);
+});
+
+test("cliente local: prefijo de build conserva sesión, CSRF y el contrato comercial", async () => {
+  const { api, calls, replies } = apiHarness("/modulos/nutrequine/");
+  replies.push(Response.json(session), Response.json({ result: "customer" }));
+  await api.login("synthetic", "synthetic-passphrase");
+  const body = JSON.stringify({ type: "CUSTOMER_SAVE", payload: {}, request_id: "same-id" });
+  await api.adminFetch("/api/command", { method: "POST", body });
+  assert.deepEqual(
+    calls.map((call) => call.url),
+    ["/modulos/nutrequine/api/auth/login", "/modulos/nutrequine/api/command"],
+  );
+  assert.equal(calls[1].options.body, body);
+  assert.equal(calls[1].options.headers.get("X-CSRF-Token"), session.csrf_token);
 });
 test("cliente local: distingue permisos, sesión expirada, errores de disponibilidad y logout", async () => {
   const { api, calls, replies } = apiHarness();
