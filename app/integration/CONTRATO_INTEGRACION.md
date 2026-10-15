@@ -66,6 +66,16 @@ relaciones, revisión, historial e identificadores. Los formularios existentes
 determinan payloads; el ERP no debe escribir directamente en SQLite ni acoplarse
 a tablas internas. No se publican aquí payloads nuevos para funciones inexistentes.
 
+Ejemplo de comando existente, después de autenticar y enviar cookie/Origin/CSRF:
+
+```json
+{
+  "type": "CUSTOMER_SAVE",
+  "payload": { "name": "Cliente sintético" },
+  "request_id": "990096b4-a254-42ca-999a-aa891cf00112"
+}
+```
+
 Cada operación lleva `request_id` estable. Su ámbito de idempotencia es el actor
 y el registro auditado existente. Una respuesta perdida no justifica generar otro
 ID ni cambiar el payload del mismo intento. No hay reintentos automáticos en cliente

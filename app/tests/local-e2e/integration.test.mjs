@@ -219,9 +219,17 @@ test(
     );
     await page.screenshot({ path: join(server.evidence, "module-b-dashboard.png") });
     await page.locator("nav").getByRole("button", { name: "Configuración", exact: true }).click();
+    await page.getByRole("button", { name: "Productos", exact: true }).click();
+    await page.getByText("Presentación original de productos", { exact: true }).click();
+    await page
+      .getByAltText("Presentación real de Nutrelin, Hi-Performance y Potripregnant", { exact: true })
+      .waitFor();
     await page.waitForFunction(() =>
       [...document.images].every((image) => image.complete && image.naturalWidth > 0),
     );
+    await page
+      .getByAltText("Presentación real de Nutrelin, Hi-Performance y Potripregnant", { exact: true })
+      .scrollIntoViewIfNeeded();
     await page.screenshot({ path: join(server.evidence, "module-b-configuration.png") });
     const logout = await context.request.post(apiRoot + "api/auth/logout", {
       headers: { Origin: origin, "X-CSRF-Token": csrf },

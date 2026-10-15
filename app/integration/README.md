@@ -75,7 +75,8 @@ El directorio portable contiene frontend compilado, backend compilado, dependenc
 de ejecución y licencias, SQL histórico/CLI SQLite, herramientas de provisión y esta
 documentación/ejemplo. No copiar el checkout, node_modules de desarrollo, outputs,
 bases, acceso.sqlite, configuración, logs o capturas. Node no se incluye en el paquete.
-React, React DOM y Lucide conservan sus licencias además de las del runtime Node.
+React, React DOM, Lucide, Scheduler y Tailwind conservan sus licencias además de
+las dependencias del backend. El ejecutable Node procede de la instalación del operador.
 
 ## Preparar una instalación nueva
 
@@ -129,6 +130,21 @@ Con el servicio detenido y desde una distribución compatible:
 node app/scripts/sqlite-admin.mjs backup --database "D:\NutrequinePrivado\negocio.sqlite" --destination "D:\NutrequinePrivado\respaldo-nuevo.sqlite"
 node app/scripts/sqlite-admin.mjs verify-backup --backup "D:\NutrequinePrivado\respaldo-nuevo.sqlite"
 ```
+
+Para ensayar una recuperación, elegir un destino de negocio nuevo, verificarlo y
+seleccionar un archivo de acceso nuevo. Con autorización expresa del responsable:
+
+```powershell
+node app/scripts/sqlite-admin.mjs restore --backup "D:\NutrequinePrivado\respaldo-nuevo.sqlite" --destination "D:\NutrequinePrivado\recuperado.sqlite"
+node app/scripts/sqlite-admin.mjs verify --database "D:\NutrequinePrivado\recuperado.sqlite"
+Get-Content -Raw -LiteralPath "D:\NutrequinePrivado\vinculacion.json" | node app/server/admin.mjs --database "D:\NutrequinePrivado\recuperado.sqlite" --auth-database "D:\NutrequinePrivado\acceso-recuperado.sqlite" --mode link --authorize-link
+```
+
+`vinculacion.json` contiene el `user_id` de un ADMIN histórico activo, `login` y
+una contraseña nueva, siempre por stdin. Actualizar el JSON privado para ambas
+rutas recuperadas. El ADMIN deberá preparar los demás accesos autorizados mediante
+la API existente; las sesiones del archivo anterior no se transfieren al nuevo.
+No ejecutar `new` sobre un negocio histórico ni editar identificadores/vínculos.
 
 El respaldo comercial no incorpora la base de autenticación. Conservar una copia
 fría de acceso/configuración según la política del responsable, sin WAL/journal
