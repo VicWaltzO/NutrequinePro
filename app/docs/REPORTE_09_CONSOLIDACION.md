@@ -176,8 +176,8 @@ TS propias. No se cargan herramientas de desarrollo para operar.
 El objetivo es conservar protección comercial, no un número artificial de tests.
 De las 171 pruebas previas se retiran 18 específicas de infraestructura (ocho de
 preparación Wrangler y diez de handlers antiguos), se adaptan paridad/propiedad de
-sentencias y transporte, y se añade un control de manifiesto/lockfile: se esperan
-154 en la batería consolidada. Los resultados reales se registrarán abajo.
+sentencias y transporte, y se añade un control de manifiesto/lockfile: la batería
+consolidada ejecuta 154 pruebas, aprobadas también desde el clon limpio.
 Los 12 pasos de navegador/HTTP de plataforma no se siguen contando como ejecutables
 sin sus dependencias: se sustituyen por los flujos independientes y su evidencia.
 
@@ -218,12 +218,110 @@ implementa ni se certifica capacidad corporativa o escalabilidad por esta limpie
 
 ## Resultados finales
 
+La limpieza se registró en conjuntos: `b0b7cfb` consolida imports/composición;
+`7aabdfb` retira infraestructura y adopta los comandos locales; `afa6092` hace
+independiente de carpetas previas la prueba de exclusión de datos dentro de la
+instalación; `21750d7` completa el formato del control arquitectónico.
+La corrección de la prueba SQLite aprobó sus diez casos y lint. El cierre
+documental no modifica reglas o código operativo.
+
+Comparación funcional: se conservaron ventas contado/crédito/futuras, producción,
+inventario, clientes, pagos, créditos, rectificaciones, devoluciones, reversiones,
+anulaciones, gastos, balances, configuración, roles y sesión. L15 añade recuperación
+real mediante herramientas distribuidas. Los 66 escenarios HTML coinciden con la
+referencia independiente obtenida antes de editar; no se regeneró después.
+
+Las capturas comparativas se inspeccionaron visualmente. La pantalla de ventas
+antes/después es además idéntica byte a byte (SHA-256
+`63a48ae85539773c469b680a6023b02e8ea8057412733ddcd2a64c4e36eed513`).
+Se mantienen layout, texto, valores financieros, logo, tablas y filtros.
+Se revisó también inventario en tema oscuro y la navegación móvil se verifica
+mediante los controles del navegador.
+
+| Antes de consolidar                                                                 | Después de consolidar                                                                  |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| ![Venta Tarea 08](../outputs/frontend-08/2026-10-15T09-37-44-890Z-1eb7468c/L05.png) | ![Venta consolidada](../outputs/frontend-08/2026-10-15T10-14-54-402Z-accaacd5/L05.png) |
+
+Son recursos locales ignorados por Git; no se incluyen en commits o distribución.
+El directorio `outputs/frontend-08/2026-10-15T10-14-54-402Z-accaacd5/` contiene
+15 pasos aprobados, 17 capturas con SHA-256 verificados, trace.zip, results.json y
+log del servidor; cero errores de página y cero peticiones externas registradas
+por el contexto principal. Desarrollo conserva evidencia separada en
+`outputs/frontend-08/2026-10-15T10-14-49-809Z-b34cdca3/`.
+Los nombres de evidencia frontend-08 se conservan por reutilización del harness;
+las fechas y logs identifican inequívocamente el ensayo de Tarea 09.
+
+La auditoría inicial de distribución aprobó 1042 archivos y 50 paquetes de runtime,
+sin paquetes retirados o archivos privados detectados. `npm ls --all --json`
+terminó correctamente; se revisaron sus dependencias instaladas y no aparecen
+paquetes de la plataforma retirada. Los formatos históricos de ledger y los
+soportes opcionales de otras plataformas declarados por Drizzle no son módulos
+operativos cargados por la aplicación.
+
 La referencia previa aprobó 171 pruebas (377,17 s), los tres chequeos TypeScript,
 lint, formato y ambas compilaciones. Aprobaron también los 12 pasos heredados
 (147,06 s) y 14 flujos independientes más desarrollo (123,61 s).
 Logs locales: `outputs/consolidacion-09-base*.log`.
 
-La selección posterior de 73 pruebas comerciales/arquitectura aprobó sin omisiones
-(19,52 s), incluidos los 66 escenarios HTML. Los tres chequeos TypeScript y ESLint
-sin Next aprobaron. Continúan en ejecución la batería completa, los E2E finales
-y la reproducción desde checkout limpio; sus resultados se completarán antes del cierre.
+Se conservan los ensayos intermedios y sus fallos, diferenciados de las ejecuciones
+finales. Una ejecución completa agotó los 30 s de espera del harness de arranque
+mientras se instalaba el clon en paralelo: 153/154 aprobaron. El caso focalizado
+aprobó luego sin cambiar código, límites ni assertions; también aprobó en la primera
+batería limpia. La repetición final se organiza sin instalaciones simultáneas.
+
+La primera batería del clon encontró otra dependencia del entorno de pruebas:
+una negativa de ruta esperaba que outputs existiera. El adaptador rechazó la ruta
+con ENOENT, pero no llegó a la comprobación esperada. Se cambió únicamente la ruta
+de prueba a la raíz existente de instalación, se añadió comprobación de que no
+crea archivo y se conservó la expectativa de rechazo. No cambió el controlador.
+
+Durante la preparación también se corrigió una variable del script de build y se
+excluyeron mapas de dependencias detectados por el auditor. Los package.json
+auxiliares que solo declaran tipo de módulo se distinguen de los manifiestos de
+paquetes. Ningún ajuste cambia cálculos, datos, reglas o fixtures comerciales.
+
+La selección intermedia de 73 pruebas comerciales/arquitectura aprobó sin omisiones
+(19,52 s), incluidos los 66 escenarios HTML. La corrección final de formato volvió
+a comprobar los cuatro controles arquitectónicos. No se modificaron expectativas
+comerciales para obtener estos resultados.
+
+| Verificación final                 | Resultado real                                                                                                                                                   |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Suite principal                    | 154 aprobadas, cero fallos, omisiones o TODO; 348,78 s.                                                                                                          |
+| TypeScript general, Node y cliente | Las tres comprobaciones aprobaron.                                                                                                                               |
+| ESLint                             | Aprobado con cero advertencias permitidas.                                                                                                                       |
+| Prettier                           | Aprobado globalmente tras el ajuste de formato de architecture.test.mjs.                                                                                         |
+| Build principal                    | React/Vite y Node aprobados; auditoría: 1042 archivos, 50 paquetes runtime, cero paquetes retirados/archivos privados detectados.                                |
+| E2E principal                      | L01–L15 y desarrollo aprobados: Node cuenta 17 tests al incluir el contenedor; cero omisiones; 159,19 s.                                                         |
+| Instalación limpia                 | Clon Git local nuevo fuera del checkout, sin objetos compartidos mediante --no-local; npm 11.16.0 / npm ci, 380 paquetes, sin cambios de versiones del lockfile. |
+| Suite limpia                       | 154 aprobadas, cero fallos, omisiones o TODO; 322,27 s.                                                                                                          |
+| verify del clon                    | Comando completo con salida cero: pruebas, los tres TypeScript, ESLint, Prettier, compilación y auditoría.                                                       |
+| E2E del clon                       | L01–L15 y desarrollo aprobados, 17 tests Node, cero omisiones; 140,70 s.                                                                                         |
+| Reproducibilidad del artefacto     | Los 1042 archivos de ambas distribuciones coinciden por ruta y SHA-256, sin diferencias.                                                                         |
+| Integridad de evidencias           | SHA-256 de las 17 capturas de cada ensayo final comprobados; traces presentes y cero errores de página/peticiones externas registradas.                          |
+| Historia/seguridad/dominio         | Licencia original idéntica; diff vacío del servidor, dominio, driver, store, persistencia, esquema, SQL/meta y fixture histórica respecto de a229671.            |
+
+El clon se preparó desde `7aabdfb` y se avanzó únicamente por fast-forward hasta
+`21750d710b5b4d865e5865d5bcb5289aa7e4f0f5` para incorporar las dos correcciones de
+pruebas. No se copiaron node_modules, perfiles, bases o artefactos del checkout
+principal. La instalación y las validaciones se ejecutaron desde su app/.
+Los datos se crearon de nuevo en ubicaciones temporales privadas. La distribución
+se copió después fuera de ese clon para los procesos Node y CLI bajo bloqueo
+instrumentado de red; el navegador usó únicamente loopback.
+
+Logs locales de cierre: `outputs/consolidacion-09-verify-aprobacion.log`
+(suite/tipos/lint principal), `outputs/consolidacion-09-cierre-checks.log`
+(lint/formato/build/auditoría tras el ajuste de formato),
+`outputs/consolidacion-09-e2e-final.log`, `outputs/consolidacion-09-clean-ci.log`,
+`outputs/consolidacion-09-clean-verify-aprobacion.log` y
+`outputs/consolidacion-09-clean-e2e-aprobacion.log`. La evidencia del clon permanece
+en su directorio temporal; su ubicación se registra en ese último log y no se
+incorporan medios externos al commit. El CI Linux queda configurado para la misma
+secuencia, pero esta validación dinámica se ejecutó en Windows con Chrome.
+
+`outputs/consolidacion-09-build-comparacion.json` registra la comparación íntegra
+de ambas distribuciones. `outputs/consolidacion-09-evidencias.json` conserva las
+comprobaciones de hashes, ausencia de paquetes retirados y fuentes protegidas.
+
+No se tocaron producción, bases reales ni la siguiente tarea. Los límites pendientes
+están identificados arriba y no se presentan como automatizados o certificados.
