@@ -1,4 +1,22 @@
-# Respaldo y restauración de D1
+# Respaldo y restauración
+
+## SQLite independiente — Tarea 06
+
+La CLI `node scripts/sqlite-admin.mjs` administra archivos SQLite con Node 24.18+
+sin Wrangler, Miniflare ni Sites. Consultar el
+[procedimiento completo, comandos y verificaciones](REPORTE_06_MIGRACIONES_SQLITE.md).
+Usa la API de respaldo SQLite y una transacción de lectura, verifica esquema,
+relaciones, recuentos y contenido, registra SHA-256 y restaura únicamente a una
+ruta nueva. Cada respaldo exige su manifiesto `.manifest.json`.
+
+Los datos deben residir en directorios privados fuera del repositorio. Suspender
+el servidor para migrar/adoptar; el respaldo activo está probado con WAL. En
+journal convencional puede bloquear commits, por lo que se recomienda detener
+escrituras. Nunca copiar el archivo principal de una base activa manualmente.
+No borrar ni reemplazar el original, y no seleccionar automáticamente una copia.
+La infraestructura D1 y su base habitual permanecen separadas de estos comandos.
+
+## Procedimiento D1 conservado
 
 Procedimiento preparado el 14/10/2026 para la rama
 `codex/reestructuracion-arquitectonica`. Ejecutar los comandos desde `app/`.

@@ -157,3 +157,19 @@ N03 repite el mismo escenario portable de R17 a través de HTTP real, sin reimpl
 5. Registrar resultado, evidencia y causa de cada diferencia. No marcar pendiente como aprobado ni actualizar hashes para ocultar cambios.
 
 Consultar [reporte y evidencias](REPORTE_02_REGRESION.md) para comandos, resultados y límites.
+
+## Avance posterior: persistencia y recuperación locales
+
+La matriz anterior conserva los resultados históricos de Tarea 02. Los
+[ensayos de persistencia de Tarea 05](REPORTE_05_PERSISTENCIA.md) y la
+[administración SQLite de Tarea 06](REPORTE_06_MIGRACIONES_SQLITE.md) amplían la evidencia:
+
+| Referencia      | Avance y límite                                                                                                                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SQLITE-DISK-01  | Adaptador en archivo, cierre/reapertura y lectura desde proceso nuevo verificados con datos sintéticos. No implica servidor HTTP independiente.         |
+| P03             | Respaldo, manifiesto, hashes y restauración SQLite a otro archivo automatizados; recuperación de credenciales y producción continúan pendientes.        |
+| P06             | Locks, revisión obsoleta, escritores y preparación entre procesos cubiertos. Carga representativa y sistemas de archivos de red sin certificar.         |
+| NODE-OFFLINE-01 | CLI administrativa probada sin paquetes ni runtime Cloudflare. El flujo completo de servidor, login, navegador y operación offline permanece pendiente. |
+
+No se sustituyen las expectativas comerciales ni se actualizan fingerprints para
+ocultar diferencias. Consultar los reportes de cada tarea para las ejecuciones finales.

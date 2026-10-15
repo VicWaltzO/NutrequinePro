@@ -1,5 +1,11 @@
 # Plan técnico de migración a aplicación local
 
+Estado de implementación: [Tarea 05](REPORTE_05_PERSISTENCIA.md) aporta el puerto
+neutral y adaptador SQLite Node; [Tarea 06](REPORTE_06_MIGRACIONES_SQLITE.md)
+aporta administración, migraciones, respaldo y recuperación independientes.
+Los pasos de servidor, autenticación, cliente y transferencia de datos continúan
+pendientes. El plan siguiente conserva la propuesta original como referencia.
+
 Propuesta del 14/10/2026 sobre la base `a832579`. No implementada en Tarea 01.
 Se apoya en la [auditoría arquitectónica](AUDITORIA_01_ARQUITECTONICA.md),
 el [inventario](INVENTARIO_DEPENDENCIAS_01.md) y los

@@ -10,7 +10,7 @@ la vista previa local portable ni credenciales de producción.
 ```powershell
 git clone https://github.com/VicWaltzO/NutrequinePro.git
 cd NutrequinePro
-git switch codex/refactorizacion-integral
+git switch codex/reestructuracion-arquitectonica
 cd app
 npm.cmd ci
 npm.cmd run dev
@@ -54,11 +54,24 @@ En macOS/Linux:
 NUTREQUINE_LOCAL_STATE_DIR=.wrangler/prueba-desarrollador npm run dev
 ```
 
-Los tests automatizados usan estados sintéticos y SQLite en memoria; no usan las
+Los tests automatizados usan estados sintéticos, SQLite en memoria y archivos
+aislados, además de D1 local de pruebas; no usan las
 bases de desarrollo ni de producción. Nunca versionar bases, volcados, `.env`,
 IDs privados de usuarios, logs o capturas con datos reales.
 
 ## Comandos
+
+### Administración SQLite independiente
+
+Con Node 24.18+, `node scripts/sqlite-admin.mjs` ofrece `directory`, `init`,
+`inspect`, `migrate`, `verify`, `backup`, `verify-backup` y `restore`. Requiere
+rutas absolutas, directorios privados y selección explícita; no usa Wrangler ni
+modifica la persistencia de `dev`. La inicialización crea únicamente esquema y
+ledger, sin usuarios o maestros. Consultar
+[la guía operativa SQLite](REPORTE_06_MIGRACIONES_SQLITE.md) antes de adoptar,
+actualizar o recuperar archivos. `npm run db:prepare` continúa siendo el comando D1.
+
+### Aplicación actual
 
 | Comando                    | Propósito                                                                   |
 | -------------------------- | --------------------------------------------------------------------------- |
