@@ -3,8 +3,9 @@
 Estado de implementación: [Tarea 05](REPORTE_05_PERSISTENCIA.md) aporta el puerto
 neutral y adaptador SQLite Node; [Tarea 06](REPORTE_06_MIGRACIONES_SQLITE.md)
 aporta administración, migraciones, respaldo y recuperación independientes.
-Los pasos de servidor, autenticación, cliente y transferencia de datos continúan
-pendientes. El plan siguiente conserva la propuesta original como referencia.
+[Tarea 07](REPORTE_07_BACKEND_NODE.md) incorpora el backend Node y sesiones locales,
+conservando el sistema anterior. Los pasos de cliente y transferencia real de
+datos continúan pendientes. El plan siguiente conserva la propuesta original como referencia.
 
 Propuesta del 14/10/2026 sobre la base `a832579`. No implementada en Tarea 01.
 Se apoya en la [auditoría arquitectónica](AUDITORIA_01_ARQUITECTONICA.md),

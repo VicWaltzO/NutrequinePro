@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 const npmCli = process.env.npm_execpath;
 if (!npmCli) throw new Error("Ejecute este script mediante npm run verify.");
 
-for (const script of ["test", "check", "lint", "format:check", "build"]) {
+for (const script of ["test", "check", "check:node", "lint", "format:check", "build", "build:node"]) {
   console.log(`\nVerificando ${script}…`);
   const result = spawnSync(process.execPath, [npmCli, "run", script], { stdio: "inherit" });
   if (result.error) throw result.error;

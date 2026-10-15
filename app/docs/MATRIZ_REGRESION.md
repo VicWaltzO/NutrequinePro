@@ -173,3 +173,20 @@ La matriz anterior conserva los resultados históricos de Tarea 02. Los
 
 No se sustituyen las expectativas comerciales ni se actualizan fingerprints para
 ocultar diferencias. Consultar los reportes de cada tarea para las ejecuciones finales.
+
+## Backend Node y autenticación local — Tarea 07
+
+Consultar [el reporte 07](REPORTE_07_BACKEND_NODE.md) para resultados finales y
+contratos de seguridad. Las expectativas comerciales originales se reutilizan.
+
+| Referencia      | Cobertura incorporada y límite                                                                                                                                                |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LOCAL-AUTH-01   | Login, consulta, expiración, logout, revocación y denegación posterior con sesiones persistentes.                                                                             |
+| LOCAL-AUTH-02   | Vinculación inicial de ADMIN histórico y credenciales para identidades existentes, sin cambiar autoría ni roles.                                                              |
+| SQLITE-DISK-01  | Escenario portable por HTTP local, cierre/reapertura y lectura idéntica desde procesos nuevos.                                                                                |
+| NODE-OFFLINE-01 | Backend compilado aislado bajo bloqueo de API de red externa del proceso de test; login y escenario comercial. No certifica firewall del SO ni frontend offline.              |
+| R15, R21–R24    | Roles actuales, desactivación, permisos, último ADMIN y último acceso administrativo con credenciales.                                                                        |
+| H01–H10         | Contratos comerciales HTTP existentes más Host/Origin/CSRF, bytes/chunked, JSON/UTF-8 inválidos, errores seguros y HTTPS. JSON malformado ahora es 400; permiso denegado 403. |
+
+No se sustituyen los doce pasos E2E de la aplicación D1; continúan ejecutándose
+por separado. El frontend independiente y la transferencia de producción siguen pendientes.

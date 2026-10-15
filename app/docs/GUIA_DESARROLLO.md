@@ -61,6 +61,19 @@ IDs privados de usuarios, logs o capturas con datos reales.
 
 ## Comandos
 
+### Backend Node y autenticación local
+
+El backend independiente requiere Node 24.18+, una base SQLite preparada y un
+archivo privado de credenciales vinculado explícitamente. Consultar
+[el procedimiento completo de Tarea 07](REPORTE_07_BACKEND_NODE.md) para el primer
+administrador y la vinculación histórica. No utiliza el usuario simulado de `dev`.
+
+`npm.cmd run check:node` verifica sus tipos; `npm.cmd run build:node` genera
+`dist-node/` con las dependencias operativas. Iniciar mediante
+`node dist-node/server/main.mjs --config RUTA_ABSOLUTA_PRIVADA`. El archivo JSON
+elige ambas bases y puerto; solo se escucha en 127.0.0.1. El frontend original
+sigue usando sus comandos anteriores y todavía no se conecta a este backend.
+
 ### Administración SQLite independiente
 
 Con Node 24.18+, `node scripts/sqlite-admin.mjs` ofrece `directory`, `init`,
@@ -73,20 +86,20 @@ actualizar o recuperar archivos. `npm run db:prepare` continúa siendo el comand
 
 ### Aplicación actual
 
-| Comando                    | Propósito                                                                   |
-| -------------------------- | --------------------------------------------------------------------------- |
-| `npm.cmd ci`               | Instalar las versiones del lockfile                                         |
-| `npm.cmd run dev`          | Preparar D1 local y servir con HMR                                          |
-| `npm.cmd run db:prepare`   | Inspeccionar y aplicar solo migraciones locales pendientes                  |
-| `npm.cmd test`             | Regresión comercial, persistencia, interfaz y arquitectura                  |
-| `npm.cmd run check`        | TypeScript estricto sin emitir archivos                                     |
-| `npm.cmd run lint`         | ESLint; advertencias hacen fallar el comando                                |
-| `npm.cmd run format`       | Prettier 3.6.2, dos espacios, LF, ancho orientativo 110                     |
-| `npm.cmd run format:check` | Comprobar formato sin modificar archivos                                    |
-| `npm.cmd run build`        | Compilar las rutas y el Worker                                              |
-| `npm.cmd run verify`       | Ejecutar test, check, lint, formato y build; detenerse ante el primer fallo |
-| `npm.cmd run db:generate`  | Generar una migración futura desde `db/schema.ts`                           |
-| `npm.cmd start`            | Servir el Worker compilado local con `.wrangler/state`                      |
+| Comando                    | Propósito                                                                                          |
+| -------------------------- | -------------------------------------------------------------------------------------------------- |
+| `npm.cmd ci`               | Instalar las versiones del lockfile                                                                |
+| `npm.cmd run dev`          | Preparar D1 local y servir con HMR                                                                 |
+| `npm.cmd run db:prepare`   | Inspeccionar y aplicar solo migraciones locales pendientes                                         |
+| `npm.cmd test`             | Regresión comercial, persistencia, interfaz y arquitectura                                         |
+| `npm.cmd run check`        | TypeScript estricto sin emitir archivos                                                            |
+| `npm.cmd run lint`         | ESLint; advertencias hacen fallar el comando                                                       |
+| `npm.cmd run format`       | Prettier 3.6.2, dos espacios, LF, ancho orientativo 110                                            |
+| `npm.cmd run format:check` | Comprobar formato sin modificar archivos                                                           |
+| `npm.cmd run build`        | Compilar las rutas y el Worker                                                                     |
+| `npm.cmd run verify`       | Pruebas, tipos generales/Node, lint, formato y ambas compilaciones; detenerse ante el primer fallo |
+| `npm.cmd run db:generate`  | Generar una migración futura desde `db/schema.ts`                                                  |
+| `npm.cmd start`            | Servir el Worker compilado local con `.wrangler/state`                                             |
 
 `start` requiere `build` y D1 ya preparado. Su ruta sigue siendo el default;
 para una prueba aislada con `NUTREQUINE_LOCAL_STATE_DIR` utilizar `dev`.
