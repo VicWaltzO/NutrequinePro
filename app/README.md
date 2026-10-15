@@ -33,6 +33,13 @@ Ver [arquitectura](docs/ARQUITECTURA.md), [desarrollo](docs/GUIA_DESARROLLO.md),
 [consolidación](docs/REPORTE_09_CONSOLIDACION.md). Las reglas comerciales se describen
 en la [especificación MVP](docs/ESPECIFICACION_MAESTRA_MVP.md).
 
+Para operar y diagnosticar una instalación, consultar la
+[guía operativa final](docs/GUIA_OPERATIVA_FINAL.md). El cierre técnico y sus límites
+se registran en [validación final](docs/REPORTE_11_VALIDACION_FINAL.md) y
+[matriz de aceptación](docs/MATRIZ_ACEPTACION_FINAL.md). La
+[arquitectura corporativa](docs/ARQUITECTURA_ERP_CORPORATIVO.md) es una propuesta
+futura; no habilita empresas, membresías ni acceso remoto en esta versión.
+
 La distribución `dist-node/` incluye frontend compilado, backend, CLI SQLite, SQL
 histórico, dependencias de runtime y avisos legales; los archivos privados se
 seleccionan aparte. La instalación puede descargar paquetes; la operación normal

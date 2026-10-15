@@ -64,6 +64,14 @@ capturados antes de consolidar; la referencia anterior también se conserva.
 No regenerar snapshots para ocultar diferencias. Evidencias en `outputs/` y
 bases temporales permanecen ignoradas; revisar capturas antes de aprobar cambios.
 
+La suite E2E incluye L01–L15, desarrollo y una validación final con métricas,
+concurrencia, bloqueo, copia fría de autenticación y teclado. Ejecutarla después
+del build; no reconstruir `dist-node/` mientras un test lo copia. Para repetir
+solo las mediciones: `node --test tests/local-e2e/final-validation.test.mjs`.
+Las muestras sintéticas y sus límites se describen en el
+[reporte final](REPORTE_11_VALIDACION_FINAL.md); no constituyen una prueba de carga
+empresarial ni una certificación de seguridad.
+
 El CI usa Node 24.18.0, npm ci, verify y navegador Chromium. La preparación puede
 descargar paquetes; el ensayo de distribución bloquea red externa mediante
 instrumentación de tests. No equivale a una certificación de firewall del SO.

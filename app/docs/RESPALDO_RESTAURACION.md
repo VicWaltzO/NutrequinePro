@@ -50,6 +50,8 @@ una versión compatible, iniciar sesión y comparar operaciones, revisión, audi
 céntimos, gramos y saldos. Conservar intactos negocio y acceso originales.
 L15 usa la CLI distribuida, comprueba el rechazo por vinculación incorrecta,
 provisiona acceso nuevo por stdin y exige igualdad del estado comercial completo.
+La validación final amplía L15 con un registro posterior a la recuperación y otro
+reinicio, comprobando persistencia y que el archivo comercial original no cambió.
 
 ## Migraciones y adopción autorizada
 
@@ -75,6 +77,13 @@ Para una copia física, detener todos los procesos que utilicen autenticación y
 preservar sus archivos auxiliares si existen; verificar hashes y permisos del
 conjunto. Eliminar una cuenta o reinicializar acceso no sustituye su recuperación.
 Un ensayo organizacional completo de recuperación de credenciales sigue pendiente.
+
+La Tarea 11 prueba una copia física cerrada, sin auxiliares activos, con SHA-256 e
+integridad SQLite, y el acceso de dos credenciales sintéticas usando esa copia
+contra el negocio en su misma ruta original. No modifica el vínculo canónico ni
+demuestra recuperación completa de todas las cuentas reales al trasladar el negocio.
+Consultar la [guía operativa final](GUIA_OPERATIVA_FINAL.md) y el
+[reporte de validación](REPORTE_11_VALIDACION_FINAL.md) para alcance y evidencia.
 
 La restauración comercial conserva IDs; una base de acceso debe corresponder
 a esos usuarios. No usar un administrador de pruebas o una identidad simulada.

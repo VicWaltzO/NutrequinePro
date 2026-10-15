@@ -11,8 +11,9 @@ neutral y adaptador SQLite Node; [Tarea 06](REPORTE_06_MIGRACIONES_SQLITE.md)
 aporta administración, migraciones, respaldo y recuperación independientes.
 [Tarea 07](REPORTE_07_BACKEND_NODE.md) incorpora el backend Node y sesiones locales,
 conservando el sistema anterior. [Tarea 08](REPORTE_08_FRONTEND_INDEPENDIENTE.md)
-aporta React/Vite conectado a Node bajo el mismo origen. Permanecen pendientes
-la eliminación final de infraestructura heredada y la transferencia real de datos.
+aporta React/Vite conectado a Node bajo el mismo origen. La Tarea 09 completó la
+retirada de infraestructura operativa heredada. La transferencia real de datos
+sigue pendiente y no forma parte de los ensayos sintéticos de cierre.
 El plan siguiente conserva la propuesta original como referencia.
 
 Propuesta del 14/10/2026 sobre la base `a832579`. No implementada en Tarea 01.
