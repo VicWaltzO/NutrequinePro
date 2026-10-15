@@ -1,5 +1,13 @@
 # Nutrequine Pro
 
+## 🧠 Mapa semántico
+
+[![Mapa neuronal de Nutrequine Pro](docs/diagramas/nutrequine-pro-mapa-neuronal.svg)](docs/diagramas/nutrequine-pro-mapa-neuronal.svg)
+
+[Mapa editable en tldraw](https://www.tldraw.com/f/CComDt22S96zp9KBMtEng) · [SVG vectorial](docs/diagramas/nutrequine-pro-mapa-neuronal.svg)
+
+Red visual de procesos, relaciones N:M, arquitectura y evolución propuesta. Basado en la rama `codex/reestructuracion-arquitectonica` (commit `5f950fd`). Las integraciones futuras aparecen diferenciadas de las funcionalidades actuales.
+
 El código de la aplicación, sus dependencias, migraciones, pruebas y documentación técnica se encuentran en [`app/`](app/README.md).
 
 ## Desarrollo
