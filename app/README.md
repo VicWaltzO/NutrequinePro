@@ -22,6 +22,11 @@ Para desarrollar: `npm.cmd run dev -- --config RUTA_PRIVADA_ABSOLUTA`.
 
 ## Verificación y arquitectura
 
+Para incorporar Nutrequine a otro repositorio, consultar la
+[guía del módulo integrable](integration/README.md), el
+[contrato HTTP y de operación](integration/CONTRATO_INTEGRACION.md) y el
+[portal de demostración A/B](integration/EJEMPLO_PORTAL.md).
+
 `npm.cmd run verify` reúne pruebas, los tres chequeos TypeScript, ESLint, Prettier,
 compilación completa y auditoría de distribución. Después ejecutar `npm.cmd run test:e2e`.
 Preparar el navegador con `npx.cmd playwright install chromium`, o seleccionar

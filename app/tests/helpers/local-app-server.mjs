@@ -12,7 +12,12 @@ import { createStore } from "../../lib/application-store.mjs";
 import { provisionAuthentication } from "../../server/provision.mts";
 
 export const appRoot = fileURLToPath(new URL("../../", import.meta.url));
-export async function localAppFixture({ development = false, minimalEnvironment = false } = {}) {
+export async function localAppFixture({
+  development = false,
+  minimalEnvironment = false,
+  distributionSource,
+  frontendDirectory,
+} = {}) {
   const root = mkdtempSync(join(tmpdir(), "nutrequine-08-test-"));
   const directory = createPrivateDirectory(join(root, "private"));
   const database = join(directory, "business.sqlite");
@@ -36,7 +41,8 @@ export async function localAppFixture({ development = false, minimalEnvironment 
   const port = probe.address().port;
   await new Promise((resolve) => probe.close(resolve));
   const distribution = join(root, "distribution", "app");
-  if (!development) cpSync(join(appRoot, "dist-node"), distribution, { recursive: true });
+  if (!development)
+    cpSync(distributionSource ?? join(appRoot, "dist-node"), distribution, { recursive: true });
   const configFile = join(directory, "server.json");
   writeFileSync(
     configFile,
@@ -44,7 +50,9 @@ export async function localAppFixture({ development = false, minimalEnvironment 
       database,
       auth_database: authDatabase,
       port,
-      ...(!development ? { frontend_directory: join(distribution, "public-client") } : {}),
+      ...(!development
+        ? { frontend_directory: frontendDirectory ?? join(distribution, "public-client") }
+        : {}),
     }),
     { mode: 0o600 },
   );

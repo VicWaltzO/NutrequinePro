@@ -1,4 +1,5 @@
 import type { User } from "../shared/types/domain";
+import { frontendPath } from "./paths.ts";
 
 export interface LocalSession {
   actor: User;
@@ -37,7 +38,7 @@ const messages: Record<number, string> = {
 
 async function send(path: string, init: RequestInit = {}) {
   try {
-    return await fetch(path, { ...init, credentials: "same-origin", cache: "no-store" });
+    return await fetch(frontendPath(path), { ...init, credentials: "same-origin", cache: "no-store" });
   } catch {
     throw new ApiError(503, messages[503]);
   }
