@@ -4,6 +4,8 @@ import { once } from "node:events";
 import { fork } from "node:child_process";
 import { existsSync, readFileSync, renameSync } from "node:fs";
 import { join } from "node:path";
+import { randomUUID } from "node:crypto";
+import { fileURLToPath } from "node:url";
 import { openSqliteDatabase } from "../lib/adapters/node-sqlite.mjs";
 import { PersistenceBusyError } from "../lib/persistence-errors.mjs";
 import { createStore } from "../lib/application-store.mjs";
@@ -47,10 +49,11 @@ test("SQLite exige apertura explícita, reserva exclusiva y datos fuera de insta
   assert.throws(() => openSqliteDatabase(filename), /ENOENT/);
   assert.equal(existsSync(filename), false);
   assert.throws(() => openSqliteDatabase(":memory:", { mode: "create" }), /ruta absoluta/);
-  assert.throws(
-    () => openSqliteDatabase(join(process.cwd(), "outputs", "no-crear.sqlite"), { mode: "create" }),
-    /fuera del directorio/,
+  const insideInstallation = fileURLToPath(
+    new URL("../no-crear-" + randomUUID() + ".sqlite", import.meta.url),
   );
+  assert.throws(() => openSqliteDatabase(insideInstallation, { mode: "create" }), /fuera del directorio/);
+  assert.equal(existsSync(insideInstallation), false);
   const connection = openSqliteDatabase(filename, { mode: "create" });
   try {
     const before = readFileSync(filename);
