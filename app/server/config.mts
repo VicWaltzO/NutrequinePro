@@ -5,6 +5,7 @@ export interface ServerConfig {
   database: string;
   auth_database: string;
   port: number;
+  frontend_directory?: string;
   tls_certificate?: string;
   tls_key?: string;
 }
@@ -12,7 +13,19 @@ export interface ServerConfig {
 export function validateConfig(input: unknown, allowEphemeralPort = false): ServerConfig {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Configuración inválida.");
   const value = input as Record<string, unknown>;
-  const allowed = new Set(["database", "auth_database", "port", "tls_certificate", "tls_key"]);
+  const allowed = new Set([
+    "database",
+    "auth_database",
+    "port",
+    "tls_certificate",
+    "tls_key",
+    "frontend_directory",
+  ]);
+  if (
+    value.frontend_directory !== undefined &&
+    (typeof value.frontend_directory !== "string" || !value.frontend_directory.trim())
+  )
+    throw new Error("Directorio público inválido.");
   if (Object.keys(value).some((key) => !allowed.has(key)))
     throw new Error("Opción de configuración desconocida.");
   if (

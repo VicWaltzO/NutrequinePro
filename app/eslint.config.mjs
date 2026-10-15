@@ -14,10 +14,15 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "dist/**",
     "dist-node/**",
+    "dist-client/**",
     ".wrangler/**",
     ".sites-runtime/**",
     "coverage/**",
   ]),
+  {
+    files: ["client/**/*.{ts,tsx,mts,mjs}"],
+    rules: { "@next/next/no-img-element": "off" },
+  },
   {
     files: ["{app,features,shared,lib,db}/**/*.{ts,tsx,mts,mjs,js,jsx}"],
     rules: {

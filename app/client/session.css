@@ -1,0 +1,84 @@
+.local-login {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #f4f5f6;
+}
+dialog.local-login {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border: 0;
+  margin: 0;
+  color: inherit;
+}
+button.account-signout {
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+.local-login form {
+  width: min(100%, 420px);
+  padding: 36px;
+  border: 1px solid #e3e5e8;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 12px 36px #00000008;
+  display: grid;
+  gap: 18px;
+}
+.local-login img {
+  justify-self: center;
+  object-fit: contain;
+}
+.local-login h1 {
+  font-size: 28px;
+  margin: 0;
+}
+.local-login p,
+.local-login small {
+  color: #657080;
+}
+.local-login label {
+  display: grid;
+  gap: 7px;
+  font-size: 14px;
+}
+.local-login input {
+  width: 100%;
+  border: 1px solid #d7dbe1;
+  border-radius: 7px;
+  padding: 11px;
+  background: white;
+  color: #181b20;
+}
+.local-login button {
+  padding: 12px;
+  background: #191c20;
+  color: white;
+  border-radius: 7px;
+}
+.local-login button:disabled {
+  opacity: 0.65;
+}
+:root[data-theme="dark"] .local-login {
+  background: #121519;
+}
+:root[data-theme="dark"] .local-login form,
+:root[data-theme="dark"] .local-login input {
+  background: #1d222a;
+  color: #f0f2f5;
+  border-color: #39404a;
+}
+@media (max-width: 480px) {
+  .local-login {
+    padding: 16px;
+  }
+  .local-login form {
+    padding: 24px;
+  }
+}

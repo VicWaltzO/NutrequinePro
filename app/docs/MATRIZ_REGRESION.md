@@ -190,3 +190,20 @@ contratos de seguridad. Las expectativas comerciales originales se reutilizan.
 
 No se sustituyen los doce pasos E2E de la aplicación D1; continúan ejecutándose
 por separado. El frontend independiente y la transferencia de producción siguen pendientes.
+
+## Frontend independiente — Tarea 08
+
+El estado anterior se conserva como historia. Consultar [reporte 08](REPORTE_08_FRONTEND_INDEPENDIENTE.md)
+para resultados finales, capturas y condiciones de la prueba de red.
+
+| Referencia           | Avance                                                                                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LOCAL-AUTH-01 / P01  | Login, recarga, roles reales ADMIN/OPERATOR/VIEWER, expiración con formulario, revocación y logout comprobados en navegador.                                               |
+| NODE-OFFLINE-01      | Distribución compilada React/Node fuera del checkout; conexiones externas bloqueadas mediante instrumentación de tests. No certifica firewall del SO.                      |
+| SQLITE-DISK-01 / P02 | Reinicio de proceso Node y recarga conservan sesión y estado completo de SQLite; el reinicio de Vinext no se presenta como automatizado.                                   |
+| R01–R24              | Se mantiene la batería previa y se reutiliza el escenario portable mediante HTTP; la suite nueva comprueba sus flujos administrativos por formulario.                      |
+| P09                  | Backend conserva Host/Origin/CSRF y bytes; transporte cliente clasifica errores, conserva ID y no reenvía automáticamente. Vite usa el mismo origen sin relajar controles. |
+| UI                   | Capturas comparativas revisadas; 66 fingerprints heredados intactos. No hay actualización automática de referencias visuales.                                              |
+
+Continúan pendientes P04/P05/P07/P08 y los límites de carga/entorno descritos en
+los reportes; esta ampliación no representa migración de datos reales.

@@ -16,6 +16,7 @@ import { openAuthDatabase } from "./auth-database.mts";
 import { validateConfig } from "./config.mts";
 import { tokenHash } from "./passwords.mts";
 import { cookieValue, installHttpSecurity, sessionCookie, verifyCsrf } from "./http-security.mts";
+import { serveFrontend } from "./frontend.mts";
 
 function objectBody(request: FastifyRequest): Record<string, unknown> {
   if (!request.body || typeof request.body !== "object" || Array.isArray(request.body))
@@ -91,6 +92,7 @@ export async function createLocalServer(
     server.server.keepAliveTimeout = 5000;
     server.server.setTimeout(15000);
     installHttpSecurity(server);
+    if (config.frontend_directory) serveFrontend(server, config.frontend_directory);
     let tail: Promise<unknown> = Promise.resolve();
     let queued = 0;
     function serialized<T>(operation: () => Promise<T>): Promise<T> {

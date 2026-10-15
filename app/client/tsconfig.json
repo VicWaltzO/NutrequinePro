@@ -1,0 +1,25 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["vite/client"],
+    "incremental": false,
+    "paths": {
+      "@/*": ["../*"],
+      "next/image": ["./LocalImage.tsx"],
+      "@/app/ui/Topbar": ["./Topbar.tsx"],
+      "@/shared/ui/LoadingScreen": ["./LoadingScreen.tsx"],
+      "@/lib/domain.mjs": ["./domain.d.mts"]
+    }
+  },
+  "include": [
+    "*.ts",
+    "*.tsx",
+    "../app/ui/**/*.ts",
+    "../app/ui/**/*.tsx",
+    "../features/**/*.ts",
+    "../features/**/*.tsx",
+    "../shared/**/*.ts",
+    "../shared/**/*.tsx"
+  ],
+  "exclude": ["../node_modules", "../dist-node", "vite.config.mts"]
+}

@@ -61,6 +61,19 @@ IDs privados de usuarios, logs o capturas con datos reales.
 
 ## Comandos
 
+### Aplicación React/Node independiente
+
+[Tarea 08](REPORTE_08_FRONTEND_INDEPENDIENTE.md) incorpora el cliente Vite con
+login local y el panel reutilizado. `npm.cmd run build:local` genera `dist-node/`
+con `public-client/`. Seleccionar esa carpeta absoluta como `frontend_directory`
+en la configuración privada de Tarea 07 e iniciar Node: cliente y API comparten
+el mismo puerto loopback. `npm.cmd run check:client` comprueba sus tipos y
+`npm.cmd run test:e2e:local` ejecuta la nueva suite tras compilar.
+
+Para HMR: `npm.cmd run dev:local -- --config RUTA_PRIVADA_ABSOLUTA`; Vite trabaja
+como middleware detrás de Fastify, conservando Host/Origin/CSRF sin CORS abierto.
+No utiliza los comandos `dev`/`start` heredados descritos abajo.
+
 ### Backend Node y autenticación local
 
 El backend independiente requiere Node 24.18+, una base SQLite preparada y un
@@ -72,7 +85,8 @@ administrador y la vinculación histórica. No utiliza el usuario simulado de `d
 `dist-node/` con las dependencias operativas. Iniciar mediante
 `node dist-node/server/main.mjs --config RUTA_ABSOLUTA_PRIVADA`. El archivo JSON
 elige ambas bases y puerto; solo se escucha en 127.0.0.1. El frontend original
-sigue usando sus comandos anteriores y todavía no se conecta a este backend.
+sigue usando sus comandos anteriores. La entrada independiente de Tarea 08 sí
+se conecta a este backend con sesiones propias.
 
 ### Administración SQLite independiente
 
