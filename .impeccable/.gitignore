@@ -1,0 +1,7 @@
+# Local inspection, generated previews and temporary decision state.
+review/
+mocks/
+questions/
+direction-body.md
+config.local.json
+hook.cache.json

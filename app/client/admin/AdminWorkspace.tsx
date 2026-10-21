@@ -90,7 +90,7 @@ export default function AdminWorkspace({
   const productionList = <ProductionList s={state} write={write} open={open} productions={productions} />;
 
   return (
-    <main>
+    <main id="main-content" tabIndex={-1}>
       <PageHeading tab={tab} view={view} admin={admin} write={write} open={open} primary={primary} />
       {error && (
         <div className="error" role="alert">

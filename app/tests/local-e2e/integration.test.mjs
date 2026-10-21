@@ -207,13 +207,14 @@ test(
     assert.deepEqual(await state(), beforeRestart);
     await page.reload();
     await page.getByRole("heading", { name: "Resumen", exact: true, level: 1 }).waitFor();
-    await page.getByAltText("Logo Nutrequine Pro", { exact: true }).waitFor();
+    await page.locator(".brand").getByAltText("Nutrequine Pro", { exact: true }).waitFor();
     await page.waitForFunction(() =>
       [...document.images].every((image) => image.complete && image.naturalWidth > 0),
     );
     assert.equal(
       await page
-        .getByAltText("Logo Nutrequine Pro", { exact: true })
+        .locator(".brand")
+        .getByAltText("Nutrequine Pro", { exact: true })
         .evaluate((image) => image.complete && image.naturalWidth > 0),
       true,
     );

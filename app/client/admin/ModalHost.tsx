@@ -43,9 +43,12 @@ export default function ModalHost({
         close();
       }}
       className="modal"
+      aria-labelledby="operation-dialog-title"
     >
       <div className="modal-head">
-        <h2>{modal?.kind === "correct" ? "Rectificar venta" : (titles[modal?.type ?? ""] ?? "Detalle")}</h2>
+        <h2 id="operation-dialog-title">
+          {modal?.kind === "correct" ? "Rectificar venta" : (titles[modal?.type ?? ""] ?? "Detalle")}
+        </h2>
         <button className="icon-button" aria-label="Cerrar" onClick={close} disabled={busy}>
           <X size={20} />
         </button>

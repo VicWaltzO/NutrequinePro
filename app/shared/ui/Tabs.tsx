@@ -15,6 +15,7 @@ export function Tabs({
         <button
           key={k}
           className={tab === k ? "selected" : ""}
+          aria-current={tab === k ? "page" : undefined}
           onClick={() => {
             location.hash = k === "all" ? view : `${view}/${k}`;
             onSelect();

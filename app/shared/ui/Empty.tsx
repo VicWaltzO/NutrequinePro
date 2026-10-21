@@ -1,4 +1,5 @@
 import React from "react";
+import { Inbox } from "lucide-react";
 export function Empty({
   text = "No hay operaciones registradas.",
   action,
@@ -8,7 +9,9 @@ export function Empty({
 }) {
   return (
     <div className="empty">
-      <span className="empty-mark">＋</span>
+      <span className="empty-mark">
+        <Inbox size={24} aria-hidden="true" />
+      </span>
       <strong>{text}</strong>
       {action}
     </div>

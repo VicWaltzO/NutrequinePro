@@ -19,7 +19,6 @@ export default function PageHeading({
   return (
     <div className="page-heading">
       <div>
-        <span className="eyebrow">NUTREQUINE PRO</span>
         <h1>{nav.find((x) => x[0] === view)?.[1]}</h1>
         <p>
           {

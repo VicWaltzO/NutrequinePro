@@ -1,4 +1,5 @@
 import type { Sale } from "@/lib/domain-types";
+import { CheckCircle2 } from "lucide-react";
 import LoadingScreen from "../LoadingScreen";
 import SaleTable from "@/features/ventas/components/SaleTable";
 import Sidebar from "@/client/admin/Sidebar";
@@ -16,7 +17,17 @@ export default function AdminApp() {
   const saleTable = (rows: Sale[]) => <SaleTable s={state} write={write} open={open} rows={rows} />;
   return (
     <div className="app-shell">
-      <Sidebar actor={actor} view={view} go={go} menu={menu} />
+      <a
+        className="skip-link"
+        href="#main-content"
+        onClick={(event) => {
+          event.preventDefault();
+          document.getElementById("main-content")?.focus();
+        }}
+      >
+        Ir al contenido
+      </a>
+      <Sidebar actor={actor} view={view} go={go} menu={menu} closeMenu={() => setMenu(false)} />
       <div className="workspace">
         <Topbar
           view={view}
@@ -39,7 +50,7 @@ export default function AdminApp() {
       </div>
       {toast && (
         <div className="toast" role="status">
-          ✓ {toast}
+          <CheckCircle2 size={19} aria-hidden="true" /> {toast}
         </div>
       )}
       <ModalHost

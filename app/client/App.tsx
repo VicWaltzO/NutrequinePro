@@ -4,6 +4,7 @@ import AdminApp from "./admin/AdminApp";
 import { ApiError, login, onSessionRequired, recoverSession } from "./session-api";
 import type { LocalSession } from "./session-api";
 import { frontendPath } from "./paths";
+import { ArrowRight, Factory, PackageCheck, Wallet } from "lucide-react";
 
 export default function App() {
   const loginDialog = useRef<HTMLDialogElement>(null);
@@ -75,11 +76,51 @@ export default function App() {
           aria-label="Autenticación local"
           onCancel={(event) => event.preventDefault()}
         >
+          <section className="login-introduction" aria-label="Nutrequine Pro">
+            <div className="login-brand">
+              <img src={frontendPath("/brand/logo.jpg")} width={56} height={56} alt="" />
+              Nutrequine Pro
+            </div>
+            <div>
+              <h2>
+                Tu operación.
+                <br />
+                Todo conectado.
+              </h2>
+              <p>Producción, ventas y cobranza en un mismo espacio de trabajo.</p>
+              <ul className="login-workflows">
+                <li>
+                  <Factory size={22} />
+                  <span>
+                    Planifica la producción<small>Fórmulas, insumos y costos.</small>
+                  </span>
+                </li>
+                <li>
+                  <PackageCheck size={22} />
+                  <span>
+                    Organiza cada entrega<small>Ventas e inventario conectados.</small>
+                  </span>
+                </li>
+                <li>
+                  <Wallet size={22} />
+                  <span>
+                    Mantén claros los cobros<small>Pagos, saldos y pendientes.</small>
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <small>Gestión empresarial · Nutrición equina</small>
+          </section>
           <form onSubmit={signIn} aria-label="Inicio de sesión local">
-            <img src={frontendPath("/brand/logo.jpg")} width={100} height={100} alt="Nutrequine Pro" />
-            <span className="eyebrow">NUTREQUINE PRO</span>
+            <img
+              className="login-mobile-logo"
+              src={frontendPath("/brand/logo.jpg")}
+              width={64}
+              height={64}
+              alt="Nutrequine Pro"
+            />
             <h1>Iniciar sesión</h1>
-            <p>Administración local · Producción, ventas e inventario</p>
+            <p>Accede a tu espacio de trabajo.</p>
             {error && (
               <p className="error" role="alert">
                 {error}
@@ -112,6 +153,7 @@ export default function App() {
             </label>
             <button className="button primary" type="submit" disabled={busy}>
               {busy ? "Iniciando sesión…" : "Entrar"}
+              {!busy && <ArrowRight size={18} aria-hidden="true" />}
             </button>
             <small>El administrador de esta instalación gestiona sus credenciales.</small>
           </form>

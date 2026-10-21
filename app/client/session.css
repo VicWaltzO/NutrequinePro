@@ -1,9 +1,9 @@
 .local-login {
   min-height: 100dvh;
   display: grid;
-  place-items: center;
-  padding: 24px;
-  background: #f4f5f6;
+  grid-template-columns: minmax(0, 1fr) minmax(400px, 1fr);
+  align-items: center;
+  background: var(--surface);
 }
 dialog.local-login {
   position: fixed;
@@ -12,73 +12,139 @@ dialog.local-login {
   height: 100%;
   max-width: none;
   max-height: none;
+  padding: 0;
   border: 0;
   margin: 0;
-  color: inherit;
+  color: var(--ink);
+  overflow-y: auto;
+}
+.login-introduction {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  padding: clamp(32px, 5vw, 80px);
+  background: #123c72;
+  color: #fff;
+}
+.login-brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+.login-brand img {
+  border-radius: 10px;
+  background: #fff;
+  object-fit: contain;
+}
+.login-introduction h2 {
+  color: #fff;
+  font-size: clamp(2rem, 3.7vw, 3.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  font-weight: 600;
+  margin-bottom: 22px;
+}
+.login-introduction p {
+  color: #d8e7fc;
+  font-size: 1rem;
+  max-width: 36ch;
+}
+.login-introduction > small {
+  color: #d8e7fc;
+  font-size: 0.8125rem;
+}
+.login-workflows {
+  list-style: none;
+  margin: 38px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 24px;
+}
+.login-workflows li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.875rem;
+}
+.login-workflows svg {
+  color: #b6d6ff;
+  flex-shrink: 0;
+}
+.login-workflows small {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  color: #d8e7fc;
+}
+.local-login form {
+  width: min(100% - 64px, 380px);
+  justify-self: center;
+  padding: 32px 0;
+  display: grid;
+  gap: 22px;
+}
+.local-login h1 {
+  font-size: 1.875rem;
+  margin: 0;
+}
+.local-login form > p {
+  margin-top: -12px;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+.local-login form > small {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.local-login label {
+  display: grid;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.local-login input {
+  min-height: 46px;
+  font-weight: 400;
+}
+.local-login button {
+  min-height: 46px;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+.login-mobile-logo {
+  display: none;
 }
 button.account-signout {
   border: 0;
   background: transparent;
   color: inherit;
 }
-.local-login form {
-  width: min(100%, 420px);
-  padding: 36px;
-  border: 1px solid #e3e5e8;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 12px 36px #00000008;
-  display: grid;
-  gap: 18px;
+button.account-signout:hover {
+  background: var(--surface-hover);
 }
-.local-login img {
-  justify-self: center;
-  object-fit: contain;
-}
-.local-login h1 {
-  font-size: 28px;
-  margin: 0;
-}
-.local-login p,
-.local-login small {
-  color: #657080;
-}
-.local-login label {
-  display: grid;
-  gap: 7px;
-  font-size: 14px;
-}
-.local-login input {
-  width: 100%;
-  border: 1px solid #d7dbe1;
-  border-radius: 7px;
-  padding: 11px;
-  background: white;
-  color: #181b20;
-}
-.local-login button {
-  padding: 12px;
-  background: #191c20;
-  color: white;
-  border-radius: 7px;
-}
-.local-login button:disabled {
-  opacity: 0.65;
-}
-:root[data-theme="dark"] .local-login {
-  background: #121519;
-}
-:root[data-theme="dark"] .local-login form,
-:root[data-theme="dark"] .local-login input {
-  background: #1d222a;
-  color: #f0f2f5;
-  border-color: #39404a;
-}
-@media (max-width: 480px) {
+@media (max-width: 760px) {
   .local-login {
-    padding: 16px;
+    grid-template-columns: 1fr;
+  }
+  .login-introduction {
+    display: none;
+  }
+  .login-mobile-logo {
+    display: block;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 12px;
   }
   .local-login form {
-    padding: 24px;
+    width: min(100% - 48px, 400px);
+    padding: 40px 0;
+  }
+  .local-login input {
+    font-size: 16px;
   }
 }

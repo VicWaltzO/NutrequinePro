@@ -69,6 +69,14 @@ recursos originales incluyen `app/public/brand/logo.jpg` y
 `app/public/brand/productos.jpg`. Init registra estos activos sin establecer una
 nueva dirección visual.
 
+El usuario confirmó después de init un rediseño corporativo de toda la aplicación,
+con Microsoft como referencia principal y Apple como referencia de acabado.
+La claridad, consistencia y precisión de esas referencias son vinculantes;
+Nutrequine conserva su identidad y no afirma afiliación con ellas. Computador y
+móvil tienen la misma prioridad. Se requieren transiciones breves, respuestas al
+pulsar y cierre por deslizamiento del menú móvil, con botones equivalentes y
+respeto al movimiento reducido.
+
 ## Evidence on Hand
 
 - `README.md` y `app/README.md`: propósito, instalación, capacidades y límites.
@@ -95,6 +103,6 @@ nueva dirección visual.
 
 ## Open Decisions
 
-No se han confirmado necesidades de accesibilidad específicas, dispositivos
-prioritarios adicionales ni objetivos medibles de velocidad de captura. Estos
+No se han confirmado necesidades de accesibilidad específicas, clases de
+dispositivos adicionales ni objetivos medibles de velocidad de captura. Estos
 puntos quedan abiertos; no constituyen requisitos acordados.

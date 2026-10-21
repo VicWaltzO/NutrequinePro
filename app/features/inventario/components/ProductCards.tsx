@@ -11,8 +11,8 @@ export default function ProductCards({ s: state }: { s: AppState }) {
           <article className="product-card" key={p.id}>
             <ProductImage image={p.image} name={p.name} />
             <div>
-              <span className="eyebrow">{p.is_sellable ? "COMERCIAL" : "CONSUMO INTERNO"}</span>
               <h3>{p.name}</h3>
+              <span className="product-kind">{p.is_sellable ? "Comercial" : "Consumo interno"}</span>
               <strong>
                 {num(a.quantity)} <span>sacos</span>
               </strong>

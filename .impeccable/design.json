@@ -1,0 +1,861 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-21T20:48:47.081Z",
+  "title": "Design System: Nutrequine Pro",
+  "extensions": {
+    "colorMeta": {
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Lienzo frío",
+        "tonalRamp": [
+          "oklch(15% 0.0057 264.53)",
+          "oklch(26% 0.0057 264.53)",
+          "oklch(38% 0.0057 264.53)",
+          "oklch(49% 0.0057 264.53)",
+          "oklch(61% 0.0057 264.53)",
+          "oklch(72% 0.0057 264.53)",
+          "oklch(84% 0.0057 264.53)",
+          "oklch(95% 0.0057 264.53)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Superficie",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(49% 0.0000 89.88)",
+          "oklch(61% 0.0000 89.88)",
+          "oklch(72% 0.0000 89.88)",
+          "oklch(84% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "surface-subtle": {
+        "role": "neutral",
+        "displayName": "Superficie de apoyo",
+        "tonalRamp": [
+          "oklch(15% 0.0074 260.73)",
+          "oklch(26% 0.0074 260.73)",
+          "oklch(38% 0.0074 260.73)",
+          "oklch(49% 0.0074 260.73)",
+          "oklch(61% 0.0074 260.73)",
+          "oklch(72% 0.0074 260.73)",
+          "oklch(84% 0.0074 260.73)",
+          "oklch(95% 0.0074 260.73)"
+        ]
+      },
+      "surface-hover": {
+        "role": "neutral",
+        "displayName": "Superficie de respuesta",
+        "tonalRamp": [
+          "oklch(15% 0.0120 259.82)",
+          "oklch(26% 0.0120 259.82)",
+          "oklch(38% 0.0120 259.82)",
+          "oklch(49% 0.0120 259.82)",
+          "oklch(61% 0.0120 259.82)",
+          "oklch(72% 0.0120 259.82)",
+          "oklch(84% 0.0120 259.82)",
+          "oklch(95% 0.0120 259.82)"
+        ]
+      },
+      "rail": {
+        "role": "neutral",
+        "displayName": "Riel azul pizarra",
+        "tonalRamp": [
+          "oklch(15% 0.0103 261.79)",
+          "oklch(26% 0.0103 261.79)",
+          "oklch(38% 0.0103 261.79)",
+          "oklch(49% 0.0103 261.79)",
+          "oklch(61% 0.0103 261.79)",
+          "oklch(72% 0.0103 261.79)",
+          "oklch(84% 0.0103 261.79)",
+          "oklch(95% 0.0103 261.79)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Línea",
+        "tonalRamp": [
+          "oklch(15% 0.0151 260.73)",
+          "oklch(26% 0.0151 260.73)",
+          "oklch(38% 0.0151 260.73)",
+          "oklch(49% 0.0151 260.73)",
+          "oklch(61% 0.0151 260.73)",
+          "oklch(72% 0.0151 260.73)",
+          "oklch(84% 0.0151 260.73)",
+          "oklch(95% 0.0151 260.73)"
+        ]
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Línea reforzada",
+        "tonalRamp": [
+          "oklch(15% 0.0338 258.37)",
+          "oklch(26% 0.0338 258.37)",
+          "oklch(38% 0.0338 258.37)",
+          "oklch(49% 0.0338 258.37)",
+          "oklch(61% 0.0338 258.37)",
+          "oklch(72% 0.0338 258.37)",
+          "oklch(84% 0.0338 258.37)",
+          "oklch(95% 0.0338 258.37)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "tonalRamp": [
+          "oklch(15% 0.0390 255.11)",
+          "oklch(26% 0.0390 255.11)",
+          "oklch(38% 0.0390 255.11)",
+          "oklch(49% 0.0390 255.11)",
+          "oklch(61% 0.0390 255.11)",
+          "oklch(72% 0.0390 255.11)",
+          "oklch(84% 0.0390 255.11)",
+          "oklch(95% 0.0390 255.11)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Texto secundario",
+        "tonalRamp": [
+          "oklch(15% 0.0382 252.71)",
+          "oklch(26% 0.0382 252.71)",
+          "oklch(38% 0.0382 252.71)",
+          "oklch(49% 0.0382 252.71)",
+          "oklch(61% 0.0382 252.71)",
+          "oklch(72% 0.0382 252.71)",
+          "oklch(84% 0.0382 252.71)",
+          "oklch(95% 0.0382 252.71)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Azul de acción",
+        "tonalRamp": [
+          "oklch(15% 0.1690 259.23)",
+          "oklch(26% 0.1690 259.23)",
+          "oklch(38% 0.1690 259.23)",
+          "oklch(49% 0.1690 259.23)",
+          "oklch(61% 0.1690 259.23)",
+          "oklch(72% 0.1690 259.23)",
+          "oklch(84% 0.1690 259.23)",
+          "oklch(95% 0.1690 259.23)"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Azul de acción al pasar el puntero",
+        "tonalRamp": [
+          "oklch(15% 0.1470 258.93)",
+          "oklch(26% 0.1470 258.93)",
+          "oklch(38% 0.1470 258.93)",
+          "oklch(49% 0.1470 258.93)",
+          "oklch(61% 0.1470 258.93)",
+          "oklch(72% 0.1470 258.93)",
+          "oklch(84% 0.1470 258.93)",
+          "oklch(95% 0.1470 258.93)"
+        ]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Azul de selección",
+        "tonalRamp": [
+          "oklch(15% 0.0271 260.32)",
+          "oklch(26% 0.0271 260.32)",
+          "oklch(38% 0.0271 260.32)",
+          "oklch(49% 0.0271 260.32)",
+          "oklch(61% 0.0271 260.32)",
+          "oklch(72% 0.0271 260.32)",
+          "oklch(84% 0.0271 260.32)",
+          "oklch(95% 0.0271 260.32)"
+        ]
+      },
+      "on-accent": {
+        "role": "primary",
+        "displayName": "Texto sobre acento",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(49% 0.0000 89.88)",
+          "oklch(61% 0.0000 89.88)",
+          "oklch(72% 0.0000 89.88)",
+          "oklch(84% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "success": {
+        "role": "secondary",
+        "displayName": "Verde de operación completada",
+        "tonalRamp": [
+          "oklch(15% 0.1009 157.17)",
+          "oklch(26% 0.1009 157.17)",
+          "oklch(38% 0.1009 157.17)",
+          "oklch(49% 0.1009 157.17)",
+          "oklch(61% 0.1009 157.17)",
+          "oklch(72% 0.1009 157.17)",
+          "oklch(84% 0.1009 157.17)",
+          "oklch(95% 0.1009 157.17)"
+        ]
+      },
+      "success-soft": {
+        "role": "secondary",
+        "displayName": "Fondo de operación completada",
+        "tonalRamp": [
+          "oklch(15% 0.0173 159.12)",
+          "oklch(26% 0.0173 159.12)",
+          "oklch(38% 0.0173 159.12)",
+          "oklch(49% 0.0173 159.12)",
+          "oklch(61% 0.0173 159.12)",
+          "oklch(72% 0.0173 159.12)",
+          "oklch(84% 0.0173 159.12)",
+          "oklch(95% 0.0173 159.12)"
+        ]
+      },
+      "warning": {
+        "role": "secondary",
+        "displayName": "Ámbar de trabajo pendiente",
+        "tonalRamp": [
+          "oklch(15% 0.1022 76.10)",
+          "oklch(26% 0.1022 76.10)",
+          "oklch(38% 0.1022 76.10)",
+          "oklch(49% 0.1022 76.10)",
+          "oklch(61% 0.1022 76.10)",
+          "oklch(72% 0.1022 76.10)",
+          "oklch(84% 0.1022 76.10)",
+          "oklch(95% 0.1022 76.10)"
+        ]
+      },
+      "warning-soft": {
+        "role": "secondary",
+        "displayName": "Fondo de trabajo pendiente",
+        "tonalRamp": [
+          "oklch(15% 0.0372 88.46)",
+          "oklch(26% 0.0372 88.46)",
+          "oklch(38% 0.0372 88.46)",
+          "oklch(49% 0.0372 88.46)",
+          "oklch(61% 0.0372 88.46)",
+          "oklch(72% 0.0372 88.46)",
+          "oklch(84% 0.0372 88.46)",
+          "oklch(95% 0.0372 88.46)"
+        ]
+      },
+      "danger": {
+        "role": "secondary",
+        "displayName": "Rojo de error",
+        "tonalRamp": [
+          "oklch(15% 0.1596 19.88)",
+          "oklch(26% 0.1596 19.88)",
+          "oklch(38% 0.1596 19.88)",
+          "oklch(49% 0.1596 19.88)",
+          "oklch(61% 0.1596 19.88)",
+          "oklch(72% 0.1596 19.88)",
+          "oklch(84% 0.1596 19.88)",
+          "oklch(95% 0.1596 19.88)"
+        ]
+      },
+      "danger-soft": {
+        "role": "secondary",
+        "displayName": "Fondo de error",
+        "tonalRamp": [
+          "oklch(15% 0.0199 5.98)",
+          "oklch(26% 0.0199 5.98)",
+          "oklch(38% 0.0199 5.98)",
+          "oklch(49% 0.0199 5.98)",
+          "oklch(61% 0.0199 5.98)",
+          "oklch(72% 0.0199 5.98)",
+          "oklch(84% 0.0199 5.98)",
+          "oklch(95% 0.0199 5.98)"
+        ]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Azul de foco",
+        "tonalRamp": [
+          "oklch(15% 0.1660 257.41)",
+          "oklch(26% 0.1660 257.41)",
+          "oklch(38% 0.1660 257.41)",
+          "oklch(49% 0.1660 257.41)",
+          "oklch(61% 0.1660 257.41)",
+          "oklch(72% 0.1660 257.41)",
+          "oklch(84% 0.1660 257.41)",
+          "oklch(95% 0.1660 257.41)"
+        ]
+      },
+      "scrollbar": {
+        "role": "neutral",
+        "displayName": "Desplazamiento",
+        "tonalRamp": [
+          "oklch(15% 0.0317 251.36)",
+          "oklch(26% 0.0317 251.36)",
+          "oklch(38% 0.0317 251.36)",
+          "oklch(49% 0.0317 251.36)",
+          "oklch(61% 0.0317 251.36)",
+          "oklch(72% 0.0317 251.36)",
+          "oklch(84% 0.0317 251.36)",
+          "oklch(95% 0.0317 251.36)"
+        ]
+      },
+      "overlay": {
+        "role": "neutral",
+        "displayName": "Velo",
+        "tonalRamp": [
+          "oklch(15% 0.0550 255.63)",
+          "oklch(26% 0.0550 255.63)",
+          "oklch(38% 0.0550 255.63)",
+          "oklch(49% 0.0550 255.63)",
+          "oklch(61% 0.0550 255.63)",
+          "oklch(72% 0.0550 255.63)",
+          "oklch(84% 0.0550 255.63)",
+          "oklch(95% 0.0550 255.63)"
+        ]
+      },
+      "dark-canvas": {
+        "role": "neutral",
+        "displayName": "Lienzo frío · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0313 256.89)",
+          "oklch(26% 0.0313 256.89)",
+          "oklch(38% 0.0313 256.89)",
+          "oklch(49% 0.0313 256.89)",
+          "oklch(61% 0.0313 256.89)",
+          "oklch(72% 0.0313 256.89)",
+          "oklch(84% 0.0313 256.89)",
+          "oklch(95% 0.0313 256.89)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Superficie · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0368 255.44)",
+          "oklch(26% 0.0368 255.44)",
+          "oklch(38% 0.0368 255.44)",
+          "oklch(49% 0.0368 255.44)",
+          "oklch(61% 0.0368 255.44)",
+          "oklch(72% 0.0368 255.44)",
+          "oklch(84% 0.0368 255.44)",
+          "oklch(95% 0.0368 255.44)"
+        ]
+      },
+      "dark-surface-subtle": {
+        "role": "neutral",
+        "displayName": "Superficie de apoyo · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0425 254.48)",
+          "oklch(26% 0.0425 254.48)",
+          "oklch(38% 0.0425 254.48)",
+          "oklch(49% 0.0425 254.48)",
+          "oklch(61% 0.0425 254.48)",
+          "oklch(72% 0.0425 254.48)",
+          "oklch(84% 0.0425 254.48)",
+          "oklch(95% 0.0425 254.48)"
+        ]
+      },
+      "dark-surface-hover": {
+        "role": "neutral",
+        "displayName": "Superficie de respuesta · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0493 253.56)",
+          "oklch(26% 0.0493 253.56)",
+          "oklch(38% 0.0493 253.56)",
+          "oklch(49% 0.0493 253.56)",
+          "oklch(61% 0.0493 253.56)",
+          "oklch(72% 0.0493 253.56)",
+          "oklch(84% 0.0493 253.56)",
+          "oklch(95% 0.0493 253.56)"
+        ]
+      },
+      "dark-rail": {
+        "role": "neutral",
+        "displayName": "Riel azul pizarra · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0407 257.77)",
+          "oklch(26% 0.0407 257.77)",
+          "oklch(38% 0.0407 257.77)",
+          "oklch(49% 0.0407 257.77)",
+          "oklch(61% 0.0407 257.77)",
+          "oklch(72% 0.0407 257.77)",
+          "oklch(84% 0.0407 257.77)",
+          "oklch(95% 0.0407 257.77)"
+        ]
+      },
+      "dark-border": {
+        "role": "neutral",
+        "displayName": "Línea · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0466 252.43)",
+          "oklch(26% 0.0466 252.43)",
+          "oklch(38% 0.0466 252.43)",
+          "oklch(49% 0.0466 252.43)",
+          "oklch(61% 0.0466 252.43)",
+          "oklch(72% 0.0466 252.43)",
+          "oklch(84% 0.0466 252.43)",
+          "oklch(95% 0.0466 252.43)"
+        ]
+      },
+      "dark-border-strong": {
+        "role": "neutral",
+        "displayName": "Línea reforzada · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0478 251.73)",
+          "oklch(26% 0.0478 251.73)",
+          "oklch(38% 0.0478 251.73)",
+          "oklch(49% 0.0478 251.73)",
+          "oklch(61% 0.0478 251.73)",
+          "oklch(72% 0.0478 251.73)",
+          "oklch(84% 0.0478 251.73)",
+          "oklch(95% 0.0478 251.73)"
+        ]
+      },
+      "dark-ink": {
+        "role": "neutral",
+        "displayName": "Tinta · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0137 258.34)",
+          "oklch(26% 0.0137 258.34)",
+          "oklch(38% 0.0137 258.34)",
+          "oklch(49% 0.0137 258.34)",
+          "oklch(61% 0.0137 258.34)",
+          "oklch(72% 0.0137 258.34)",
+          "oklch(84% 0.0137 258.34)",
+          "oklch(95% 0.0137 258.34)"
+        ]
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "Texto secundario · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0316 254.35)",
+          "oklch(26% 0.0316 254.35)",
+          "oklch(38% 0.0316 254.35)",
+          "oklch(49% 0.0316 254.35)",
+          "oklch(61% 0.0316 254.35)",
+          "oklch(72% 0.0316 254.35)",
+          "oklch(84% 0.0316 254.35)",
+          "oklch(95% 0.0316 254.35)"
+        ]
+      },
+      "dark-accent": {
+        "role": "primary",
+        "displayName": "Azul de acción · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.1039 258.46)",
+          "oklch(26% 0.1039 258.46)",
+          "oklch(38% 0.1039 258.46)",
+          "oklch(49% 0.1039 258.46)",
+          "oklch(61% 0.1039 258.46)",
+          "oklch(72% 0.1039 258.46)",
+          "oklch(84% 0.1039 258.46)",
+          "oklch(95% 0.1039 258.46)"
+        ]
+      },
+      "dark-accent-hover": {
+        "role": "primary",
+        "displayName": "Azul de acción al pasar el puntero · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0677 258.10)",
+          "oklch(26% 0.0677 258.10)",
+          "oklch(38% 0.0677 258.10)",
+          "oklch(49% 0.0677 258.10)",
+          "oklch(61% 0.0677 258.10)",
+          "oklch(72% 0.0677 258.10)",
+          "oklch(84% 0.0677 258.10)",
+          "oklch(95% 0.0677 258.10)"
+        ]
+      },
+      "dark-accent-soft": {
+        "role": "primary",
+        "displayName": "Azul de selección · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0724 256.62)",
+          "oklch(26% 0.0724 256.62)",
+          "oklch(38% 0.0724 256.62)",
+          "oklch(49% 0.0724 256.62)",
+          "oklch(61% 0.0724 256.62)",
+          "oklch(72% 0.0724 256.62)",
+          "oklch(84% 0.0724 256.62)",
+          "oklch(95% 0.0724 256.62)"
+        ]
+      },
+      "dark-on-accent": {
+        "role": "primary",
+        "displayName": "Texto sobre acento · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0587 258.04)",
+          "oklch(26% 0.0587 258.04)",
+          "oklch(38% 0.0587 258.04)",
+          "oklch(49% 0.0587 258.04)",
+          "oklch(61% 0.0587 258.04)",
+          "oklch(72% 0.0587 258.04)",
+          "oklch(84% 0.0587 258.04)",
+          "oklch(95% 0.0587 258.04)"
+        ]
+      },
+      "dark-success": {
+        "role": "secondary",
+        "displayName": "Verde de operación completada · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0838 161.12)",
+          "oklch(26% 0.0838 161.12)",
+          "oklch(38% 0.0838 161.12)",
+          "oklch(49% 0.0838 161.12)",
+          "oklch(61% 0.0838 161.12)",
+          "oklch(72% 0.0838 161.12)",
+          "oklch(84% 0.0838 161.12)",
+          "oklch(95% 0.0838 161.12)"
+        ]
+      },
+      "dark-success-soft": {
+        "role": "secondary",
+        "displayName": "Fondo de operación completada · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0431 169.12)",
+          "oklch(26% 0.0431 169.12)",
+          "oklch(38% 0.0431 169.12)",
+          "oklch(49% 0.0431 169.12)",
+          "oklch(61% 0.0431 169.12)",
+          "oklch(72% 0.0431 169.12)",
+          "oklch(84% 0.0431 169.12)",
+          "oklch(95% 0.0431 169.12)"
+        ]
+      },
+      "dark-warning": {
+        "role": "secondary",
+        "displayName": "Ámbar de trabajo pendiente · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.1124 87.91)",
+          "oklch(26% 0.1124 87.91)",
+          "oklch(38% 0.1124 87.91)",
+          "oklch(49% 0.1124 87.91)",
+          "oklch(61% 0.1124 87.91)",
+          "oklch(72% 0.1124 87.91)",
+          "oklch(84% 0.1124 87.91)",
+          "oklch(95% 0.1124 87.91)"
+        ]
+      },
+      "dark-warning-soft": {
+        "role": "secondary",
+        "displayName": "Fondo de trabajo pendiente · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0386 88.92)",
+          "oklch(26% 0.0386 88.92)",
+          "oklch(38% 0.0386 88.92)",
+          "oklch(49% 0.0386 88.92)",
+          "oklch(61% 0.0386 88.92)",
+          "oklch(72% 0.0386 88.92)",
+          "oklch(84% 0.0386 88.92)",
+          "oklch(95% 0.0386 88.92)"
+        ]
+      },
+      "dark-danger": {
+        "role": "secondary",
+        "displayName": "Rojo de error · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0904 12.33)",
+          "oklch(26% 0.0904 12.33)",
+          "oklch(38% 0.0904 12.33)",
+          "oklch(49% 0.0904 12.33)",
+          "oklch(61% 0.0904 12.33)",
+          "oklch(72% 0.0904 12.33)",
+          "oklch(84% 0.0904 12.33)",
+          "oklch(95% 0.0904 12.33)"
+        ]
+      },
+      "dark-danger-soft": {
+        "role": "secondary",
+        "displayName": "Fondo de error · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0416 349.42)",
+          "oklch(26% 0.0416 349.42)",
+          "oklch(38% 0.0416 349.42)",
+          "oklch(49% 0.0416 349.42)",
+          "oklch(61% 0.0416 349.42)",
+          "oklch(72% 0.0416 349.42)",
+          "oklch(84% 0.0416 349.42)",
+          "oklch(95% 0.0416 349.42)"
+        ]
+      },
+      "dark-focus": {
+        "role": "primary",
+        "displayName": "Azul de foco · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0874 254.52)",
+          "oklch(26% 0.0874 254.52)",
+          "oklch(38% 0.0874 254.52)",
+          "oklch(49% 0.0874 254.52)",
+          "oklch(61% 0.0874 254.52)",
+          "oklch(72% 0.0874 254.52)",
+          "oklch(84% 0.0874 254.52)",
+          "oklch(95% 0.0874 254.52)"
+        ]
+      },
+      "dark-scrollbar": {
+        "role": "neutral",
+        "displayName": "Desplazamiento · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0449 252.02)",
+          "oklch(26% 0.0449 252.02)",
+          "oklch(38% 0.0449 252.02)",
+          "oklch(49% 0.0449 252.02)",
+          "oklch(61% 0.0449 252.02)",
+          "oklch(72% 0.0449 252.02)",
+          "oklch(84% 0.0449 252.02)",
+          "oklch(95% 0.0449 252.02)"
+        ]
+      },
+      "dark-overlay": {
+        "role": "neutral",
+        "displayName": "Velo · oscuro",
+        "tonalRamp": [
+          "oklch(15% 0.0264 259.08)",
+          "oklch(26% 0.0264 259.08)",
+          "oklch(38% 0.0264 259.08)",
+          "oklch(49% 0.0264 259.08)",
+          "oklch(61% 0.0264 259.08)",
+          "oklch(72% 0.0264 259.08)",
+          "oklch(84% 0.0264 259.08)",
+          "oklch(95% 0.0264 259.08)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Introducción de acceso",
+        "purpose": "Mensaje introductorio del acceso en escritorio."
+      },
+      "headline": {
+        "displayName": "Título de página",
+        "purpose": "Identificar la sección o iniciar sesión."
+      },
+      "title": {
+        "displayName": "Título de sección",
+        "purpose": "Agrupar información operativa."
+      },
+      "body": {
+        "displayName": "Texto operativo",
+        "purpose": "Descripciones y lectura cotidiana."
+      },
+      "label": {
+        "displayName": "Etiqueta de campo",
+        "purpose": "Nombrar controles de captura."
+      },
+      "caption": {
+        "displayName": "Ayuda y estado",
+        "purpose": "Metadatos, ayudas y estados escritos."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Botones y acciones."
+      },
+      "metric": {
+        "displayName": "Importe del resumen",
+        "purpose": "Comparar cifras principales con números tabulares."
+      }
+    },
+    "shadows": [
+      {
+        "name": "elevation-dialog",
+        "value": "0 24px 80px #102c5230",
+        "purpose": "Diálogo y cajón móvil abierto en claro."
+      },
+      {
+        "name": "elevation-dialog-dark",
+        "value": "0 24px 80px #00000066",
+        "purpose": "Diálogo y cajón móvil abierto en oscuro."
+      },
+      {
+        "name": "elevation-toast",
+        "value": "0 8px 28px #102c5226",
+        "purpose": "Confirmación flotante en claro."
+      },
+      {
+        "name": "elevation-toast-dark",
+        "value": "0 8px 28px #0000004d",
+        "purpose": "Confirmación flotante en oscuro."
+      },
+      {
+        "name": "product-photo",
+        "value": "drop-shadow(0 5px 3px #0000000c)",
+        "purpose": "Recorte fotográfico existente; no extrapolar a tarjetas."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-fast",
+        "value": "120ms",
+        "purpose": "Respuesta de botones y filas de tabla."
+      },
+      {
+        "name": "duration-normal",
+        "value": "220ms",
+        "purpose": "Entrada de diálogo, confirmación y cajón."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Desplazamientos breves de entrada y respuesta al pulsar."
+      },
+      {
+        "name": "dialog-arrive",
+        "value": "opacity: 0.6 → 1; translate: 0 10px → 0 0",
+        "purpose": "Entrada de diálogo; no animar cada tarjeta."
+      },
+      {
+        "name": "notification-arrive",
+        "value": "opacity: 0.5 → 1; translate: 0 8px → 0 0",
+        "purpose": "Confirmación breve de operación."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } button:active:not(:disabled) { transform: none; } }",
+        "purpose": "Eliminar animaciones, transiciones y desplazamiento al pulsar."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "desktop-compact-max",
+        "value": "1250px"
+      },
+      {
+        "name": "tablet-max",
+        "value": "1000px"
+      },
+      {
+        "name": "mobile-max",
+        "value": "760px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Confirmar o iniciar la acción principal.",
+      "html": "<button class=\"ds-primary\">Nueva venta</button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 15px;border:1px solid var(--border, #dce2ec);border-radius:var(--radius-control, 7px);font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;font-size:.875rem;font-weight:600;line-height:1.4;cursor:pointer;transition:background var(--duration-fast, 120ms),color var(--duration-fast, 120ms),border-color var(--duration-fast, 120ms),transform var(--duration-fast, 120ms) var(--ease-out, cubic-bezier(.16,1,.3,1));background:var(--accent, #185abd);border-color:var(--accent, #185abd);color:var(--on-accent, #fff)}.ds-primary:hover{background:var(--accent-hover, #114a9d);border-color:var(--accent-hover, #114a9d)}.ds-primary:focus-visible{outline:2px solid var(--focus, #256dce);outline-offset:3px;}.ds-primary:active:not(:disabled){transform:translateY(1px)}.ds-primary:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}.ds-primary:active:not(:disabled){transform:none}}"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción secundaria dentro del mismo flujo.",
+      "html": "<button class=\"ds-secondary\">Registrar producción</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 15px;border:1px solid var(--border, #dce2ec);border-radius:var(--radius-control, 7px);font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;font-size:.875rem;font-weight:600;line-height:1.4;cursor:pointer;transition:background var(--duration-fast, 120ms),color var(--duration-fast, 120ms),border-color var(--duration-fast, 120ms),transform var(--duration-fast, 120ms) var(--ease-out, cubic-bezier(.16,1,.3,1));background:var(--surface, #fff);color:var(--ink, #182638)}.ds-secondary:hover{background:var(--surface-hover, #e9eef6);border-color:var(--border-strong, #aab8cd)}.ds-secondary:focus-visible{outline:2px solid var(--focus, #256dce);outline-offset:3px;}.ds-secondary:active:not(:disabled){transform:translateY(1px)}.ds-secondary:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none}.ds-secondary:active:not(:disabled){transform:none}}"
+    },
+    {
+      "name": "Acción de texto",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Continuar hacia el detalle de una sección.",
+      "html": "<button class=\"ds-text\">Ver todas</button>",
+      "css": ".ds-text{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 15px;border:1px solid var(--border, #dce2ec);border-radius:var(--radius-control, 7px);font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;font-size:.875rem;font-weight:600;line-height:1.4;cursor:pointer;transition:background var(--duration-fast, 120ms),color var(--duration-fast, 120ms),border-color var(--duration-fast, 120ms),transform var(--duration-fast, 120ms) var(--ease-out, cubic-bezier(.16,1,.3,1));padding:4px 0;border:0;background:none;color:var(--accent, #185abd);text-underline-offset:3px;white-space:normal}.ds-text:hover{background:none;text-decoration:underline}.ds-text:focus-visible{outline:2px solid var(--focus, #256dce);outline-offset:3px;}.ds-text:active:not(:disabled){transform:translateY(1px)}.ds-text:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-text{transition:none}.ds-text:active:not(:disabled){transform:none}}"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Etiqueta visible y contorno inequívoco al enfocar.",
+      "html": "<label class=\"ds-field\"><span>Cliente</span><input class=\"ds-input\" placeholder=\"Nombre del cliente\" /></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:7px;font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;color:var(--ink, #182638)}.ds-field>span{font-size:.8125rem;font-weight:550}.ds-input{width:100%;min-height:42px;padding:10px 11px;border:1px solid var(--border, #dce2ec);border-radius:var(--radius-control, 7px);background:var(--surface, #fff);color:var(--ink, #182638);font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;font-size:.875rem;caret-color:var(--accent, #185abd)}.ds-input::placeholder{color:var(--muted, #546579);opacity:1}.ds-input:focus{border-color:var(--accent, #185abd);box-shadow:none}.ds-input:focus-visible{outline:2px solid var(--focus, #256dce);outline-offset:3px;}@media(max-width:760px){.ds-input{font-size:16px;min-height:44px}}"
+    },
+    {
+      "name": "Navegación seleccionada",
+      "kind": "nav",
+      "refersTo": "navigation-selected",
+      "description": "Selección azul con marcador lateral y etiqueta.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Secciones\"><button aria-current=\"page\"><svg width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg>Resumen</button><button>Ventas</button></nav>",
+      "css": ".ds-nav{display:flex;flex-direction:column;gap:5px}.ds-nav button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 15px;border:1px solid var(--border, #dce2ec);border-radius:var(--radius-control, 7px);font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;font-size:.875rem;font-weight:600;line-height:1.4;cursor:pointer;transition:background var(--duration-fast, 120ms),color var(--duration-fast, 120ms),border-color var(--duration-fast, 120ms),transform var(--duration-fast, 120ms) var(--ease-out, cubic-bezier(.16,1,.3,1));position:relative;justify-content:flex-start;width:100%;min-height:44px;padding:11px 14px;border:0;border-radius:8px;background:transparent;color:var(--muted, #546579);font-weight:500}.ds-nav button:hover{color:var(--ink, #182638);background:var(--surface-hover, #e9eef6)}.ds-nav button[aria-current]{color:var(--accent, #185abd);background:var(--accent-soft, #e2edff);font-weight:650}.ds-nav button[aria-current]::before{content:\"\";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:3px;background:var(--accent, #185abd)}.ds-nav button:focus-visible{outline:2px solid var(--focus, #256dce);outline-offset:3px;}.ds-nav button:active:not(:disabled){transform:translateY(1px)}.ds-nav button:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-nav button{transition:none}.ds-nav button:active:not(:disabled){transform:none}}@media(max-width:760px){.ds-nav button{min-height:46px}}"
+    },
+    {
+      "name": "Estado de operación",
+      "kind": "chip",
+      "refersTo": "badge-success",
+      "description": "Etiqueta informativa con palabra y color semántico.",
+      "html": "<div class=\"ds-statuses\"><span class=\"ds-badge ds-paid\">Pagada</span><span class=\"ds-badge ds-pending\">Pendiente</span><span class=\"ds-badge ds-cancelled\">Anulada</span></div>",
+      "css": ".ds-statuses{display:flex;gap:8px;flex-wrap:wrap}.ds-badge{display:inline-block;padding:4px 8px;border:0;border-radius:5px;font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;font-size:.75rem;font-weight:550;line-height:1.5;white-space:nowrap}.ds-paid{color:var(--success, #1b6d45);background:var(--success-soft, #e8f5ed)}.ds-pending{color:var(--warning, #805600);background:var(--warning-soft, #fff4d9)}.ds-cancelled{color:var(--danger, #ac303c);background:var(--danger-soft, #ffedf0)}"
+    },
+    {
+      "name": "Panel de trabajo",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Contenedor plano con título y datos operativos.",
+      "html": "<section class=\"ds-panel\"><h2>Costos de operación</h2><p>Importes registrados en la operación.</p></section>",
+      "css": ".ds-panel{min-width:0;padding:22px;border:1px solid var(--border, #dce2ec);border-radius:var(--radius-surface, 14px);background:var(--surface, #fff);color:var(--ink, #182638);font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif}.ds-panel h2{margin:0 0 18px;font-size:1.0625rem;font-weight:650;line-height:1.45;letter-spacing:-.015em}.ds-panel p{margin:16px 0;color:var(--muted, #546579);font-size:.8125rem;line-height:1.6}@media(max-width:760px){.ds-panel{padding:18px}}"
+    },
+    {
+      "name": "Pestañas de navegación",
+      "kind": "nav",
+      "refersTo": "tab-selected",
+      "description": "Secciones con selección inferior y desplazamiento horizontal.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"Ventas\"><button aria-current=\"page\">Todas</button><button>Próximas entregas</button><button>Borradores</button></nav>",
+      "css": ".ds-tabs{display:flex;gap:24px;overflow-x:auto;border-bottom:1px solid var(--border, #dce2ec)}.ds-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 15px;border:1px solid var(--border, #dce2ec);border-radius:var(--radius-control, 7px);font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;font-size:.875rem;font-weight:600;line-height:1.4;cursor:pointer;transition:background var(--duration-fast, 120ms),color var(--duration-fast, 120ms),border-color var(--duration-fast, 120ms),transform var(--duration-fast, 120ms) var(--ease-out, cubic-bezier(.16,1,.3,1));position:relative;flex-shrink:0;min-height:48px;padding:14px 0;border:0;border-radius:0;background:none;color:var(--muted, #546579);font-weight:600;white-space:nowrap}.ds-tabs button:hover,.ds-tabs button[aria-current]{background:none;color:var(--accent, #185abd)}.ds-tabs button[aria-current]::after{content:\"\";position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--accent, #185abd);border-radius:3px 3px 0 0}.ds-tabs button:focus-visible{outline:2px solid var(--focus, #256dce);outline-offset:3px;}.ds-tabs button:active:not(:disabled){transform:translateY(1px)}.ds-tabs button:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-tabs button{transition:none}.ds-tabs button:active:not(:disabled){transform:none}}@media(max-width:760px){.ds-tabs{gap:22px}}"
+    },
+    {
+      "name": "Estado vacío",
+      "kind": "custom",
+      "refersTo": "empty",
+      "description": "Vacío operativo con icono de línea y mensaje.",
+      "html": "<div class=\"ds-empty\"><span class=\"ds-empty-mark\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M22 12h-6l-2 3h-4l-2-3H2\"/><path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z\"/></svg></span><strong>No hay operaciones registradas.</strong></div>",
+      "css": ".ds-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:15px;padding:38px 20px;color:var(--muted, #546579);font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;font-size:.875rem}.ds-empty-mark{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:12px;background:var(--surface-subtle, #f0f3f8)}.ds-empty>strong{font-weight:500}"
+    },
+    {
+      "name": "Pendiente accionable",
+      "kind": "custom",
+      "description": "Acción operativa de la banda de producción y entregas.",
+      "html": "<button class=\"ds-queue\"><span class=\"ds-queue-icon\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 16h.01\"/><path d=\"M16 16h.01\"/><path d=\"M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z\"/><path d=\"M8 16h.01\"/></svg></span><span class=\"ds-queue-copy\"><strong>1 lote a producir</strong><small>Planificación pendiente</small></span><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button>",
+      "css": ".ds-queue{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 15px;border:1px solid var(--border, #dce2ec);border-radius:var(--radius-control, 7px);font-family:\"Segoe UI Variable\", \"Segoe UI\", -apple-system, BlinkMacSystemFont, sans-serif;font-size:.875rem;font-weight:600;line-height:1.4;cursor:pointer;transition:background var(--duration-fast, 120ms),color var(--duration-fast, 120ms),border-color var(--duration-fast, 120ms),transform var(--duration-fast, 120ms) var(--ease-out, cubic-bezier(.16,1,.3,1));width:100%;padding:10px 8px;gap:12px;text-align:left;justify-content:flex-start;border:0;background:transparent;color:var(--ink, #182638)}.ds-queue:hover{background:var(--surface-subtle, #f0f3f8)}.ds-queue-icon{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;border-radius:10px;color:var(--accent, #185abd);background:var(--accent-soft, #e2edff)}.ds-queue-copy{flex:1;min-width:0}.ds-queue-copy strong,.ds-queue-copy small{display:block}.ds-queue-copy strong{font-size:.8125rem;font-weight:650}.ds-queue-copy small{margin-top:3px;font-size:.75rem;font-weight:400;color:var(--muted, #546579)}.ds-queue>svg{flex-shrink:0;color:var(--muted, #546579)}.ds-queue:focus-visible{outline:2px solid var(--focus, #256dce);outline-offset:3px;}.ds-queue:active:not(:disabled){transform:translateY(1px)}.ds-queue:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-queue{transition:none}.ds-queue:active:not(:disabled){transform:none}}@media(max-width:760px){.ds-queue{padding:10px 0}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "El espacio de trabajo preciso",
+    "overview": "Nutrequine Pro presenta la operación como un espacio corporativo claro, estable y ágil. La referencia principal de Microsoft se concreta en Segoe, navegación persistente y selección azul; la precisión de acabado de Apple se concreta en alineaciones, superficies contenidas y respuestas breves. Son referencias de diseño confirmadas, sin afiliación con esas empresas.\n\nLa densidad permite consultar importes y registrar operaciones sin perder contexto. Computador y móvil tienen la misma prioridad: la estructura cambia de columnas y navegación, mientras los términos, estados y acciones conservan su significado. La identidad vive en el nombre, el logo y las fotografías existentes; la interfaz no necesita imágenes generadas.",
+    "keyCharacteristics": [
+      "Azul funcional y superficies azul pizarra con temas claro y oscuro.",
+      "Jerarquía tipográfica contenida, cifras tabulares e iconos de línea.",
+      "Navegación reconocible, controles consistentes y foco visible.",
+      "Elevación reservada principalmente a superposiciones y movimiento breve."
+    ],
+    "rules": [
+      {
+        "name": "The Estado con palabra Rule",
+        "body": "El color acompaña una etiqueta o un mensaje comprensible: Pagada, Pendiente, Entregada, error o confirmación. No sustituye esa información.",
+        "section": "colors"
+      },
+      {
+        "name": "The Acento de acción Rule",
+        "body": "Usar el azul para actuar, seleccionar o enfocar; conservar tinta y neutros para la lectura ordinaria.",
+        "section": "colors"
+      },
+      {
+        "name": "The Cifras alineadas Rule",
+        "body": "Importes, métricas, tablas y contexto numérico usan cifras tabulares para facilitar la comparación.",
+        "section": "typography"
+      },
+      {
+        "name": "The Plano en reposo Rule",
+        "body": "Separar superficies ordinarias mediante tono y borde; reservar la elevación estructural para elementos que se superponen al trabajo.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** reutilizar las variables semánticas y verificar la superficie en claro y oscuro.",
+      "**Do** conservar foco visible, etiquetas, cifras tabulares y estados escritos.",
+      "**Do** adaptar la estructura en los tres puntos de corte y mantener controles táctiles alcanzables.",
+      "**Do** ofrecer botones y teclado equivalentes al gesto del cajón y respetar movimiento reducido.",
+      "**Do** conservar el logo y las fotografías de producto originales con su procedencia, sin modificar sus píxeles.",
+      "**Do** mantener acciones de formulario opacas y contenido desplazable completamente alcanzable."
+    ],
+    "donts": [
+      "**Don't** afirmar afiliación con Microsoft o Apple al aplicar las referencias aprobadas.",
+      "**Don't** confundir venta, entrega y pago mediante etiquetas o estados visuales.",
+      "**Don't** añadir elevación a cada tarjeta ni animar toda la cuadrícula al entrar.",
+      "**Don't** usar el color como única explicación de estado o convertir acciones en glifos de texto.",
+      "**Don't** reintroducir grandes bloques promocionales, marca repetida sobre títulos o pequeños titulares decorativos.",
+      "**Don't** inventar imágenes, métricas, certificaciones o restricciones comerciales para completar una pantalla."
+    ]
+  }
+}

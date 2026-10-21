@@ -37,7 +37,10 @@ export default function Topbar({
     <header className="topbar">
       <button
         className="icon-button mobile-menu"
-        aria-label="Abrir navegación"
+        id="navigation-toggle"
+        aria-label={menu ? "Cerrar navegación" : "Abrir navegación"}
+        aria-expanded={menu}
+        aria-controls="primary-navigation"
         onClick={() => setMenu(!menu)}
       >
         <Menu size={20} />
@@ -47,7 +50,7 @@ export default function Topbar({
         <strong>{nav.find((item) => item[0] === view)?.[1]}</strong>
       </div>
       <div className="topbar-right">
-        <span>PEN · {day()}</span>
+        <span className="workspace-context">PEN · {day()}</span>
         <button
           className="icon-button"
           aria-label={theme === "dark" ? "Activar modo claro" : "Activar modo oscuro"}
