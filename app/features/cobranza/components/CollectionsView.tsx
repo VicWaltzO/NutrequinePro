@@ -1,4 +1,5 @@
 import type { AppState, Sale, BalanceSummary, OpenModal } from "@/lib/domain-types";
+import { SubtabContent } from "@/shared/ui/SubtabContent";
 import { saleSummary } from "@/lib/domain-preview.mjs";
 import { Table, Metrics, money, label, find } from "@/shared/ui";
 import type { ReactNode } from "react";
@@ -42,36 +43,38 @@ export default function CollectionsView({
         ]}
       />
       {filters}
-      <section className="panel flush">
-        {tab === "payments" ? (
-          <Table heads={["Pago", "Fecha", "Cliente", "Método", "Monto", "Estado"]}>
-            {state.payments
-              .filter(match)
-              .slice()
-              .reverse()
-              .map((x) => (
-                <tr key={x.id}>
-                  <td>
-                    <button className="row-link" onClick={() => open("payment-detail", x)}>
-                      {x.code}
-                    </button>
-                  </td>
-                  <td>{x.payment_date}</td>
-                  <td>{find(state, "customers", x.customer_id)?.name}</td>
-                  <td>
-                    {label(x.payment_method)} {x.other_method}
-                  </td>
-                  <td>{money(x.total_amount)}</td>
-                  <td>
-                    {state.paymentReversals.some((r) => r.payment_id === x.id) ? "Revertido" : "Registrado"}
-                  </td>
-                </tr>
-              ))}
-          </Table>
-        ) : (
-          saleTable(pending)
-        )}
-      </section>
+      <SubtabContent tab={tab} order={["all", "payments"]}>
+        <section className="panel flush">
+          {tab === "payments" ? (
+            <Table heads={["Pago", "Fecha", "Cliente", "Método", "Monto", "Estado"]}>
+              {state.payments
+                .filter(match)
+                .slice()
+                .reverse()
+                .map((x) => (
+                  <tr key={x.id}>
+                    <td>
+                      <button className="row-link" onClick={() => open("payment-detail", x)}>
+                        {x.code}
+                      </button>
+                    </td>
+                    <td>{x.payment_date}</td>
+                    <td>{find(state, "customers", x.customer_id)?.name}</td>
+                    <td>
+                      {label(x.payment_method)} {x.other_method}
+                    </td>
+                    <td>{money(x.total_amount)}</td>
+                    <td>
+                      {state.paymentReversals.some((r) => r.payment_id === x.id) ? "Revertido" : "Registrado"}
+                    </td>
+                  </tr>
+                ))}
+            </Table>
+          ) : (
+            saleTable(pending)
+          )}
+        </section>
+      </SubtabContent>
     </>
   );
 }

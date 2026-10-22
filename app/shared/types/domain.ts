@@ -60,6 +60,7 @@ export interface Operation extends Entity {
   confirmed_at?: string;
   closed_at?: string;
   delivered_at?: string;
+  cancelled_at?: string;
 }
 export interface Sale extends Operation {
   customer_id: string;

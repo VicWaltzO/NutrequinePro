@@ -1,4 +1,5 @@
 import { requireValue, normalize, scaled, positiveInt, text, pick } from "../../../shared/domain/core.mjs";
+import { saveCustomerSites } from "../../clientes/domain/sites.mjs";
 export function customerSave(context) {
   const { s: state, type, p: payload, actor, clock, add, code, correction } = context;
   let result = null;
@@ -47,15 +48,7 @@ export function customerSave(context) {
     Object.assign(old, v);
     result = old.id;
   } else result = add(table, { ...v, ...(table === "customers" ? { code: code(table, "CL") } : {}) }).id;
-  if (table === "customers" && payload.site_ids) {
-    state.customerSites.filter((x) => x.customer_id === result).forEach((x) => (x.is_active = false));
-    payload.site_ids.forEach((id, i) => {
-      pick(state, "sites", id);
-      const link = state.customerSites.find((x) => x.customer_id === result && x.site_id === id);
-      if (link) Object.assign(link, { is_active: true, is_default: i === 0 });
-      else add("customerSites", { customer_id: result, site_id: id, is_default: i === 0, is_active: true });
-    });
-  }
+  if (table === "customers") saveCustomerSites(context, result);
   return result;
 }
 export function configSave(context) {

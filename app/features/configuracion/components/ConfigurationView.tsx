@@ -1,4 +1,5 @@
 import type { AppState, User, OpenModal } from "@/lib/domain-types";
+import { SubtabContent } from "@/shared/ui/SubtabContent";
 import Configuration from "@/features/configuracion/components/Configuration";
 import type { ReactNode } from "react";
 export default function ConfigurationView({
@@ -25,7 +26,9 @@ export default function ConfigurationView({
         ["audit", "Auditoría"],
         ["appearance", "Apariencia"],
       ])}
-      <Configuration s={state} actor={actor} tab={tab} open={open} theme={theme} />
+      <SubtabContent tab={tab} order={["all", "products", "users", "audit", "appearance"]}>
+        <Configuration s={state} actor={actor} tab={tab} open={open} theme={theme} />
+      </SubtabContent>
     </>
   );
 }
