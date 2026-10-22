@@ -235,7 +235,7 @@ Los diálogos usan `min(1040px, calc(100vw - 48px))` y un máximo de (90dvh); en
 
 Los registros de venta, pago, gasto, producción y ajuste de inventario agrupan sus
 campos por tarea en tarjetas consecutivas. Cada cabecera combina icono de línea,
-título y contexto breve; el grupo central usa `accent-soft`. Separación de (22px),
+título y contexto breve; el grupo central usa `accent-soft`. Separación de (26px) en escritorio y (18px) en móvil,
 cuerpo de (20px), reducido a (16px) en móvil. Producción conserva cuatro grupos
 por su densidad. Las tablas desplazan dentro de su grupo; los costos adicionales
 usan filas divididas, sin otra tarjeta anidada.
@@ -276,6 +276,18 @@ Paneles y tarjetas de producto usan superficie, borde y radio `surface`, sin som
 ### Inputs / Fields
 
 Superficie sólida, borde fino, radio `control`, relleno (10px 11px), mínimo (42px). Etiqueta visible sobre el campo, separado por (7px); en móvil los caracteres de entrada usan (16px) y mínimo (44px). El foco cambia el borde a acento y añade el contorno visible sin brillo. La búsqueda aplica su contorno al conjunto (`focus-within`, separación de 2px), no duplica el del campo interior. Los errores muestran mensaje con fondo y tinta de peligro; la espera de acceso deshabilita campos y cambia el texto de la acción.
+
+El registro de producción usa una tabla de siete columnas. El precio permanece
+en lectura con lápiz; descuento opcional por fila; cobro al teórico neto destacado
+con `accent-soft` y texto Automático o Valor ajustado. Restablecer recupera el
+cálculo automático. Pagado/Pendiente siempre lleva texto y control independiente.
+El editor de precio tiene Aplicar/Cancelar y equivalentes Enter/Escape sin cerrar
+el diálogo; todas las acciones permanecen dentro del desplazamiento de la tabla.
+
+Los nombres comerciales en producción y el selector de venta incorporan un
+marcador de (12px) inmediatamente después del nombre. Nutrelin: (#DDB83E),
+Hi-Performance: (#2F926C), Potripregnant: (#C74A8A), BASE: (#F2F1EC) con borde
+`border-strong`. Son identificadores secundarios; no reemplazan nombres ni estados.
 
 ### Navigation
 

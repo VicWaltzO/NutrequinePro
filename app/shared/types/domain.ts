@@ -264,8 +264,12 @@ export interface CostInput {
 export interface IngredientInput {
   id?: string;
   ingredient_id: string;
+  /** Soles per kg applied only to this production; historical snapshots store cents. */
+  price_per_kg?: NumericInput;
   discount_amount?: NumericInput;
   actual_charge?: NumericInput | null;
+  /** Missing on historical records: preserve their stored charge instead of inferring automatic mode. */
+  actual_charge_mode?: "auto" | "manual";
   is_paid?: boolean;
   notes?: string;
 }

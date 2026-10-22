@@ -1,8 +1,10 @@
 import { useState } from "react";
-import type { CostInput, IngredientInput, NumericInput } from "@/lib/domain-types";
+import type { CostInput, NumericInput } from "@/lib/domain-types";
 import type { ProductionValues, FormProps } from "@/shared/types/forms";
 import { day } from "@/shared/lib/format";
 import { productionFormPreview } from "./production-form-preview";
+import { initialProductionIngredients } from "./production-ingredient-input";
+import type { ProductionIngredientDraft } from "./production-ingredient-input";
 
 export function useProductionFormState({ s: state, record }: Pick<FormProps, "s" | "record">) {
   const snapshot = record?.input_snapshot;
@@ -23,31 +25,28 @@ export function useProductionFormState({ s: state, record }: Pick<FormProps, "s"
         .map((p) => [p.id, snapshot?.products?.find((x) => x.product_id === p.id)?.nuclei_count ?? 0]),
     ),
   );
-  const [adjust, setAdjust] = useState<Record<string, IngredientInput>>(
-    Object.fromEntries((snapshot?.ingredients ?? []).map((x) => [x.ingredient_id, x])),
+  const [adjust, setAdjust] = useState<Record<string, ProductionIngredientDraft>>(() =>
+    initialProductionIngredients(state, record),
   );
   const [costs, setCosts] = useState<CostInput[]>(snapshot?.costs ?? []);
-  const { bags, weight, nuclei, ingredients, estimated, real } = productionFormPreview(
-    state,
-    counts,
-    adjust,
-    costs,
-    values,
-  );
-  const adj = (id: string, k: string, x: string | boolean) =>
-    setAdjust((a) => ({ ...a, [id]: { ...a[id], ingredient_id: id, [k]: x } }));
+  const { bags, weight, nuclei, ingredients, estimated, real, ingredientInputs, errors, quantityError } =
+    productionFormPreview(state, counts, adjust, costs, values);
+  const adj = (id: string, change: Partial<ProductionIngredientDraft>) =>
+    setAdjust((a) => ({ ...a, [id]: { ...a[id], ingredient_id: id, ...change } }));
   return {
     v: values,
     set,
     counts,
     setCounts,
-    adjust,
     costs,
     setCosts,
     bags,
     weight,
     nuclei,
     ingredients,
+    ingredientInputs,
+    errors,
+    quantityError,
     estimated,
     real,
     adj,

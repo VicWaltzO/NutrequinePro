@@ -1,0 +1,138 @@
+/* Identification complements the commercial name; it never carries state alone. */
+.product-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.product-marker {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  border-radius: 50%;
+}
+.product-marker-nutrelin {
+  background: #ddb83e;
+}
+.product-marker-performance {
+  background: #2f926c;
+}
+.product-marker-potripregnant {
+  background: #c74a8a;
+}
+.product-marker-base {
+  background: #f2f1ec;
+  border: 1px solid var(--border-strong);
+}
+.production-form .field > span {
+  line-height: 1.6;
+}
+.production-table-help {
+  margin: 0 0 16px;
+  max-width: 75ch;
+  font-size: 0.8125rem;
+}
+.production-form .table-wrap {
+  overflow-x: auto;
+}
+.production-form th,
+.production-form td {
+  vertical-align: top;
+}
+.production-form td:first-child {
+  min-width: 130px;
+}
+.production-price-value {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.production-price-value .production-edit-price {
+  padding: 6px;
+  min-width: 32px;
+  min-height: 32px;
+  color: var(--accent);
+}
+.production-price-editor {
+  min-width: 142px;
+  max-width: 180px;
+}
+.production-cell-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.production-cell-actions .text-button,
+.production-reset-charge {
+  font-size: 0.75rem;
+  min-height: 32px;
+  padding: 4px 0;
+}
+.production-cell-hint {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  max-width: 180px;
+}
+.production-cell-error {
+  display: block;
+  color: var(--danger);
+  font-size: 0.75rem;
+  max-width: 190px;
+  margin-top: 8px;
+}
+.production-cell-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.production-form .production-cell-check input {
+  min-width: 18px;
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex: 0 0 18px;
+}
+.production-cell-check + input {
+  margin-top: 8px;
+}
+.production-pending {
+  color: var(--warning);
+}
+.production-form .production-actual-charge {
+  background: var(--accent-soft);
+  border-color: var(--border-strong);
+  min-width: 132px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.production-reset-charge {
+  text-align: left;
+  max-width: 180px;
+  white-space: normal;
+}
+.modal-body > .panel {
+  margin-bottom: 26px;
+}
+@media (max-width: 760px) {
+  .production-price-value .production-edit-price {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .production-cell-check,
+  .production-cell-actions .text-button,
+  .production-reset-charge {
+    min-height: 44px;
+  }
+  .modal-body > .panel {
+    margin-bottom: 18px;
+  }
+}

@@ -34,18 +34,24 @@ export function buildProductionProduct(state, productionId, row) {
 export function buildProductionIngredient(state, productionId, ingredient_id, total_kg, adjustments) {
   const ingredient = pick(state, "ingredients", ingredient_id);
   const adjustment = (adjustments ?? []).find((x) => x.ingredient_id === ingredient_id) ?? {};
-  const gross = roundedProduct(total_kg, ingredient.current_price_per_kg, 1000);
+  const price =
+    adjustment.price_per_kg === undefined ? ingredient.current_price_per_kg : scaled(adjustment.price_per_kg);
+  const gross = roundedProduct(total_kg, price, 1000);
   const discount = scaled(adjustment.discount_amount ?? 0);
   requireValue(discount <= gross, "Descuento supera costo del insumo.");
-  const actual =
-    adjustment.actual_charge === "" || adjustment.actual_charge == null
-      ? null
-      : scaled(adjustment.actual_charge);
+  requireValue(
+    adjustment.actual_charge_mode === undefined || ["auto", "manual"].includes(adjustment.actual_charge_mode),
+    "Modo de cobro real inválido.",
+  );
+  let actual = null;
+  if (adjustment.actual_charge_mode === "auto") actual = gross - discount;
+  else if (adjustment.actual_charge !== "" && adjustment.actual_charge != null)
+    actual = scaled(adjustment.actual_charge);
   return {
     production_id: productionId,
     ingredient_id,
     total_kg,
-    historical_price_per_kg: ingredient.current_price_per_kg,
+    historical_price_per_kg: price,
     theoretical_gross_cost: gross,
     discount_amount: discount,
     theoretical_net_cost: gross - discount,

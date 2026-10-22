@@ -9,7 +9,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-surface);
   background: var(--surface);
-  margin-bottom: 22px;
+  margin-bottom: 26px;
   min-width: 0;
 }
 .sale-section-header {
@@ -317,6 +317,9 @@
   }
 }
 @media (max-width: 760px) {
+  .sale-form .sale-section {
+    margin-bottom: 18px;
+  }
   .sale-section-header {
     padding: 14px 16px;
     align-items: flex-start;

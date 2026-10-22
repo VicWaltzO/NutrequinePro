@@ -20,6 +20,18 @@ Cliente y API comparten `http://127.0.0.1:PUERTO`. El servidor no crea bases ni
 usuarios al arrancar. Las cookies se gestionan en el navegador y CSRF en memoria.
 Para desarrollar: `npm.cmd run dev -- --config RUTA_PRIVADA_ABSOLUTA`.
 
+## Registro de producción
+
+Los insumos se recalculan al indicar los núcleos. El lápiz de cada fila permite
+ajustar el precio exclusivamente para ese lote; el descuento es opcional y al
+desactivarlo se contabiliza cero. El cobro automático sigue el teórico neto, mientras
+que un importe editado manualmente se conserva hasta restablecer el modo automático.
+
+Las filas nuevas de insumos comienzan pagadas y permiten marcar varios pendientes.
+El estado de pago es independiente del importe. Los borradores existentes conservan
+precios, cobros nulos, descuentos y pagos históricos. No se requieren migraciones ni
+cambios en los maestros. Consulta las [interacciones y compatibilidad](docs/UX_OPERATIVA.md).
+
 ## Verificación y arquitectura
 
 Para incorporar Nutrequine a otro repositorio, consultar la

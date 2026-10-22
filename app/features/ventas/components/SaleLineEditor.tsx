@@ -6,6 +6,7 @@ import type { SaleLine } from "@/shared/types/forms";
 import { stock } from "../../inventario/domain/stock.mjs";
 import { Input, ProductImage, money, kg, find, num } from "@/shared/ui";
 import { addSaleProduct, createSaleLine } from "../hooks/sale-lines";
+import { ProductName } from "@/shared/ui/ProductMarker";
 
 export function SaleLineEditor({
   state,
@@ -60,7 +61,9 @@ export function SaleLineEditor({
                     <ProductImage image={product.image} name={product.name} />
                   </span>
                   <span className="sale-picker-description">
-                    <strong>{product.name}</strong>
+                    <strong>
+                      <ProductName name={product.name} />
+                    </strong>
                     <span>{money(product.default_sale_price)} / saco</span>
                     <small>{num(available.quantity)} sacos en stock</small>
                     {quantity > 0 && (

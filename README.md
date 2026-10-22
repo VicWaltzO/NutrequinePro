@@ -39,6 +39,20 @@ sin una cuenta de ChatGPT o Cloudflare y sin servicios externos durante el uso n
 | Configuración    | Administrar parámetros, productos, usuarios y permisos.                  |
 | Historial        | Consultar rectificaciones, devoluciones, anulaciones y reversiones.      |
 
+## Captura de producción
+
+Al indicar los núcleos, los insumos se recalculan de inmediato. Cada insumo permite
+ajustar su precio para ese lote y aplicar un descuento opcional, sin cambiar el
+catálogo ni los precios de otras producciones. El cobro real se inicia en el teórico
+neto y acompaña los cambios de cantidad, precio y descuento; si se edita manualmente,
+conserva ese importe hasta elegir **Restablecer al teórico neto**.
+
+Las filas nuevas de insumos comienzan pagadas. El operador puede marcar varias como
+pendientes antes de guardar, independientemente del cobro registrado. Los borradores
+existentes conservan sus precios, cobros y estados de pago. Consulta las
+[interacciones y compatibilidad de producción](app/docs/UX_OPERATIVA.md) para conocer
+el detalle y las comparaciones visuales.
+
 ## La complejidad que resuelve
 
 Una venta registrada, una entrega realizada y un pago recibido representan hechos

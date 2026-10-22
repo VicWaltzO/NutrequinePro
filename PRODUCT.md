@@ -57,6 +57,10 @@ cobro; conserva los parámetros históricos de cada operación.
   captura no cambia los parámetros maestros de producción.
 - Las correcciones dejan rastro; los documentos históricos conservan los precios,
   pesos y fórmulas registrados. La rapidez de captura no justifica omitir estas reglas.
+- El registro de producción permite un precio por kg exclusivo del lote y descuentos
+  opcionales por insumo. Las filas nuevas precargan cobro al teórico neto y estado
+  pagado; editar un cobro lo fija hasta restablecer el cálculo automático. Los
+  registros históricos conservan precios, cobros nulos y pendientes almacenados.
 - El balance es estimado: no representa contabilidad formal ni valoración FIFO.
   No existe un libro completo de pagos a proveedores ni un flujo de compras de
   materia prima en este alcance.
