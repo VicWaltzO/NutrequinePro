@@ -50,6 +50,7 @@ export function simpleFormInitial({ s, record, kind }: Pick<FormProps, "s" | "re
   if (kind === "customer" && record)
     initial.site_ids = s.customerSites
       .filter((x) => x.customer_id === record.id && x.is_active !== false)
+      .sort((a, b) => Number(b.is_default) - Number(a.is_default))
       .map((x) => x.site_id);
   return initial;
 }

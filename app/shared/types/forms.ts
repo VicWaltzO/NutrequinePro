@@ -72,6 +72,8 @@ export interface SimpleFields {
   name?: string;
   is_active?: boolean;
   site_ids?: string[];
+  new_sites?: string[];
+  default_site_id?: string;
   tax_id?: string;
   contact_name?: string;
   phone?: string;

@@ -497,6 +497,7 @@ tbody tr:hover {
   font-weight: 500;
 }
 .tabs {
+  position: relative;
   gap: 24px;
   border-color: var(--border);
   margin-bottom: 22px;
@@ -516,15 +517,36 @@ tbody tr:hover {
 .tabs button.selected {
   color: var(--accent);
 }
-.tabs button.selected::after {
-  content: "";
+.tab-indicator {
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
+  width: var(--tab-width, 0px);
+  transform: translateX(var(--tab-left, 0px));
   height: 3px;
   background: var(--accent);
   border-radius: 3px 3px 0 0;
+  pointer-events: none;
+}
+.tabs[data-ready="true"] .tab-indicator {
+  transition:
+    transform 440ms cubic-bezier(0.16, 1, 0.3, 1),
+    width 440ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.subtab-content {
+  min-width: 0;
+  display: flow-root;
+}
+.subtab-viewport {
+  min-width: 0;
+  overflow-x: clip;
+  padding: 6px;
+  margin: -6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tabs[data-ready="true"] .tab-indicator {
+    transition: none;
+  }
 }
 .filters {
   gap: 12px;

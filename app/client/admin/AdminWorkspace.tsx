@@ -65,9 +65,7 @@ export default function AdminWorkspace({
 
   const productCards = <ProductCards s={state} />;
   const saleTable = (rows: Sale[]) => <SaleTable s={state} write={write} open={open} rows={rows} />;
-  const tabs = (options: [string, string][]) => (
-    <Tabs options={options} view={view} tab={tab} onSelect={() => setFilter("")} />
-  );
+  const tabs = (options: [string, string][]) => <Tabs options={options} view={view} tab={tab} />;
   const filters = (
     <RecordFilters
       s={state}

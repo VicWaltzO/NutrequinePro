@@ -71,7 +71,18 @@ export default function ModalContent({
     );
   if (modal.type === "customer-detail") {
     if (!record) return null;
-    return <CustomerDetail state={state} customer={record} write={write} open={open} saleTable={saleTable} />;
+    return (
+      <CustomerDetail
+        key={record.id}
+        state={state}
+        customer={record}
+        write={write}
+        open={open}
+        saleTable={saleTable}
+        run={run}
+        busy={busy}
+      />
+    );
   }
   return (
     <SimpleForm {...props} record={modal.type === "reason" ? modal.record : props.record} kind={modal.type} />

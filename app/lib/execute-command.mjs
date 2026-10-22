@@ -3,6 +3,7 @@ import { saleSummary } from "../features/ventas/domain/summary.mjs";
 import { TABLES } from "./state-schema.mjs";
 import { customerSave, configSave, userSave } from "../features/configuracion/domain/commands.mjs";
 import { customerDelete } from "../features/clientes/domain/commands.mjs";
+import { customerSitesSave } from "../features/clientes/domain/sites.mjs";
 import {
   formulaSave,
   productionSave,
@@ -29,6 +30,7 @@ import { createCommandContext } from "./command-context.mjs";
 import { assertCommandPermission } from "../shared/domain/permissions.mjs";
 const handlers = {
   CUSTOMER_SAVE: customerSave,
+  CUSTOMER_SITES_SAVE: customerSitesSave,
   SITE_SAVE: customerSave,
   PRODUCT_SAVE: customerSave,
   INGREDIENT_SAVE: customerSave,

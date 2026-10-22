@@ -3,6 +3,7 @@ import App from "./App";
 import "./globals.css";
 import "./session.css";
 import "./workspace.css";
+import "./customer-profile.css";
 import "./sale-form.css";
 import "./operation-forms.css";
 import "./production-entry.css";
