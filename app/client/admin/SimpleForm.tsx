@@ -52,6 +52,7 @@ export default function SimpleForm({ s: state, record, kind, submit, close, busy
     : categories[0];
   return (
     <form
+      className={["expense", "adjust"].includes(kind ?? "") ? "operation-form" : undefined}
       onSubmit={async (e) => {
         e.preventDefault();
         await submit(operations[kind ?? ""] ?? record?._operation ?? "", {

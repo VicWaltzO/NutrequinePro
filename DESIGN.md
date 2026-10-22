@@ -233,6 +233,13 @@ En escritorio, el resumen agrupa cuatro métricas dentro de una superficie divid
 
 Los diálogos usan `min(1040px, calc(100vw - 48px))` y un máximo de (90dvh); en móvil, ancho `calc(100vw - 24px)` y (94dvh). El cuerpo desplaza su contenido; el pie de acciones es opaco, llega a los bordes y ofrece margen de lectura al desplazarse. La corrección final conserva Notas, Condición y Entrega alcanzables y visibles.
 
+Los registros de venta, pago, gasto, producción y ajuste de inventario agrupan sus
+campos por tarea en tarjetas consecutivas. Cada cabecera combina icono de línea,
+título y contexto breve; el grupo central usa `accent-soft`. Separación de (22px),
+cuerpo de (20px), reducido a (16px) en móvil. Producción conserva cuatro grupos
+por su densidad. Las tablas desplazan dentro de su grupo; los costos adicionales
+usan filas divididas, sin otra tarjeta anidada.
+
 ## Elevation & Depth
 
 El espacio de trabajo se organiza con tono, bordes y divisiones; las tarjetas ordinarias no se levantan al pasar el puntero. Diálogo, cajón móvil abierto y confirmación flotante usan sombras suaves. El velo de diálogo desenfoca el fondo (4px). Las fotografías de producto existentes conservan una sombra de recorte tenue (`drop-shadow(0 5px 3px #0000000c)`); no es una sombra general de tarjetas.
@@ -281,6 +288,13 @@ El cajón entra desde la izquierda. Se cierra con botón, fondo exterior, Escape
 El vacío combina icono Inbox de línea en superficie de apoyo, mensaje legible y acción cuando existe; no usa glifos decorativos. Carga, error y confirmación nombran el estado. La confirmación flotante usa texto, icono de validación y `role="status"`; errores usan alerta cuando corresponde. Los permisos se expresan mediante las acciones disponibles, conservando las reglas del producto.
 
 Las transiciones de controles duran (120ms); diálogo, cajón y confirmación usan (220ms) y `cubic-bezier(0.16, 1, 0.3, 1)`. La entrada de diálogo desplaza (10px) y la de confirmación (8px), con opacidad. No se anima cada tarjeta. Con `prefers-reduced-motion: reduce`, se eliminan animaciones y transiciones, el desplazamiento vuelve a automático y el botón no se mueve al pulsar.
+
+El diálogo conserva su contenido al salir: se desvanece con el velo y se desplaza
+(6px) durante (120ms), sin aceptar otra interacción, antes del cierre nativo y la restauración del foco. Una
+apertura nueva interrumpe esa salida. Los formularios seccionados y los estados
+que aparecen al seleccionar datos o agregar costos entran en (220ms), con
+desplazamientos de (4–6px). El movimiento reducido omite estas secuencias y cierra
+inmediatamente; no oculta contenido ni confirmaciones.
 
 ## Do's and Don'ts
 

@@ -283,6 +283,7 @@ test(
     assert.equal(await page.evaluate(() => document.activeElement.closest("dialog") !== null), true);
     await page.screenshot({ path: join(server.evidence, "keyboard-dialog-11.png") });
     await page.keyboard.press("Escape");
+    await page.getByRole("dialog").waitFor({ state: "hidden" });
     assert.equal(await page.getByRole("dialog").count(), 0);
     await page.screenshot({ path: join(server.evidence, "keyboard-return-11.png") });
     assert.deepEqual(metrics.pageErrors, []);

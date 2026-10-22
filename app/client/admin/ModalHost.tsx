@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AppState, User, Sale, OpenModal, Submit } from "@/lib/domain-types";
 import type { ReactNode } from "react";
 import type { Modal } from "@/shared/types/admin";
@@ -31,13 +31,42 @@ export default function ModalHost({
   saleTable: (rows: Sale[]) => ReactNode;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const [retainedModal, setRetainedModal] = useState(modal);
+  if (modal && modal !== retainedModal) setRetainedModal(modal);
+  const visibleModal = modal ?? retainedModal;
   useEffect(() => {
-    if (modal && !dialog.current?.open) dialog.current?.showModal();
-    if (!modal && dialog.current?.open) dialog.current.close();
+    const element = dialog.current;
+    if (!element) return;
+    if (modal) {
+      if (!element.open) element.showModal();
+      return;
+    }
+    if (!element.open) return;
+    const finish = () => {
+      element.close();
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      finish();
+      return;
+    }
+    element.dataset.closing = "true";
+    const exit = element.animate(
+      [
+        { opacity: 1, translate: "0 0" },
+        { opacity: 0, translate: "0 6px" },
+      ],
+      { duration: 120, easing: "ease-out" },
+    );
+    exit.onfinish = finish;
+    return () => {
+      exit.cancel();
+      delete element.dataset.closing;
+    };
   }, [modal]);
   return (
     <dialog
       ref={dialog}
+      onClose={() => setRetainedModal(null)}
       onCancel={(e) => {
         e.preventDefault();
         close();
@@ -47,13 +76,20 @@ export default function ModalHost({
     >
       <div className="modal-head">
         <h2 id="operation-dialog-title">
-          {modal?.kind === "correct" ? "Rectificar venta" : (titles[modal?.type ?? ""] ?? "Detalle")}
+          {visibleModal?.kind === "correct"
+            ? "Rectificar venta"
+            : (titles[visibleModal?.type ?? ""] ?? "Detalle")}
         </h2>
-        <button className="icon-button" aria-label="Cerrar" onClick={close} disabled={busy}>
+        <button
+          className="icon-button"
+          aria-label="Cerrar"
+          onClick={close}
+          disabled={busy || (!!visibleModal && !modal)}
+        >
           <X size={20} />
         </button>
       </div>
-      <div className="modal-body">
+      <div className="modal-body" inert={!!visibleModal && !modal ? true : undefined}>
         {error && (
           <div className="error" role="alert">
             {error}{" "}
@@ -62,7 +98,7 @@ export default function ModalHost({
             </button>
           </div>
         )}
-        {modal && (
+        {visibleModal && (
           <ModalContent
             state={state}
             actor={actor}
@@ -71,7 +107,7 @@ export default function ModalHost({
             run={run}
             close={close}
             busy={busy}
-            modal={modal}
+            modal={visibleModal}
             saleTable={saleTable}
           />
         )}

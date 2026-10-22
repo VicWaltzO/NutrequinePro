@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { AppState, CostInput } from "@/lib/domain-types";
 import { Input, Select, Check } from "@/shared/ui";
+import { Plus } from "lucide-react";
 
 export function CostRows({
   s: state,
@@ -17,7 +18,7 @@ export function CostRows({
         const update = (k: string, v: string | boolean) =>
           setCosts((a) => a.map((x, j) => (i === j ? { ...x, [k]: v } : x)));
         return (
-          <div className="inset" key={i}>
+          <div className="inset production-extra-cost form-state-enter" key={i}>
             <div className="form-grid">
               <Select
                 label="Concepto"
@@ -69,7 +70,7 @@ export function CostRows({
           setCosts((a) => [...a, { category: "FREIGHT", description: "", amount: "", is_paid: false }])
         }
       >
-        ＋ Agregar costo adicional
+        <Plus size={16} aria-hidden="true" /> Agregar costo adicional
       </button>
     </>
   );

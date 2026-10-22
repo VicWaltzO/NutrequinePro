@@ -4,5 +4,6 @@ import "./globals.css";
 import "./session.css";
 import "./workspace.css";
 import "./sale-form.css";
+import "./operation-forms.css";
 
 createRoot(document.getElementById("root")!).render(<App />);

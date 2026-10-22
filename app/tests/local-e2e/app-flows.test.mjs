@@ -99,8 +99,20 @@ test(
       return { ...body, request: result.request().postDataJSON() };
     }
     async function close() {
-      if (await dialog().isVisible())
-        await dialog().getByRole("button", { name: "Cerrar", exact: true }).click();
+      // An operation may already be fading out after a successful save.
+      await page.waitForFunction(() => {
+        const element = document.querySelector("dialog.modal");
+        return (
+          !element.open ||
+          element.hasAttribute("data-closing") ||
+          !element.querySelector('button[aria-label="Cerrar"]').disabled
+        );
+      });
+      await page.locator("dialog.modal").evaluate((element) => {
+        if (element.open && !element.hasAttribute("data-closing"))
+          element.querySelector('button[aria-label="Cerrar"]').click();
+      });
+      await page.locator("dialog.modal").waitFor({ state: "hidden" });
     }
     async function step(id, title, action) {
       let passed = false;

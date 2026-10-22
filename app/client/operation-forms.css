@@ -1,0 +1,154 @@
+/* The task groups follow the same hierarchy and spacing as Registrar venta. */
+.modal-body:has(> .operation-form) {
+  background: var(--canvas);
+}
+.operation-form {
+  min-width: 0;
+  animation: operation-enter var(--duration-normal) var(--ease-out);
+}
+.form-section {
+  min-width: 0;
+  margin-bottom: 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-surface);
+  background: var(--surface);
+}
+.form-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 13px 13px 0 0;
+  background: var(--surface-subtle);
+}
+.form-section-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: 650;
+}
+.form-section-header h3 svg {
+  flex-shrink: 0;
+  color: var(--accent);
+}
+.form-section-meta {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.form-section-accent > .form-section-header {
+  background: var(--accent-soft);
+}
+.form-section-body {
+  min-width: 0;
+  padding: 20px;
+}
+.form-section-body > :last-child,
+.form-section-body > .form-grid > .field:nth-last-child(-n + 2) {
+  margin-bottom: 0;
+}
+.form-section .table-wrap {
+  border: 0;
+  border-radius: 0;
+}
+.form-section .total-line {
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.form-section .production-extra-cost {
+  padding: 20px 0;
+  margin: 20px 0 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+.form-record-value {
+  color: var(--ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.form-empty {
+  padding: 12px 0 20px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.form-table-hint {
+  display: none;
+}
+.form-state-enter {
+  animation: operation-state-enter var(--duration-normal) var(--ease-out);
+}
+
+/* The dialog and its veil leave together before native focus restoration. */
+.modal::backdrop {
+  animation: operation-veil-enter var(--duration-normal) var(--ease-out);
+}
+.modal[data-closing]::backdrop {
+  animation: operation-veil-exit var(--duration-fast) ease-out forwards;
+}
+@keyframes operation-enter {
+  from {
+    opacity: 0.7;
+    translate: 0 6px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes operation-state-enter {
+  from {
+    opacity: 0.4;
+    translate: 0 4px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes operation-veil-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes operation-veil-exit {
+  to {
+    opacity: 0;
+  }
+}
+@media (max-width: 760px) {
+  .form-section-header {
+    padding: 14px 16px;
+    align-items: flex-start;
+  }
+  .form-section-meta {
+    max-width: 140px;
+    text-align: right;
+  }
+  .form-section-body {
+    padding: 16px;
+  }
+  .form-section-body > .form-grid > .field:nth-last-child(2) {
+    margin-bottom: 18px;
+  }
+  .form-table-hint {
+    display: block;
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .operation-form,
+  .form-state-enter,
+  .modal::backdrop,
+  .modal[data-closing]::backdrop {
+    animation: none;
+  }
+}

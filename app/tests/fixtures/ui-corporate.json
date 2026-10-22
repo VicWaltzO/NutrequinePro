@@ -48,10 +48,10 @@
     "VIEWER:config": "d36e697f796ca3efc020850fb3daf6e90f0a9b8eaa972dd6e526df3369b14a0d",
     "modal:sale": "3dda9f47ef91781af92de3b781c4c6b370bfbddf4e07a721eff06d79410fc9c6",
     "modal:sale:correct": "cef134f15d57532c33a432d06a9e07495fdd097ecf74b1690e59a1a58aa758d4",
-    "modal:payment": "2a840c6e7b6531b29f6ee0a42522ef18b01fd964d560d422bd0d03a5238affee",
-    "modal:credit": "ca6cbdb238d87eca45ff75245e84ea4bdb94d570b2764349943c582831b5144e",
-    "modal:production": "3ad4bb5b02277677cc9605f41afda91e08dc00f95f64cbfccd4baa7412f2410e",
-    "modal:reconcile": "f5b1c02c22119a40da105b9cebd9535e311d6b0f6d5dcfa860f30c023af4e668",
+    "modal:payment": "bbe80a5303fe1651345a2f03d1d7004da3f21e52e9c978ae4f23633e229b501a",
+    "modal:credit": "0310fb4a7d7fe6cfe1cfedf4000047cabe75bccf483d01bf6e3be167d8e01b21",
+    "modal:production": "17b6a551bedbbb9ec87c544c6780303f85fbf3e59ed4c930f29727677044d910",
+    "modal:reconcile": "f395bce9cff55e027f4965336a5b44eed7f175a07bd69f8a516268b2287c74a9",
     "modal:production-quantities": "17b495550786c013e9baa2d6e35974e69524b722b620ac2c4dea0a6e859e5f33",
     "modal:formula": "c5b48827797d7c749d7b4882363ee967c858acad011f8d7a549447a9f0511025",
     "modal:customer": "9a5b204b91cabffa4b985bc4b7f97904e6fc108bc5faf333f537bc712082d7e3",
@@ -60,8 +60,8 @@
     "modal:product": "cf51a57455e48505569bd1f5c771e8d3facc0aa3496dd49e7af44ab4dfd36ba8",
     "modal:ingredient": "02044ffea01a05b72b23dc047586c6a8c6d45c79a1ea69f75998d76d4df542ad",
     "modal:user": "5a8a9236029813362a3e86fc7632384efd8b4f6d62e5432e931eacba6493b5f8",
-    "modal:expense": "249ac1bc80f79a50fb53a89808b4bad00193bfee7c8afbf690f68d2283832906",
-    "modal:adjust": "80cb208a231534ddd741dd99d6b7fa25983826246ef519ddb93cbf9aa5d0a29e",
+    "modal:expense": "ab11e57e218d1854dc963b9f4bc0671cba9e18c69954a60cb0e35a065ea3e8ad",
+    "modal:adjust": "348f57f10cdb96e331db14d126424d0c87d25001097c3b817fa68f20b0814edc",
     "modal:config": "0c2e892811c03f76df8806de50890db44534ad6832b058051a1f60322323ed7d",
     "modal:reason": "4ba15cd5c0eddef49c3c705dc2bbc7838095296a5195235c18518b534dbcd412",
     "modal:sale-detail": "2b499981952cd979d570bf1fddb77bb6d5c590b869047630fbdce89288eacba3",
@@ -69,5 +69,6 @@
     "modal:payment-detail": "1b476102a958f8bb1adf3afe466b1e9a0b80d4ba1f060ace5109b208a4de3ba5",
     "modal:customer-detail": "9171332add4d85ae8d24c21a1d6f25d51cf0b593d20d0e7f8cf6b14c00307ba4"
   },
-  "saleFormReview": "Nueva venta y rectificación: Cliente, Productos y Pagos; selector visual; 25 kg editables sin alterar snapshots históricos. Resto de vistas sin cambios."
+  "saleFormReview": "Nueva venta y rectificación: Cliente, Productos y Pagos; selector visual; 25 kg editables sin alterar snapshots históricos. Resto de vistas sin cambios.",
+  "operationFormsReview": "Pago, gasto, producción y ajuste comparten la jerarquía por tarjetas de venta; etiquetas y contratos comerciales conservados. El icono de agregar costo se comparte con conciliación. Apertura/cierre y estados con movimiento breve y alternativa de movimiento reducido."
 }
