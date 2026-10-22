@@ -1008,3 +1008,39 @@ tbody tr:hover {
     transform: none;
   }
 }
+.pdf-download {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 100%;
+}
+.pdf-download button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: normal;
+  text-align: left;
+}
+.pdf-download > span:empty {
+  display: none;
+}
+.pdf-download .field-error {
+  color: var(--danger);
+  font-size: 0.8125rem;
+  max-width: 40ch;
+}
+.detail-actions:has(.pdf-download) {
+  align-items: flex-start;
+}
+@media (max-width: 760px) {
+  .pdf-download button {
+    min-height: 44px;
+  }
+}
+.monthly-export {
+  margin-block: 16px;
+}
+.monthly-export .detail-actions {
+  align-items: end;
+}

@@ -33,7 +33,7 @@ test("Node arquitectura: grafo ejecutable sin ciclos, frameworks de frontend ni 
       const name = node.moduleSpecifier.text;
       assert.doesNotMatch(name, /cloudflare|wrangler|miniflare|vinext|^next|^react/);
       if (!name.startsWith(".")) {
-        assert.ok(name.startsWith("node:") || name === "fastify", name);
+        assert.ok(name.startsWith("node:") || ["fastify", "pdfkit"].includes(name), name);
         continue;
       }
       const path = resolve(dirname(file), name);

@@ -1,6 +1,7 @@
 import type { AppState, Production, OpenModal } from "@/lib/domain-types";
 import { productionSummary } from "@/lib/domain-preview.mjs";
 import { Badge, Table, Empty, money, num } from "@/shared/ui";
+import DownloadPdfButton from "@/features/documentos/components/DownloadPdfButton.tsx";
 
 export default function ProductionList({
   s: state,
@@ -23,6 +24,11 @@ export default function ProductionList({
               <button className="row-link" onClick={() => open("production-detail", x)}>
                 {x.code}
               </button>
+              {x.status === "DRAFT" && (
+                <DownloadPdfButton kind="production" id={x.id}>
+                  Exportar lote PDF
+                </DownloadPdfButton>
+              )}
             </td>
             <td>{x.production_date}</td>
             <td>

@@ -1,6 +1,7 @@
 import { saleSummary, deliveryAvailability } from "@/lib/domain-preview.mjs";
 import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
+import DownloadPdfButton from "@/features/documentos/components/DownloadPdfButton.tsx";
 export default function SaleDetail({ s: state, actor, id, open, run }: DetailProps) {
   const admin = actor.role === "ADMIN";
   const write = actor.role !== "VIEWER";
@@ -34,6 +35,9 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
         ]}
       />
       <div className="detail-actions">
+        <DownloadPdfButton kind="sale" id={id}>
+          Descargar nota de venta PDF
+        </DownloadPdfButton>
         {sale.commercial_status === "DRAFT" && write && (
           <button onClick={() => open("sale", sale, "sale")}>Editar / confirmar borrador</button>
         )}

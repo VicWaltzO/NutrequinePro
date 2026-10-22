@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import DownloadPdfButton from "@/features/documentos/components/DownloadPdfButton.tsx";
 import {
   recordId,
   type AppState,
@@ -144,11 +145,16 @@ export function CustomerDetail({
             {customer.code} · {customer.is_active ? "Activo" : "Inactivo"}
           </p>
         </div>
-        {write && (
-          <button type="button" onClick={() => open("customer", customer)}>
-            Editar cliente
-          </button>
-        )}
+        <div className="detail-actions">
+          <DownloadPdfButton kind="customer" id={id} from={from} to={to}>
+            Exportar historial PDF
+          </DownloadPdfButton>
+          {write && (
+            <button type="button" onClick={() => open("customer", customer)}>
+              Editar cliente
+            </button>
+          )}
+        </div>
       </header>
       <dl className="customer-metrics">
         {[

@@ -93,6 +93,7 @@ export interface ProductionProduct extends Entity {
   formula_id: string;
   formula_snapshot: FormulaIngredient[];
   nuclei_count: number;
+  bags_per_nucleus_snapshot?: number;
   bags_produced: number;
   commercial_weight_kg: number;
   formula_weight_kg: number;

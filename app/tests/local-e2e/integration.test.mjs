@@ -5,15 +5,18 @@ import { build } from "vite";
 import { createHash, randomUUID } from "node:crypto";
 import { cpSync, mkdtempSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { pathToFileURL } from "node:url";
 import { join, relative, isAbsolute, sep } from "node:path";
 import { localAppFixture, appRoot } from "../helpers/local-app-server.mjs";
 import { cashCreditScenario } from "../helpers/regression-scenarios.mjs";
-import { createPortal } from "../../integration/portal.mjs";
 import { packageModule } from "../../scripts/package-module.mjs";
 
 const prefix = "/modulos/nutrequine/";
 const hash = (file) => createHash("sha256").update(readFileSync(file)).digest("hex");
 async function portalFor(server, mode) {
+  const { createPortal } = await import(
+    pathToFileURL(join(server.distribution, "integration/portal.mjs")).href
+  );
   const portal = createPortal({ moduleUrl: server.baseURL, mode, prefix });
   await new Promise((resolve) => portal.listen(0, "127.0.0.1", resolve));
   return { portal, url: `http://127.0.0.1:${portal.address().port}` };
@@ -201,6 +204,15 @@ test(
     for (const file of ["server/config.mts", "database.sqlite", ".env", "../server/passwords.mts"])
       assert.ok([400, 404].includes((await context.request.get(apiRoot + file)).status()), file);
     await cashCreditScenario({ state, run });
+    await page.locator("nav").getByRole("button", { name: "Balance", exact: true }).click();
+    await page.getByLabel("Mes del PDF", { exact: true }).fill("2026-10");
+    const downloaded = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Exportar balance mensual PDF", exact: true }).click();
+    const pdf = await downloaded;
+    assert.equal(await pdf.failure(), null);
+    assert.equal(pdf.suggestedFilename(), "NUTREQUINE_Balance_2026-10.pdf");
+    await pdf.saveAs(join(server.evidence, pdf.suggestedFilename()));
+    await page.locator("nav").getByRole("button", { name: "Resumen", exact: true }).click();
     const beforeRestart = await state();
     await server.stop();
     await server.start();

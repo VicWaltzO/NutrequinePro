@@ -39,6 +39,14 @@ test("portal local: valida perímetro antes de adaptar Host/Origin, limita cuerp
   const upstream = createServer((req, res) => {
     seen.push({ url: req.url, headers: req.headers });
     req.resume();
+    if (req.url === "/api/documents/balance/2026-10.pdf") {
+      res.writeHead(200, {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": 'attachment; filename="NUTREQUINE_Balance_2026-10.pdf"',
+      });
+      res.end("%PDF-synthetic");
+      return;
+    }
     res.writeHead(422, {
       "Content-Type": "application/json",
       "Set-Cookie":
@@ -124,6 +132,10 @@ test("portal local: valida perímetro antes de adaptar Host/Origin, limita cuerp
   assert.equal(seen[0].headers.origin, new URL(moduleUrl).origin);
   assert.equal(seen[0].headers["x-csrf-token"], "opaque-csrf");
   assert.doesNotMatch(seen[0].headers.cookie, /erp_session/);
+  const pdf = await call("/modulos/nutrequine/api/documents/balance/2026-10.pdf");
+  assert.equal(pdf.status, 200);
+  assert.equal(pdf.headers["content-disposition"], 'attachment; filename="NUTREQUINE_Balance_2026-10.pdf"');
+  assert.equal(pdf.body, "%PDF-synthetic");
   const malformed = await call("/modulos/nutrequine/malformed");
   assert.equal(malformed.status, 502);
   assert.equal(malformed.headers["set-cookie"], undefined);
