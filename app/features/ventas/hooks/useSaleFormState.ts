@@ -6,6 +6,7 @@ import { normalize } from "@/shared/domain/core.mjs";
 import { saleFormPreview } from "./sale-form-preview";
 import { day } from "@/shared/lib/format";
 import { find } from "@/shared/lib/find";
+import { createSaleLine, selectSaleProduct } from "./sale-lines";
 
 export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s" | "record" | "kind">) {
   const old: SaleItem[] = record?.id ? saleSummary(state, { id: record.id }).items : [];
@@ -33,7 +34,7 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
           unit_weight_kg: x.unit_weight_kg / 1000,
           unit_price: x.unit_price / 100,
         }))
-      : [{ product_id: "", quantity: 1, unit_weight_kg: "", unit_price: "" }],
+      : [createSaleLine()],
   );
   const [paidAmount, setPaidAmount] = useState<string | null>(null);
   const [quick, setQuick] = useState("");
@@ -43,13 +44,11 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
     setRows((a) =>
       a.map((r, j) => {
         if (i !== j) return r;
-        const n = { ...r, [k]: x };
         if (k === "product_id") {
           const p = find(state, "products", x);
-          n.unit_price = (p?.default_sale_price ?? 0) / 100;
-          n.unit_weight_kg = (p?.standard_bag_weight_kg ?? 0) / 1000;
+          return selectSaleProduct(r, x, p);
         }
-        return n;
+        return { ...r, [k]: x };
       }),
     );
   const { missing, total } = saleFormPreview(

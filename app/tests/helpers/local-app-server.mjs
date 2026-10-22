@@ -17,6 +17,7 @@ export async function localAppFixture({
   minimalEnvironment = false,
   distributionSource,
   frontendDirectory,
+  emptyBusiness = false,
 } = {}) {
   const root = mkdtempSync(join(tmpdir(), "nutrequine-08-test-"));
   const directory = createPrivateDirectory(join(root, "private"));
@@ -24,17 +25,20 @@ export async function localAppFixture({
   const authDatabase = join(directory, "auth.sqlite");
   initializeDatabase(database);
   const admin = { userId: "local-admin-08", displayName: "Administrador sintético 08" };
-  const connection = openSqliteDatabase(database);
-  try {
-    await createStore(() => connection).ensureState(admin);
-  } finally {
-    connection.close();
+  if (!emptyBusiness) {
+    const connection = openSqliteDatabase(database);
+    try {
+      await createStore(() => connection).ensureState(admin);
+    } finally {
+      connection.close();
+    }
   }
   const password = randomBytes(24).toString("base64url");
-  await provisionAuthentication(database, authDatabase, "link", {
+  await provisionAuthentication(database, authDatabase, emptyBusiness ? "new" : "link", {
     user_id: admin.userId,
     login: "admin.local",
     password,
+    name: admin.displayName,
   });
   const probe = net.createServer();
   await new Promise((resolve) => probe.listen(0, "127.0.0.1", resolve));

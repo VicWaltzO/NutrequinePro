@@ -36,6 +36,7 @@ function includeRuntime(target) {
 for (const file of readdirSync(join(destination, "server")))
   if (file.endsWith(".mjs")) includeRuntime(join(destination, "server", file));
 includeRuntime(join(destination, "scripts/sqlite-admin.mjs"));
+includeRuntime(join(destination, "scripts/company-catalog.mjs"));
 cpSync(join(root, "drizzle"), join(destination, "drizzle"), { recursive: true });
 for (const file of readdirSync(join(root, "vendor")))
   if (/LICENSE|NOTICE/i.test(file)) {

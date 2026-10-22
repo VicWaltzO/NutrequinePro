@@ -51,6 +51,10 @@ cobro; conserva los parámetros históricos de cada operación.
   rectificaciones, anulaciones, ajustes y configuración corresponden al administrador.
 - Los cálculos monetarios y de peso usan céntimos y gramos enteros. El peso de
   fórmula y el peso comercial tienen significados distintos y deben conservarse.
+- Cada línea nueva de venta comienza con 25 kg por saco, editables por el usuario.
+  Elegir una presentación conserva un peso introducido expresamente; las ventas
+  guardadas y sus rectificaciones mantienen el peso histórico. Esta preferencia de
+  captura no cambia los parámetros maestros de producción.
 - Las correcciones dejan rastro; los documentos históricos conservan los precios,
   pesos y fórmulas registrados. La rapidez de captura no justifica omitir estas reglas.
 - El balance es estimado: no representa contabilidad formal ni valoración FIFO.

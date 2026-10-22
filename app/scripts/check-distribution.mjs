@@ -51,6 +51,7 @@ inspect(root);
 for (const path of [
   "server/main.mjs",
   "scripts/sqlite-admin.mjs",
+  "scripts/company-catalog.mjs",
   "lib/sqlite/recovery.mjs",
   "public-client/index.html",
 ])

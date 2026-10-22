@@ -46,8 +46,8 @@
     "VIEWER:balance": "4a2ddbd4b53de23e93fdd154518e5be434652215a67013ed32d05f6f095efb8d",
     "VIEWER:customers": "23807da3ce8adda78b1de3cd2c7783b64084d29dd0dd32dfed2b1cb85d9eb99a",
     "VIEWER:config": "d36e697f796ca3efc020850fb3daf6e90f0a9b8eaa972dd6e526df3369b14a0d",
-    "modal:sale": "6b3232364848802e709f8327c1686a1898c989885e7026443f677e555b36ba0d",
-    "modal:sale:correct": "1129bcd05ded41ef6bb67fe11a6b15b4ebeaf6f80b6909e9013b04668e233f28",
+    "modal:sale": "3dda9f47ef91781af92de3b781c4c6b370bfbddf4e07a721eff06d79410fc9c6",
+    "modal:sale:correct": "cef134f15d57532c33a432d06a9e07495fdd097ecf74b1690e59a1a58aa758d4",
     "modal:payment": "2a840c6e7b6531b29f6ee0a42522ef18b01fd964d560d422bd0d03a5238affee",
     "modal:credit": "ca6cbdb238d87eca45ff75245e84ea4bdb94d570b2764349943c582831b5144e",
     "modal:production": "3ad4bb5b02277677cc9605f41afda91e08dc00f95f64cbfccd4baa7412f2410e",
@@ -68,5 +68,6 @@
     "modal:production-detail": "18a64028f6b094d2ecf457160b4f8b9199512f9cf6d9d23bd904924eb345ceed",
     "modal:payment-detail": "1b476102a958f8bb1adf3afe466b1e9a0b80d4ba1f060ace5109b208a4de3ba5",
     "modal:customer-detail": "9171332add4d85ae8d24c21a1d6f25d51cf0b593d20d0e7f8cf6b14c00307ba4"
-  }
+  },
+  "saleFormReview": "Nueva venta y rectificación: Cliente, Productos y Pagos; selector visual; 25 kg editables sin alterar snapshots históricos. Resto de vistas sin cambios."
 }
