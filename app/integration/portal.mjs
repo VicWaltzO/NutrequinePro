@@ -139,6 +139,7 @@ export function createPortal({ moduleUrl, mode = "A", prefix = "/modulos/nutrequ
             const allowed = new Set([
               "content-type",
               "content-length",
+              "content-disposition",
               "cache-control",
               "content-security-policy",
               "x-content-type-options",

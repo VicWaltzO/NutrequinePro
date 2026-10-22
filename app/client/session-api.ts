@@ -79,7 +79,11 @@ export async function logout() {
 
 /** Commercial HTTP transport: browser cookies, in-memory CSRF and no automatic command retries. */
 export async function adminFetch(input: RequestInfo | URL, init: RequestInit = {}) {
-  if (typeof input !== "string" || !["/api/state", "/api/command"].includes(input))
+  const documentRead =
+    typeof input === "string" &&
+    /^\/api\/documents\/(production|sale|customer|balance)\/[^/?#]+\.pdf(?:\?[^#]*)?$/.test(input) &&
+    (!init.method || init.method === "GET");
+  if (typeof input !== "string" || (!documentRead && !["/api/state", "/api/command"].includes(input)))
     throw new ApiError(400, "Ruta comercial inválida.");
   const headers = new Headers(init.headers);
   if (init.method === "POST") headers.set("X-CSRF-Token", csrf);

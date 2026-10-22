@@ -108,6 +108,8 @@ function copyDependency(name, parentRequire) {
     copyDependency(dependency, dependencyRequire);
 }
 copyDependency("fastify", require);
+copyDependency("pdfkit", require);
+cpSync(join(root, "assets/reports"), join(destination, "assets/reports"), { recursive: true });
 console.log(
   `Backend compilado: dist-node/server/main.mjs; ${copied.size} paquetes de runtime, sin infraestructura Cloudflare.`,
 );

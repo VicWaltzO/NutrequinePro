@@ -85,6 +85,24 @@ test("cliente local: prefijo de build conserva sesión, CSRF y el contrato comer
   );
   assert.equal(calls[1].options.body, body);
   assert.equal(calls[1].options.headers.get("X-CSRF-Token"), session.csrf_token);
+  for (const kind of ["production", "sale", "customer", "balance"]) {
+    replies.push(new Response("%PDF-synthetic", { headers: { "Content-Type": "application/pdf" } }));
+    const response = await api.adminFetch(`/api/documents/${kind}/synthetic.pdf`);
+    assert.equal(await response.text(), "%PDF-synthetic");
+    assert.equal(calls.at(-1).url, `/modulos/nutrequine/api/documents/${kind}/synthetic.pdf`);
+    assert.equal(calls.at(-1).options.credentials, "same-origin");
+    assert.equal(calls.at(-1).options.cache, "no-store");
+  }
+  const count = calls.length;
+  await assert.rejects(
+    api.adminFetch("/api/documents/sale/synthetic.pdf", { method: "POST" }),
+    (error) => error.status === 400,
+  );
+  await assert.rejects(
+    api.adminFetch("/api/documents/private/synthetic.pdf"),
+    (error) => error.status === 400,
+  );
+  assert.equal(calls.length, count, "Una ruta o método inválido no debe llegar a fetch");
 });
 test("cliente local: distingue permisos, sesión expirada, errores de disponibilidad y logout", async () => {
   const { api, calls, replies } = apiHarness();

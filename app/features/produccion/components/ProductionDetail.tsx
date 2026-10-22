@@ -2,6 +2,7 @@ import { productionSummary } from "@/lib/domain-preview.mjs";
 import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
 import { ProductName } from "@/shared/ui/ProductMarker";
+import DownloadPdfButton from "@/features/documentos/components/DownloadPdfButton.tsx";
 export default function ProductionDetail({ s: state, actor, id, open, run }: DetailProps) {
   const admin = actor.role === "ADMIN";
   const write = actor.role !== "VIEWER";
@@ -33,6 +34,9 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
         <p className="warning">Producción sin conciliar. Complete los cobros reales para cerrar.</p>
       )}
       <div className="detail-actions">
+        <DownloadPdfButton kind="production" id={id}>
+          Exportar lote PDF
+        </DownloadPdfButton>
         {p.status === "DRAFT" && write && <button onClick={() => open("production", p)}>Editar lote</button>}
         {p.status === "DRAFT" && admin && (
           <button className="primary" onClick={() => run("PRODUCTION_CONFIRM", { id })}>

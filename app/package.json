@@ -29,6 +29,7 @@
   "dependencies": {
     "fastify": "5.12.7",
     "lucide-react": "^1.31.0",
+    "pdfkit": "0.20.2",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },
@@ -36,6 +37,7 @@
     "@eslint/js": "9.39.4",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
+    "@types/pdfkit": "0.17.7",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",

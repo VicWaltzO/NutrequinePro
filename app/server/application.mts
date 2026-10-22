@@ -17,6 +17,8 @@ import { validateConfig } from "./config.mts";
 import { tokenHash } from "./passwords.mts";
 import { cookieValue, installHttpSecurity, sessionCookie, verifyCsrf } from "./http-security.mts";
 import { serveFrontend } from "./frontend.mts";
+import { documentModel, renderReport } from "./reports.mts";
+import { canExportDocuments } from "../features/documentos/domain/common.ts";
 
 function objectBody(request: FastifyRequest): Record<string, unknown> {
   if (!request.body || typeof request.body !== "object" || Array.isArray(request.body))
@@ -168,6 +170,27 @@ export async function createLocalServer(
         const { state, session } = await authorized(request);
         return { state, actor: session.actor };
       }),
+    );
+    server.get<{ Params: { kind: string; id: string }; Querystring: Record<string, unknown> }>(
+      "/api/documents/:kind/:id.pdf",
+      (request, reply) =>
+        serialized(async () => {
+          const { state, session } = await authorized(request);
+          if (!canExportDocuments(session.actor))
+            throw new HttpError(403, "No dispone de permisos para exportar documentos.");
+          const report = documentModel(
+            state,
+            request.params.kind,
+            request.params.id,
+            request.query,
+            new Date(dependencies.clock?.() ?? Date.now()).toISOString(),
+          );
+          const bytes = await renderReport(report);
+          return reply
+            .type("application/pdf")
+            .header("Content-Disposition", `attachment; filename="${report.filename}"`)
+            .send(bytes);
+        }),
     );
     server.post("/api/command", (request) =>
       serialized(async () => {
