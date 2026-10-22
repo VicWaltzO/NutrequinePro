@@ -52,14 +52,18 @@ export function CustomerDetail({
   const inRange = (date: string) =>
     (!from || businessDate(date) >= from) && (!to || businessDate(date) <= to);
   const allSales = state.sales.filter((sale) => sale.customer_id === id);
-  const sales = allSales
-    .filter((sale) => inRange(sale.sale_date) && (!status || sale.commercial_status === status))
+  const periodSales = allSales
+    .filter((sale) => inRange(sale.sale_date))
     .sort((a, b) => b.sale_date.localeCompare(a.sale_date));
+  const sales = periodSales.filter((sale) => !status || sale.commercial_status === status);
   const payments = state.payments
     .filter((payment) => payment.customer_id === id && inRange(payment.payment_date))
     .sort((a, b) => b.payment_date.localeCompare(a.payment_date));
   const effectiveSales = sales.filter((sale) => !["DRAFT", "CANCELLED"].includes(sale.commercial_status));
-  const periodSold = effectiveSales.reduce((sum, sale) => sum + saleSummary(state, sale).total, 0);
+  const filteredSold = effectiveSales.reduce((sum, sale) => sum + saleSummary(state, sale).total, 0);
+  const periodSold = periodSales
+    .filter((sale) => !["DRAFT", "CANCELLED"].includes(sale.commercial_status))
+    .reduce((sum, sale) => sum + saleSummary(state, sale).total, 0);
   const periodReceived = payments.reduce(
     (sum, payment) => sum + (paymentSummary(state, payment).reversed ? 0 : payment.total_amount),
     0,
@@ -215,14 +219,14 @@ export function CustomerDetail({
               Los indicadores superiores son históricos y los saldos corresponden al estado actual. Los cobros
               del periodo se cuentan una sola vez, independientemente de sus aplicaciones.
             </p>
-            {!sales.length && !payments.length && <p>No hay actividad en el periodo seleccionado.</p>}
+            {!periodSales.length && !payments.length && <p>No hay actividad en el periodo seleccionado.</p>}
           </section>
         )}
         {tab === "sales" && (
           <section aria-label="Ventas del cliente">
             <p>
               {effectiveSales.length} ventas efectivas · Total del periodo:{" "}
-              <strong>{money(periodSold)}</strong>
+              <strong>{money(filteredSold)}</strong>
             </p>
             {sales.length ? saleTable(sales) : <p>No hay ventas con estos filtros.</p>}
           </section>

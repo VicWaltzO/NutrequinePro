@@ -192,6 +192,31 @@ test(
     current = await state();
     const expected = customerProfile(current, scenario.customer);
     await expect(dialog.locator(".customer-metrics dd").nth(4)).toHaveText(String(expected.count));
+    const periodTotal = dialog.locator(".customer-summary p strong").first();
+    const unfilteredTotal = await periodTotal.textContent();
+    assert.ok(expected.sold > 0);
+    for (const status of ["DRAFT", "CANCELLED", "CONFIRMED", "RECTIFIED"]) {
+      await profileTabs.getByRole("button", { name: "Ventas", exact: true }).click();
+      await dialog.getByLabel("Estado comercial", { exact: true }).selectOption(status);
+      if (["DRAFT", "CANCELLED"].includes(status)) {
+        await expect(dialog.getByRole("region", { name: "Ventas del cliente" })).toContainText(
+          "0 ventas efectivas",
+        );
+      }
+      await profileTabs.getByRole("button", { name: "Resumen", exact: true }).click();
+      await expect(dialog.getByLabel("Estado comercial", { exact: true })).toHaveCount(0);
+      await expect(periodTotal).toHaveText(unfilteredTotal);
+      await expect(
+        dialog.getByText("No hay actividad en el periodo seleccionado.", { exact: true }),
+      ).toHaveCount(0);
+    }
+    await dialog.getByLabel("Desde", { exact: true }).fill("2026-11-01");
+    await expect(periodTotal).not.toHaveText(unfilteredTotal);
+    await expect(
+      dialog.getByText("No hay actividad en el periodo seleccionado.", { exact: true }),
+    ).toBeVisible();
+    await dialog.getByLabel("Desde", { exact: true }).fill("");
+    await expect(periodTotal).toHaveText(unfilteredTotal);
     await profileTabs.getByRole("button", { name: "Cobros y aplicaciones", exact: true }).click();
     await expect(dialog.getByRole("cell", { name: /^Revertido · aplicaciones sin efecto/ })).toBeVisible();
     assert.equal(await dialog.locator("tbody tr").count(), 1);
@@ -272,7 +297,7 @@ test(
       .count()
       .then((count) => assert.equal(count, 0));
     await page.getByRole("button", { name: "Sedes", exact: true }).click();
-    assert.equal(await page.getByRole("button", { name: "Nueva sede", exact: true }).count(), 1);
+    await expect(page.getByRole("button", { name: "Nueva sede", exact: true })).toBeVisible();
     await navigate("sales");
     await capture("navigation-desktop-dark");
     await page.getByRole("button", { name: "Nueva venta", exact: true }).click();
