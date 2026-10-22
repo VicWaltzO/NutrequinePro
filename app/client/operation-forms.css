@@ -8,7 +8,7 @@
 }
 .form-section {
   min-width: 0;
-  margin-bottom: 22px;
+  margin-bottom: 26px;
   border: 1px solid var(--border);
   border-radius: var(--radius-surface);
   background: var(--surface);
@@ -123,6 +123,9 @@
   }
 }
 @media (max-width: 760px) {
+  .form-section {
+    margin-bottom: 18px;
+  }
   .form-section-header {
     padding: 14px 16px;
     align-items: flex-start;

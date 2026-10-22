@@ -1,23 +1,27 @@
 import { useProductionFormState } from "../hooks/useProductionFormState";
-import { Input, Select, Check, Table, money, kg } from "@/shared/ui";
+import { Input, Select, Check, money, kg } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import type { FormProps } from "@/shared/types/forms";
 import { CostRows } from "./CostRows";
 import { Boxes, CalendarDays, Coins, Wheat } from "lucide-react";
 import { FormSection } from "@/shared/ui/FormSection";
+import { ProductName } from "@/shared/ui/ProductMarker";
+import { ProductionIngredients } from "./ProductionIngredients";
 export function ProductionForm({ s: state, record, submit, close, busy }: FormProps) {
   const {
     v: values,
     set,
     counts,
     setCounts,
-    adjust,
     costs,
     setCosts,
     bags,
     weight,
     nuclei,
     ingredients,
+    ingredientInputs,
+    errors,
+    quantityError,
     estimated,
     real,
     adj,
@@ -33,7 +37,7 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
           products: Object.entries(counts)
             .filter(([, n]) => Number(n) > 0)
             .map(([product_id, nuclei_count]) => ({ product_id, nuclei_count })),
-          ingredients: Object.values(adjust),
+          ingredients: ingredientInputs,
           costs,
         });
       }}
@@ -63,7 +67,11 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
             .map((x) => (
               <Input
                 key={x.id}
-                label={`${x.name} · ${x.bags_per_nucleus} sacos / núcleo`}
+                label={
+                  <>
+                    <ProductName name={x.name} /> · {x.bags_per_nucleus} sacos / núcleo
+                  </>
+                }
                 type="number"
                 min="0"
                 step="1"
@@ -72,6 +80,11 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
               />
             ))}
         </div>
+        {quantityError && (
+          <p className="error" role="alert">
+            {quantityError}
+          </p>
+        )}
         <div className="summary-strip">
           <strong>{nuclei} núcleos</strong>
           <span>{bags} sacos</span>
@@ -79,51 +92,19 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
           <span>{kg(ingredients.reduce((a, x) => a + x.w, 0))} kg de fórmula</span>
         </div>
       </FormSection>
-      <FormSection title="Insumos consolidados" icon={Wheat} meta={`${ingredients.length} insumos`}>
+      <FormSection
+        title="Insumos consolidados"
+        icon={Wheat}
+        meta={`${ingredients.length} insumos · ${ingredients.filter((row) => !row.a.is_paid).length} pendientes`}
+      >
         {ingredients.length ? (
           <div className="form-state-enter">
             <p className="form-table-hint">Desliza la tabla para consultar todas las columnas.</p>
-            <Table
-              heads={["Insumo", "Kg", "S/ por kg", "Teórico", "Descuento S/", "Cobro real S/", "Pagado"]}
-            >
-              {ingredients.map(({ ing, w, gross, a }) => (
-                <tr key={ing.id}>
-                  <td>{ing.name}</td>
-                  <td>{kg(w)}</td>
-                  <td>{money(ing.current_price_per_kg)}</td>
-                  <td>{money(gross)}</td>
-                  <td>
-                    <input
-                      aria-label={`Descuento ${ing.name}`}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={a.discount_amount ?? ""}
-                      onChange={(e) => adj(ing.id, "discount_amount", e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      aria-label={`Cobro real ${ing.name}`}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      placeholder="Pendiente"
-                      value={a.actual_charge ?? ""}
-                      onChange={(e) => adj(ing.id, "actual_charge", e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      aria-label={`Pagado ${ing.name}`}
-                      type="checkbox"
-                      checked={!!a.is_paid}
-                      onChange={(e) => adj(ing.id, "is_paid", e.target.checked)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </Table>
+            <p className="production-table-help">
+              El precio se aplica solo a este lote. El cobro automático sigue el teórico neto; «Pagado» indica
+              si ya se abonó.
+            </p>
+            <ProductionIngredients rows={ingredients} update={adj} />
           </div>
         ) : (
           <p className="form-empty" role="status">
@@ -168,7 +149,7 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
             Estimado <strong>{money(estimated)}</strong>
           </span>
           <span>
-            {ingredients.every((x) => x.a.actual_charge !== undefined && x.a.actual_charge !== "")
+            {ingredients.every((x) => x.a.actual_charge != null && x.a.actual_charge !== "")
               ? "Real"
               : "Real parcial"}{" "}
             <strong>{money(real)}</strong>
@@ -187,6 +168,7 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
       </FormSection>
       <Footer
         busy={busy}
+        disabled={errors.length > 0}
         close={close}
         label={values.confirm ? "Confirmar producción" : "Guardar lote a producir"}
       />

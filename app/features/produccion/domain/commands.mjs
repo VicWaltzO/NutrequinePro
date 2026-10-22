@@ -79,6 +79,23 @@ export function productionConfirm(context) {
   const { s: state, p: payload, productionRows, confirmProduction } = context;
   let result = null;
   const production = pick(state, "productions", payload.id);
+  const input = structuredClone(production.input_snapshot);
+  // Old drafts may predate explicit lot prices; confirmation retains their stored prices.
+  const historical = state.productionIngredients.filter(
+    (row) => row.production_id === production.id && row.is_current !== false,
+  );
+  input.ingredients = [...(input.ingredients ?? [])];
+  for (const row of historical) {
+    const adjustment = input.ingredients.find((item) => item.ingredient_id === row.ingredient_id);
+    if (adjustment) {
+      if (adjustment.price_per_kg === undefined) adjustment.price_per_kg = row.historical_price_per_kg / 100;
+    } else {
+      input.ingredients.push({
+        ingredient_id: row.ingredient_id,
+        price_per_kg: row.historical_price_per_kg / 100,
+      });
+    }
+  }
   for (const t of ["productionProducts", "productionIngredients", "productionCosts"])
     state[t]
       .filter(
@@ -89,7 +106,7 @@ export function productionConfirm(context) {
       )
       .forEach((x) => (x.is_current = false));
   requireValue(production.status === "DRAFT", "Producción ya confirmada.");
-  productionRows(production, production.input_snapshot);
+  productionRows(production, input);
   confirmProduction(production);
   result = production.id;
   return result;

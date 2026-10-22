@@ -1,6 +1,7 @@
 import { productionSummary } from "@/lib/domain-preview.mjs";
 import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
+import { ProductName } from "@/shared/ui/ProductMarker";
 export default function ProductionDetail({ s: state, actor, id, open, run }: DetailProps) {
   const admin = actor.role === "ADMIN";
   const write = actor.role !== "VIEWER";
@@ -65,7 +66,9 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
         <Table heads={["Producto", "Versión", "Núcleos", "Sacos", "Kg comerciales", "Kg fórmula"]}>
           {a.products.map((x) => (
             <tr key={x.id}>
-              <td>{find(state, "products", x.product_id)?.name}</td>
+              <td>
+                <ProductName name={find(state, "products", x.product_id)?.name ?? ""} />
+              </td>
               <td>v{find(state, "formulas", x.formula_id)?.version}</td>
               <td>{x.nuclei_count}</td>
               <td>{x.bags_produced}</td>
