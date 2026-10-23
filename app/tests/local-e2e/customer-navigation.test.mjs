@@ -136,9 +136,17 @@ test(
     );
     await page.getByRole("button", { name: "Borradores", exact: true }).click();
     await settle();
+    const animationsBeforeBack = await page.evaluate(() => window.subtabAnimations.length);
     await page.goBack();
     await expect(page.locator('main .tabs [aria-current="page"]')).toHaveText("Ventas futuras");
-    const backward = await page.evaluate(() => window.subtabAnimations.at(-1).frames[0].transform);
+    // aria-current can render before the content transition commits.
+    await expect
+      .poll(() => page.evaluate(() => window.subtabAnimations.length))
+      .toBe(animationsBeforeBack + 1);
+    const backward = await page.evaluate(
+      (index) => window.subtabAnimations[index].frames[0].transform,
+      animationsBeforeBack,
+    );
     assert.equal(backward, "translateX(-16px)");
     await settle();
     await page.goForward();

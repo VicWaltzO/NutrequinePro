@@ -129,3 +129,13 @@ El commit de T01 se identificará en la entrega y mediante `git log --oneline b8
 Reversión: revertir el commit de código de T01 y sus pruebas asociadas; no hay cambios de esquema o transformaciones de datos que revertir. Las entradas válidas guardadas conservan el formato existente. Los datos inválidos que pudieran existir previamente no se limpian ni reescriben en esta tarea.
 
 H01 se considera corregido para nuevas ejecuciones de CUSTOMER_SAVE solo después de su reproducción previa y de los resultados finales anteriores. La aceptación de T01 no cierra T02, T03 ni el gate T19 y no constituye aprobación de publicación en Internet.
+
+## Seguimiento de CI y sincronización E2E
+
+La ejecución GitHub Actions 39981305332 aprobó verify, pero falló dos de las 29 pruebas E2E en Ubuntu: catálogo empresarial leyó una lista vacía antes de renderizar la tabla y navegación leyó la animación anterior al volver por historial. No se consideran resultados aprobados.
+
+Se sustituyó la lectura inmediata del catálogo por una aserción Playwright que espera las primeras siete celdas y comprueba sus mismos valores. La prueba de historial espera exactamente una animación nueva y comprueba su dirección negativa. No se añadieron pausas fijas, reintentos de suites ni omisiones; no cambia el código de aplicación ni los contratos de T01.
+
+El PR documental T00 (#8) se dirige a main y conserva la referencia al commit histórico probado. Su integración es independiente del código T01.
+
+Validación local posterior a la corrección: npm.cmd run verify aprobado (227 pruebas, tres chequeos TypeScript, lint, formato, build y distribución); npm.cmd run test:e2e con Chrome aprobado (29 pruebas, cero fallos, cancelaciones u omisiones; 746,37 segundos). git diff --check aprobado. La confirmación en Ubuntu corresponde a la nueva ejecución de GitHub Actions del commit de seguimiento.
