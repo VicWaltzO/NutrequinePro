@@ -5,6 +5,7 @@ import type {
   NumericInput,
   CostInput,
   ProductionIngredient,
+  PresentationSnapshot,
 } from "@/lib/domain-types";
 
 export type FormProps = {
@@ -33,7 +34,7 @@ export interface SaleFields extends PaymentFieldsValue {
   production_id: string;
   payment_date?: string;
 }
-export interface SaleLine {
+export interface SaleLine extends PresentationSnapshot {
   original_item_id?: string;
   product_id: string;
   quantity: NumericInput;
@@ -81,7 +82,12 @@ export interface SimpleFields {
   notes?: string;
   confirm_duplicate?: boolean;
   category?: string;
-  default_sale_price?: NumericInput;
+  presentation_unit?: string;
+  unit_weight_grams?: NumericInput;
+  weight_policy?: string;
+  stock_entry_mode?: string;
+  image?: string | null;
+  default_sale_price?: NumericInput | null;
   standard_bag_weight_kg?: NumericInput;
   bags_per_nucleus?: NumericInput;
   commercial_weight_per_nucleus_kg?: NumericInput;

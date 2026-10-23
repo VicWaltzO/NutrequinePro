@@ -11,10 +11,12 @@ import {
 } from "../../../shared/domain/core.mjs";
 import { stock } from "../../inventario/domain/stock.mjs";
 import { productionSummary } from "./summary.mjs";
+import { isNucleusProduct } from "../../../shared/domain/presentation.mjs";
 export function formulaSave(context) {
   const { s: state, p: payload, add } = context;
   let result = null;
   const product = pick(state, "products", payload.product_id);
+  requireValue(isNucleusProduct(product), "El producto de ingreso directo no admite fórmula por núcleo.");
   requireValue(payload.ingredients?.length > 0, "Agregue insumos.");
   requireValue(
     new Set(payload.ingredients.map((x) => x.ingredient_id)).size === payload.ingredients.length,

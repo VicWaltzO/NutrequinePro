@@ -2,6 +2,7 @@ import type { AppState, NumericInput, CostInput } from "@/lib/domain-types";
 import type { ProductionValues } from "@/shared/types/forms";
 import { resolveProductionIngredient } from "./production-ingredient-input.ts";
 import type { ProductionIngredientDraft } from "./production-ingredient-input";
+import { isNucleusProduct } from "../../../shared/domain/presentation.mjs";
 
 // These estimates mirror editable input, not the confirmed historical snapshot.
 export function productionFormPreview(
@@ -17,6 +18,7 @@ export function productionFormPreview(
   let nuclei = 0;
   let quantityError = "";
   for (const product of state.products) {
+    if (!isNucleusProduct(product)) continue;
     const nucleiCount = Number(counts[product.id] ?? 0);
     if (!Number.isSafeInteger(nucleiCount) || nucleiCount < 0 || nucleiCount > 1e7) {
       quantityError = "Los núcleos deben ser cantidades enteras entre 0 y 10 000 000.";
@@ -24,8 +26,8 @@ export function productionFormPreview(
     }
     if (nucleiCount <= 0) continue;
     nuclei += nucleiCount;
-    bags += nucleiCount * product.bags_per_nucleus;
-    weight += nucleiCount * product.commercial_weight_per_nucleus_kg;
+    bags += nucleiCount * (product.bags_per_nucleus ?? 0);
+    weight += nucleiCount * (product.commercial_weight_per_nucleus_kg ?? 0);
     const formula = state.formulas.find((x) => x.product_id === product.id && x.is_active);
     state.formulaIngredients
       .filter((x) => x.formula_id === formula?.id)

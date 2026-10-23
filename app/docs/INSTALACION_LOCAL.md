@@ -241,3 +241,11 @@ Consultar [respaldo y restauración](RESPALDO_RESTAURACION.md),
 [arquitectura](ARQUITECTURA.md) y [desarrollo](GUIA_DESARROLLO.md). No sustituir una
 base por una copia sin verificar su manifiesto, relaciones e historial; no copiar
 manualmente una base activa ni inicializar silenciosamente una ruta ausente.
+
+## Presentaciones comerciales y suplementos
+
+La actualización de sacos y frascos añade metadatos al JSON existente sin migración
+SQL ni reescritura histórica. El alta de CascoPlus+, su fotografía, precio y
+existencias se realiza por el administrador mediante el canal privado documentado
+en [Presentaciones comerciales](PRESENTACIONES_COMERCIALES.md). El arranque no
+inserta suplementos ni modifica los datos de una instalación empresarial.

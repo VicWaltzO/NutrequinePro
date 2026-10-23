@@ -125,8 +125,8 @@ test(
       const cells = await row.getByRole("cell").allTextContents();
       assert.deepEqual(cells.slice(0, 7), [
         product.name,
-        money(product.default_sale_price),
-        kg(product.standard_bag_weight_kg),
+        money(product.default_sale_price) + " / saco",
+        "saco · " + kg(product.standard_bag_weight_kg) + " kg · Variable",
         String(product.bags_per_nucleus),
         kg(product.commercial_weight_per_nucleus_kg),
         product.is_sellable ? "Habilitada" : "Consumo interno",
@@ -204,7 +204,7 @@ test(
       .getByRole("button", { name: "Editar", exact: true })
       .click();
     let dialog = page.getByRole("dialog");
-    await dialog.getByLabel("Precio base S/", { exact: true }).fill("74.01");
+    await dialog.getByLabel("Precio base S/ por saco", { exact: true }).fill("74.01");
     await submit(dialog.getByRole("button", { name: "Guardar", exact: true }), "PRODUCT_SAVE");
     await nav("Producción");
     await page.getByRole("button", { name: "Insumos", exact: true }).click();

@@ -1,6 +1,7 @@
 import { requireValue, scaled, positiveInt, date, pick, sum } from "../../../shared/domain/core.mjs";
 import { saleSummary } from "./summary.mjs";
 import { stock } from "../../inventario/domain/stock.mjs";
+import { isNucleusProduct, presentationSnapshot } from "../../../shared/domain/presentation.mjs";
 export function saleSave(context) {
   const {
     s: state,
@@ -67,32 +68,37 @@ export function saleSave(context) {
       is_active: true,
     });
   if (payload.create_production) {
-    const production = add("productions", {
-      code: code("productions", "PR"),
-      status: "DRAFT",
-      production_date: sale.sale_date,
-      responsible_user_id: actor.id,
-      notes: `Planificado para ${sale.code}`,
-    });
     const grouped = {};
-    rows.forEach((x) => (grouped[x.product_id] = (grouped[x.product_id] ?? 0) + x.quantity));
-    const input = {
-      products: Object.entries(grouped).map(([id, quantity]) => ({
-        product_id: id,
-        nuclei_count: Math.max(
-          1,
-          Math.ceil(
-            Math.max(0, quantity - stock(state, id).quantity) / pick(state, "products", id).bags_per_nucleus,
+    rows
+      .filter((x) => isNucleusProduct(pick(state, "products", x.product_id)))
+      .forEach((x) => (grouped[x.product_id] = (grouped[x.product_id] ?? 0) + x.quantity));
+    if (Object.keys(grouped).length) {
+      const production = add("productions", {
+        code: code("productions", "PR"),
+        status: "DRAFT",
+        production_date: sale.sale_date,
+        responsible_user_id: actor.id,
+        notes: `Planificado para ${sale.code}`,
+      });
+      const input = {
+        products: Object.entries(grouped).map(([id, quantity]) => ({
+          product_id: id,
+          nuclei_count: Math.max(
+            1,
+            Math.ceil(
+              Math.max(0, quantity - stock(state, id).quantity) /
+                pick(state, "products", id).bags_per_nucleus,
+            ),
           ),
-        ),
-      })),
-    };
-    productionRows(production, input);
-    add("saleProductionLinks", {
-      sale_id: sale.id,
-      production_id: production.id,
-      notes: "Creado desde venta futura",
-    });
+        })),
+      };
+      productionRows(production, input);
+      add("saleProductionLinks", {
+        sale_id: sale.id,
+        production_id: production.id,
+        notes: "Creado desde venta futura",
+      });
+    }
   }
   if (payload.production_id) {
     pick(state, "productions", payload.production_id);
@@ -176,6 +182,7 @@ export function saleCancel(context) {
       const weight = row.total_weight_kg - sum(returned, (x) => x.weight_kg);
       if (quantity)
         movement({
+          ...presentationSnapshot(row, true),
           item_type: "PRODUCT",
           item_id: row.product_id,
           movement_type: "CANCELLATION_REVERSAL",
@@ -248,6 +255,7 @@ export function returnCreate(context) {
       weight_kg: weight,
     });
     movement({
+      ...presentationSnapshot(saleItem, true),
       date: returnRecord.return_date,
       item_type: "PRODUCT",
       item_id: saleItem.product_id,

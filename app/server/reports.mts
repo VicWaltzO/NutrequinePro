@@ -100,13 +100,13 @@ export async function renderReport(report: Report) {
       t("ANULADA · " + (report.cancellationReason || "Sin efecto comercial vigente."));
     if (report.hasCorrections) t("Incluye rectificaciones. Los importes reflejan la versión vigente.");
     table(
-      ["Producto", "Sacos", "Kg / saco", "Kg", "Precio / saco", "Subtotal"],
+      ["Producto", "Cantidad", "Kg / unidad", "Kg", "Precio / unidad", "Subtotal"],
       report.items.map((row) => [
         row.name,
-        num(row.bags),
-        kg(row.bagWeight),
+        num(row.bags) + " " + (row.bags === 1 ? row.unit : row.units),
+        kg(row.bagWeight) + " / " + row.unit,
         kg(row.weight),
-        money(row.price),
+        money(row.price) + " / " + row.unit,
         money(row.subtotal),
       ]),
       [2.5, 0.8, 1, 1, 1.4, 1.4],

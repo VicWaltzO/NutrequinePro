@@ -1,4 +1,5 @@
-import { Select } from "@/shared/ui";
+import { Select, Input, kg } from "@/shared/ui";
+import { productPresentation, unitLabels } from "@/shared/domain/presentation.mjs";
 import { ArrowLeftRight, ClipboardList, Package } from "lucide-react";
 import { FormSection } from "@/shared/ui/FormSection";
 import type { SimpleFieldProps } from "@/shared/types/simple-fields";
@@ -8,6 +9,9 @@ export default function InventoryAdjustmentFields({
   set,
   input,
 }: Pick<SimpleFieldProps, "s" | "v" | "set" | "input">) {
+  const product = state.products.find((x) => x.id === v.product_id);
+  const presentation = productPresentation(product);
+  const fixed = presentation.weight_policy === "FIXED";
   return (
     <>
       <FormSection title="Producto" label="Producto y fecha" icon={Package} meta="Datos del ajuste">
@@ -41,8 +45,23 @@ export default function InventoryAdjustmentFields({
               { id: "OUT", name: "Salida" },
             ]}
           />
-          {input("quantity", "Cantidad de sacos", "number")}
-          {input("weight_kg", "Peso total kg", "number")}
+          <Input
+            label={"Cantidad de " + unitLabels(product).plural}
+            type="number"
+            min="1"
+            step="1"
+            required
+            value={v.quantity}
+            onChange={(x) => set("quantity", x)}
+          />
+          {fixed ? (
+            <p className="notice">
+              Peso total: {kg(Number(v.quantity || 0) * presentation.unit_weight_grams)} kg ·{" "}
+              {kg(presentation.unit_weight_grams)} kg / {unitLabels(product).singular}
+            </p>
+          ) : (
+            input("weight_kg", "Peso total kg", "number")
+          )}
         </div>
       </FormSection>
       <FormSection title="Motivo" label="Motivo del ajuste" icon={ClipboardList} meta="Obligatorio">

@@ -3,6 +3,7 @@ import type { AppState, OpenModal, User } from "@/lib/domain-types";
 import { changeTheme } from "@/lib/browser-preferences.mjs";
 import { Table, kg, label, money, stamp } from "@/shared/ui";
 import AuthenticatedId from "@/shared/ui/AuthenticatedId";
+import { unitLabels, productPresentation, isNucleusProduct } from "@/shared/domain/presentation.mjs";
 export default function Configuration({
   s: state,
   actor,
@@ -27,7 +28,7 @@ export default function Configuration({
             heads={[
               "Producto",
               "Precio base",
-              "Kg / saco",
+              "Presentación",
               "Sacos / núcleo",
               "Kg / núcleo",
               "Venta",
@@ -38,10 +39,17 @@ export default function Configuration({
             {state.products.map((p) => (
               <tr key={p.id}>
                 <td>{p.name}</td>
-                <td>{money(p.default_sale_price)}</td>
-                <td>{kg(p.standard_bag_weight_kg)}</td>
-                <td>{p.bags_per_nucleus}</td>
-                <td>{kg(p.commercial_weight_per_nucleus_kg)}</td>
+                <td>
+                  {p.default_sale_price == null
+                    ? "Pendiente de configurar"
+                    : money(p.default_sale_price) + " / " + unitLabels(p).singular}
+                </td>
+                <td>
+                  {unitLabels(p).singular} · {kg(productPresentation(p).unit_weight_grams)} kg ·{" "}
+                  {productPresentation(p).weight_policy === "FIXED" ? "Fijo" : "Variable"}
+                </td>
+                <td>{isNucleusProduct(p) ? p.bags_per_nucleus : "Ingreso directo"}</td>
+                <td>{isNucleusProduct(p) ? kg(p.commercial_weight_per_nucleus_kg ?? 0) : "—"}</td>
                 <td>{p.is_sellable ? "Habilitada" : "Consumo interno"}</td>
                 <td>{p.is_active ? "Activo" : "Inactivo"}</td>
                 <td>{admin && <button onClick={() => open("product", p)}>Editar</button>}</td>

@@ -1,4 +1,5 @@
 import { text, today } from "../shared/domain/core.mjs";
+import { presentationSnapshot } from "../shared/domain/presentation.mjs";
 export function createCommandContext(state, type, payload, actor, clock) {
   const uid = () => crypto.randomUUID();
   const add = (t, v) => {
@@ -8,7 +9,14 @@ export function createCommandContext(state, type, payload, actor, clock) {
   };
   const code = (t, prefix) => `${prefix}-${String(state[t].length + 1).padStart(6, "0")}`;
   const reason = () => text(payload.reason, "Motivo");
-  const movement = (v) => add("inventoryMovements", { date: payload.date ?? today(), ...v });
+  const movement = (v) =>
+    add("inventoryMovements", {
+      date: payload.date ?? today(),
+      ...(v.item_type === "PRODUCT"
+        ? presentationSnapshot(state.products.find((x) => x.id === v.item_id))
+        : {}),
+      ...v,
+    });
   const correction = (entity_type, entity_id, old_value, new_value, why) => {
     const c = add("corrections", {
       code: code("corrections", "RC"),

@@ -3,6 +3,7 @@ import { requireValue, sum } from "../../../shared/domain/core.mjs";
 import { productionSummary } from "../../produccion/domain/summary.mjs";
 import { saleSummary } from "../../ventas/domain/summary.mjs";
 import { baseReport } from "./common.ts";
+import { unitLabels } from "../../../shared/domain/presentation.mjs";
 
 export function productionReport(state: AppState, id: string, generatedAt: string) {
   const production = state.productions.find((record) => record.id === id);
@@ -77,6 +78,8 @@ export function saleReport(state: AppState, id: string, generatedAt: string) {
     items: summary.items.map((row: AppState["saleItems"][number]) => ({
       name: state.products.find((product) => product.id === row.product_id)?.name ?? row.product_id,
       bags: row.quantity,
+      unit: unitLabels(row).singular,
+      units: unitLabels(row).plural,
       bagWeight: row.unit_weight_kg,
       weight: row.total_weight_kg,
       price: row.unit_price,
