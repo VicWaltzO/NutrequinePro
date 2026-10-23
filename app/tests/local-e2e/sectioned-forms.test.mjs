@@ -164,7 +164,11 @@ test(
     await open("productions", "Nueva producción");
     await sections(["Lote", "Productos", "Insumos consolidados", "Costos y registro"]);
     await expect(dialog.getByRole("status")).toContainText("Indica los núcleos");
-    await dialog.getByLabel("Potripregnant · 40 sacos / núcleo", { exact: true }).fill("1");
+    await dialog.getByLabel("Potripregnant · 40 sacos / núcleo", { exact: true }).fill("3.57");
+    await expect(dialog.locator(".summary-strip")).toContainText("142 sacos");
+    await dialog.getByLabel("Potripregnant · 40 sacos / núcleo", { exact: true }).fill("3,57");
+    await expect(dialog.locator(".summary-strip")).toContainText("142 sacos");
+    await expect(dialog.locator(".summary-strip")).toContainText("20 kg no comerciales");
     await expect(
       dialog.getByRole("region", { name: "Insumos consolidados", exact: true }).getByRole("table"),
     ).toBeVisible();
@@ -176,8 +180,14 @@ test(
     const production = await submit("Guardar lote a producir", "PRODUCTION_SAVE");
     const produced = production.state.productions.find((row) => row.id === production.result);
     assert.equal(produced.status, "DRAFT");
-    assert.equal(produced.input_snapshot.products[0].nuclei_count, "1");
+    assert.equal(produced.input_snapshot.products[0].nuclei_count, "3,57");
     assert.equal(produced.input_snapshot.costs[0].amount, "7.03");
+    const output = production.state.productionProducts.find(
+      (row) => row.production_id === production.result && row.is_current !== false,
+    );
+    assert.equal(output.nuclei_count, 3.57);
+    assert.equal(output.bags_produced, 142);
+    assert.equal(output.commercial_weight_kg, 3550000);
     await close();
 
     await open("inventory", "Ajustar inventario");

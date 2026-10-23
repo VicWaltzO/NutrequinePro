@@ -1,6 +1,6 @@
 {
   "baseCommit": "54a4ef7",
-  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría.",
+  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría. Núcleos decimales: solo los campos de cantidad de producción y rectificación admiten coma/punto con dos decimales.",
   "snapshots": {
     "ADMIN:dashboard": "f63f327371847be1f5670be60c4359bd1cec8628289a826a87a8ee394535deb7",
     "ADMIN:sales": "970f542136365c03e3878a6e286fafb7b86026bacb59d5085d6ee12a56e8fa2b",
@@ -50,9 +50,9 @@
     "modal:sale:correct": "b03115c5e70ca834eca9095c864281cfdc4a0edb59278da2fa655e5171f2f87c",
     "modal:payment": "bbe80a5303fe1651345a2f03d1d7004da3f21e52e9c978ae4f23633e229b501a",
     "modal:credit": "0310fb4a7d7fe6cfe1cfedf4000047cabe75bccf483d01bf6e3be167d8e01b21",
-    "modal:production": "24f063e4fbe6d1127d9e565a61e1cdb39220232ded59eaed0ce62c9f88ea50f0",
+    "modal:production": "ba5d9dc9a54157935082427149e8f1eb71808f90f663d43b8136823ed771952d",
     "modal:reconcile": "f395bce9cff55e027f4965336a5b44eed7f175a07bd69f8a516268b2287c74a9",
-    "modal:production-quantities": "17b495550786c013e9baa2d6e35974e69524b722b620ac2c4dea0a6e859e5f33",
+    "modal:production-quantities": "5122284eb79833b76cb665661d5fb5839f971bf9b753c803e3a4f2252e9426dd",
     "modal:formula": "c5b48827797d7c749d7b4882363ee967c858acad011f8d7a549447a9f0511025",
     "modal:customer": "348b75d2a8f17136a0dcef58983776c6e2df2fcd4d6ea4eeb29b378e52d032cf",
     "modal:customer-delete": "ec205a7330f3656a83c3bfec2da115d46a0625b3454f9ee4bdbdd84b8d4c2a9c",

@@ -1,4 +1,5 @@
-import { fail, safe } from "../shared/domain/core.mjs";
+import { fail, safe, scaled } from "../shared/domain/core.mjs";
+import { nucleusHundredths } from "../shared/domain/production-quantities.mjs";
 import { saleSummary } from "../features/ventas/domain/summary.mjs";
 import { TABLES } from "./state-schema.mjs";
 import { customerSave, configSave, userSave } from "../features/configuracion/domain/commands.mjs";
@@ -81,7 +82,13 @@ export function executeCommand(original, command, actor, clock = new Date().toIS
   const result = handler(context);
   for (const table of TABLES)
     for (const row of state[table])
-      for (const value of Object.values(row)) if (typeof value === "number") safe(value);
+      for (const [field, value] of Object.entries(row)) {
+        if (typeof value !== "number") continue;
+        if (table === "productionProducts" && field === "nuclei_count") nucleusHundredths(value);
+        else if (table === "productionCosts" && row.category === "NUCLEUS" && field === "quantity")
+          scaled(value);
+        else safe(value);
+      }
   refresh();
   add("audit", {
     action: type,
