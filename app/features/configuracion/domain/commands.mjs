@@ -4,6 +4,7 @@ import {
   productPresentation,
   validatePresentation,
   isNucleusProduct,
+  validateNucleusWeight,
 } from "../../../shared/domain/presentation.mjs";
 export function customerSave(context) {
   const { s: state, type, p: payload, actor, clock, add, code, correction } = context;
@@ -100,6 +101,7 @@ export function customerSave(context) {
           ? old.commercial_weight_per_nucleus_kg
           : scaled(payload.commercial_weight_per_nucleus_kg, 3);
       requireValue(v.commercial_weight_per_nucleus_kg > 0, "Los pesos deben ser mayores que cero.");
+      validateNucleusWeight(v);
     }
   }
   if (table === "ingredients") v.current_price_per_kg = scaled(payload.current_price_per_kg);

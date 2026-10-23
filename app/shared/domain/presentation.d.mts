@@ -25,5 +25,6 @@ export function presentationSnapshot(
 };
 export function isNucleusProduct(product: Partial<Product>): boolean;
 export function validatePresentation(presentation: ReturnType<typeof productPresentation>): void;
+export function validateNucleusWeight(product: Partial<Product>): void;
 export function assertUnitWeight(snapshot: ReturnType<typeof presentationSnapshot>, weight: number): void;
 export const PRESENTATION_UNITS: PresentationUnit[];

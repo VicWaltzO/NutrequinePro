@@ -6,7 +6,7 @@ import {
   sum,
   roundedProduct,
 } from "../../../shared/domain/core.mjs";
-import { isNucleusProduct } from "../../../shared/domain/presentation.mjs";
+import { isNucleusProduct, validateNucleusWeight } from "../../../shared/domain/presentation.mjs";
 
 export function buildProductionProduct(state, productionId, row) {
   const product = pick(state, "products", row.product_id);
@@ -16,6 +16,7 @@ export function buildProductionProduct(state, productionId, row) {
     "El producto requiere ingreso directo al inventario; no admite producción por núcleos.",
   );
   const nucleiCount = positiveInt(row.nuclei_count, "Núcleos");
+  validateNucleusWeight(product);
   const formula = state.formulas.find((x) => x.product_id === product.id && x.is_active);
   requireValue(formula, "Fórmula activa no disponible.");
   const formulaIngredients = state.formulaIngredients.filter((x) => x.formula_id === formula.id);

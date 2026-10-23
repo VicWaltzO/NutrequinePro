@@ -44,6 +44,10 @@ export function isNucleusProduct(product) {
 export function validatePresentation(presentation) {
   requireValue(PRESENTATION_UNITS.includes(presentation.presentation_unit), "Unidad comercial inválida.");
   positiveInt(presentation.unit_weight_grams, "Contenido neto en gramos");
+  requireValue(
+    presentation.presentation_unit !== "BAG" || [25000, 50000].includes(presentation.unit_weight_grams),
+    "Los sacos deben tener una presentación de 25 kg o 50 kg.",
+  );
   requireValue(["FIXED", "VARIABLE"].includes(presentation.weight_policy), "Política de peso inválida.");
   requireValue(
     ["NUCLEUS_PRODUCTION", "DIRECT_STOCK"].includes(presentation.stock_entry_mode),
@@ -56,6 +60,15 @@ export function validatePresentation(presentation) {
   requireValue(
     presentation.stock_entry_mode !== "NUCLEUS_PRODUCTION" || presentation.presentation_unit === "BAG",
     "La producción por núcleo requiere presentación en sacos.",
+  );
+}
+
+export function validateNucleusWeight(product) {
+  if (!isNucleusProduct(product)) return;
+  const { unit_weight_grams } = productPresentation(product);
+  requireValue(
+    product.commercial_weight_per_nucleus_kg === product.bags_per_nucleus * unit_weight_grams,
+    "El peso comercial por núcleo debe coincidir con los sacos por núcleo y el peso de cada saco.",
   );
 }
 

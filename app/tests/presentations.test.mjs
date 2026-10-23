@@ -17,6 +17,51 @@ import { initializeDatabase } from "../lib/sqlite/migrations.mjs";
 import { backupDatabase, restoreDatabase, verifyBackup } from "../lib/sqlite/recovery.mjs";
 import { openSqliteDatabase } from "../lib/adapters/node-sqlite.mjs";
 import { createStore } from "../lib/application-store.mjs";
+import { buildProductionProduct } from "../features/produccion/domain/production-snapshots.mjs";
+
+test("presentaciones: sacos de 25/50 kg y rechazo de núcleos inconsistentes", () => {
+  let state = seedState();
+  const actor = { id: "admin", role: "ADMIN", name: "Sintético", is_active: true };
+  const save = (payload) => {
+    const result = executeCommand(state, { type: "PRODUCT_SAVE", payload }, actor);
+    state = result.state;
+    return result.result;
+  };
+  const input = {
+    name: "Saco sintético",
+    presentation_unit: "BAG",
+    weight_policy: "FIXED",
+    stock_entry_mode: "NUCLEUS_PRODUCTION",
+    unit_weight_grams: 25000,
+    bags_per_nucleus: 40,
+    commercial_weight_per_nucleus_kg: 1000,
+  };
+  for (const unit_weight_grams of [2200, 30000])
+    assert.throws(() => save({ ...input, unit_weight_grams }), /25 kg o 50 kg/);
+  for (const weight_policy of ["FIXED", "VARIABLE"])
+    for (const commercial_weight_per_nucleus_kg of [900, 1200])
+      assert.throws(
+        () => save({ ...input, weight_policy, commercial_weight_per_nucleus_kg }),
+        /peso comercial por núcleo/,
+      );
+  for (const unit_weight_grams of [25000, 50000]) {
+    const id = save({
+      ...input,
+      name: `Saco sintético ${unit_weight_grams}`,
+      unit_weight_grams,
+      commercial_weight_per_nucleus_kg: (40 * unit_weight_grams) / 1000,
+    });
+    const product = state.products.find((x) => x.id === id);
+    assert.equal(product.commercial_weight_per_nucleus_kg, 40 * unit_weight_grams);
+  }
+  // An inconsistent master already on disk must also fail before any production enters stock.
+  const product = state.products[0];
+  product.commercial_weight_per_nucleus_kg += 1000;
+  assert.throws(
+    () => buildProductionProduct(state, "synthetic-production", { product_id: product.id, nuclei_count: 1 }),
+    /peso comercial por núcleo/,
+  );
+});
 
 // Only synthetic prices/quantities are used here; no business master is seeded by the application.
 export const bottleInput = {
