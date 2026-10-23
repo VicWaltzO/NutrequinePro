@@ -41,7 +41,7 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
     const result = await submit(quick === "customer" ? "CUSTOMER_SAVE" : "SITE_SAVE", {
       name: newName,
       is_active: true,
-      confirm_duplicate: duplicate,
+      ...(quick === "customer" ? { confirm_duplicate: duplicate } : {}),
       _keep_open: true,
     });
     if (typeof result === "string") {

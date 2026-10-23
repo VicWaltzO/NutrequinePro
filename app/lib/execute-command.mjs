@@ -28,6 +28,7 @@ import { createSaleOperations } from "../features/ventas/domain/operations.mjs";
 import { createProductionOperations } from "../features/produccion/domain/operations.mjs";
 import { createCommandContext } from "./command-context.mjs";
 import { assertCommandPermission } from "../shared/domain/permissions.mjs";
+import { validateMasterCommand } from "./master-command-contracts.mjs";
 const handlers = {
   CUSTOMER_SAVE: customerSave,
   CUSTOMER_SITES_SAVE: customerSitesSave,
@@ -61,6 +62,7 @@ export function executeCommand(original, command, actor, clock = new Date().toIS
   const state = structuredClone(original);
   const { type, payload: payload = {} } = command;
   assertCommandPermission(actor, type);
+  validateMasterCommand(state, type, payload);
   const context = createCommandContext(state, type, payload, actor, clock);
   Object.assign(
     context,

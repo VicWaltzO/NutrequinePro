@@ -112,10 +112,20 @@ export function createUiHarness(readSource = (file) => readFileSync(path.join(ap
   let state = domain.seedState();
   const actor = { id: "test-admin", name: "Administrador de prueba", role: "ADMIN", is_active: true };
   state.users.push(actor);
+  const parsePayload = vm.runInContext("JSON.parse", context);
   const run = (type, payload) => {
     const outcome = domain.executeCommand(
       state,
-      { type, payload: { date: "2026-10-09", ...payload } },
+      {
+        type,
+        // Match the JSON boundary used by HTTP, within the domain module's VM realm.
+        payload: parsePayload(
+          JSON.stringify({
+            ...(type === "CUSTOMER_SAVE" ? {} : { date: "2026-10-09" }),
+            ...payload,
+          }),
+        ),
+      },
       actor,
       fixedTime,
     );
