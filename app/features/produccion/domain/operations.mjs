@@ -1,6 +1,7 @@
 import { requireValue, scaled, text, pick } from "../../../shared/domain/core.mjs";
 import { productionSummary } from "./summary.mjs";
 import { buildProductionProduct, buildProductionIngredient } from "./production-snapshots.mjs";
+import { nucleusHundredths, perNucleusAmount } from "../../../shared/domain/production-quantities.mjs";
 export function createProductionOperations(context) {
   const { add, movement, s: state, actor, clock } = context;
   const productionRows = (production, input) => {
@@ -12,17 +13,18 @@ export function createProductionOperations(context) {
     const totals = {};
     const nucleusCost = scaled(input.nucleus_cost ?? state.config.default_nucleus_cost / 100);
     const bagCost = scaled(input.packaging_cost ?? state.config.default_packaging_cost / 100);
-    let nuclei = 0;
+    let totalNucleusHundredths = 0;
     let bags = 0;
     for (const row of input.products) {
       const snapshot = buildProductionProduct(state, production.id, row);
       add("productionProducts", snapshot);
-      nuclei += snapshot.nuclei_count;
+      totalNucleusHundredths += nucleusHundredths(snapshot.nuclei_count);
       bags += snapshot.bags_produced;
       snapshot.formula_snapshot.forEach(
         (ingredient) =>
           (totals[ingredient.ingredient_id] =
-            (totals[ingredient.ingredient_id] ?? 0) + ingredient.kg_per_nucleus * snapshot.nuclei_count),
+            (totals[ingredient.ingredient_id] ?? 0) +
+            perNucleusAmount(ingredient.kg_per_nucleus, nucleusHundredths(snapshot.nuclei_count))),
       );
     }
     for (const [ingredient_id, total_kg] of Object.entries(totals)) {
@@ -35,9 +37,9 @@ export function createProductionOperations(context) {
       production_id: production.id,
       category: "NUCLEUS",
       description: "Núcleos",
-      quantity: nuclei,
+      quantity: totalNucleusHundredths / 100,
       unit_cost: nucleusCost,
-      amount: nuclei * nucleusCost,
+      amount: perNucleusAmount(nucleusCost, totalNucleusHundredths),
       is_paid: !!input.nucleus_paid,
       is_current: true,
     });

@@ -1,12 +1,11 @@
-import {
-  requireValue,
-  positiveInt,
-  scaled,
-  pick,
-  sum,
-  roundedProduct,
-} from "../../../shared/domain/core.mjs";
+import { requireValue, scaled, pick, sum, roundedProduct } from "../../../shared/domain/core.mjs";
 import { isNucleusProduct, validateNucleusWeight } from "../../../shared/domain/presentation.mjs";
+
+import {
+  nucleusHundredths,
+  perNucleusAmount,
+  productionYield,
+} from "../../../shared/domain/production-quantities.mjs";
 
 export function buildProductionProduct(state, productionId, row) {
   const product = pick(state, "products", row.product_id);
@@ -15,13 +14,20 @@ export function buildProductionProduct(state, productionId, row) {
     isNucleusProduct(product),
     "El producto requiere ingreso directo al inventario; no admite producción por núcleos.",
   );
-  const nucleiCount = positiveInt(row.nuclei_count, "Núcleos");
+  const hundredths = nucleusHundredths(row.nuclei_count);
+  requireValue(hundredths > 0, "Núcleos debe ser mayor que cero.");
+  const nucleiCount = hundredths / 100;
   validateNucleusWeight(product);
   const formula = state.formulas.find((x) => x.product_id === product.id && x.is_active);
   requireValue(formula, "Fórmula activa no disponible.");
   const formulaIngredients = state.formulaIngredients.filter((x) => x.formula_id === formula.id);
   requireValue(formulaIngredients.length > 0, "Fórmula sin insumos.");
-  const formulaWeight = sum(formulaIngredients, (x) => x.kg_per_nucleus) * nucleiCount;
+  const formulaWeight = sum(formulaIngredients, (x) => perNucleusAmount(x.kg_per_nucleus, hundredths));
+  const output = productionYield(
+    hundredths,
+    product.bags_per_nucleus,
+    product.commercial_weight_per_nucleus_kg,
+  );
   return {
     production_id: productionId,
     product_id: product.id,
@@ -29,9 +35,9 @@ export function buildProductionProduct(state, productionId, row) {
     formula_snapshot: structuredClone(formulaIngredients),
     nuclei_count: nucleiCount,
     bags_per_nucleus_snapshot: product.bags_per_nucleus,
-    bags_produced: nucleiCount * product.bags_per_nucleus,
+    bags_produced: output.bags,
     commercial_weight_per_nucleus_snapshot: product.commercial_weight_per_nucleus_kg,
-    commercial_weight_kg: nucleiCount * product.commercial_weight_per_nucleus_kg,
+    commercial_weight_kg: output.weight,
     formula_weight_kg: formulaWeight,
     is_current: true,
   };

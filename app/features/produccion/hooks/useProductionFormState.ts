@@ -29,8 +29,18 @@ export function useProductionFormState({ s: state, record }: Pick<FormProps, "s"
     initialProductionIngredients(state, record),
   );
   const [costs, setCosts] = useState<CostInput[]>(snapshot?.costs ?? []);
-  const { bags, weight, nuclei, ingredients, estimated, real, ingredientInputs, errors, quantityError } =
-    productionFormPreview(state, counts, adjust, costs, values);
+  const {
+    bags,
+    weight,
+    nonCommercialWeight,
+    nuclei,
+    ingredients,
+    estimated,
+    real,
+    ingredientInputs,
+    errors,
+    quantityError,
+  } = productionFormPreview(state, counts, adjust, costs, values);
   const adj = (id: string, change: Partial<ProductionIngredientDraft>) =>
     setAdjust((a) => ({ ...a, [id]: { ...a[id], ingredient_id: id, ...change } }));
   return {
@@ -42,6 +52,7 @@ export function useProductionFormState({ s: state, record }: Pick<FormProps, "s"
     setCosts,
     bags,
     weight,
+    nonCommercialWeight,
     nuclei,
     ingredients,
     ingredientInputs,

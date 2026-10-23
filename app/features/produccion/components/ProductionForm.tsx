@@ -18,6 +18,7 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
     setCosts,
     bags,
     weight,
+    nonCommercialWeight,
     nuclei,
     ingredients,
     ingredientInputs,
@@ -36,7 +37,7 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
           ...values,
           id: record?.id,
           products: Object.entries(counts)
-            .filter(([, n]) => Number(n) > 0)
+            .filter(([, n]) => Number(String(n).replace(",", ".")) > 0)
             .map(([product_id, nuclei_count]) => ({ product_id, nuclei_count })),
           ingredients: ingredientInputs,
           costs,
@@ -73,9 +74,9 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
                     <ProductName name={x.name} /> · {x.bags_per_nucleus} sacos / núcleo
                   </>
                 }
-                type="number"
-                min="0"
-                step="1"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]+([.,][0-9]{1,2})?"
                 value={counts[x.id]}
                 onChange={(n) => setCounts((a) => ({ ...a, [x.id]: n }))}
               />
@@ -90,6 +91,7 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
           <strong>{nuclei} núcleos</strong>
           <span>{bags} sacos</span>
           <span>{kg(weight)} kg comerciales</span>
+          {nonCommercialWeight > 0 && <span>{kg(nonCommercialWeight)} kg no comerciales</span>}
           <span>{kg(ingredients.reduce((a, x) => a + x.w, 0))} kg de fórmula</span>
         </div>
       </FormSection>

@@ -5,10 +5,14 @@ import {
   text,
   pick,
   sum,
-  multiply,
   roundedProduct,
   today,
 } from "../../../shared/domain/core.mjs";
+import {
+  nucleusHundredths,
+  perNucleusAmount,
+  productionYield,
+} from "../../../shared/domain/production-quantities.mjs";
 import { stock } from "../../inventario/domain/stock.mjs";
 import { productionSummary } from "./summary.mjs";
 import { isNucleusProduct } from "../../../shared/domain/presentation.mjs";
@@ -189,18 +193,18 @@ export function productionCorrectQuantities(context) {
     "Producto repetido.",
   );
   const amounts = {};
-  let totalNuclei = 0;
+  let totalNucleusHundredths = 0;
   let totalBags = 0;
   for (const old of before.products) {
     const input = payload.products.find((x) => x.product_id === old.product_id);
     requireValue(input, "Producto original no incluido.");
-    const nucleiCount = Number(input.nuclei_count);
-    requireValue(
-      Number.isSafeInteger(nucleiCount) && nucleiCount >= 0 && nucleiCount <= 1e7,
-      "Núcleos debe ser un entero válido.",
+    const hundredths = nucleusHundredths(input.nuclei_count);
+    const nucleiCount = hundredths / 100;
+    const { bags, weight } = productionYield(
+      hundredths,
+      old.bags_per_nucleus_snapshot,
+      old.commercial_weight_per_nucleus_snapshot,
     );
-    const bags = multiply(nucleiCount, old.bags_per_nucleus_snapshot);
-    const weight = multiply(nucleiCount, old.commercial_weight_per_nucleus_snapshot);
     const deltaBags = bags - old.bags_produced;
     const deltaWeight = weight - old.commercial_weight_kg;
     const st = stock(state, old.product_id);
@@ -218,13 +222,14 @@ export function productionCorrectQuantities(context) {
         nuclei_count: nucleiCount,
         bags_produced: bags,
         commercial_weight_kg: weight,
-        formula_weight_kg: sum(old.formula_snapshot, (x) => x.kg_per_nucleus) * nucleiCount,
+        formula_weight_kg: sum(old.formula_snapshot, (x) => perNucleusAmount(x.kg_per_nucleus, hundredths)),
         is_current: true,
       });
-    totalNuclei += nucleiCount;
+    totalNucleusHundredths += hundredths;
     totalBags += bags;
     for (const fi of old.formula_snapshot)
-      amounts[fi.ingredient_id] = (amounts[fi.ingredient_id] ?? 0) + fi.kg_per_nucleus * nucleiCount;
+      amounts[fi.ingredient_id] =
+        (amounts[fi.ingredient_id] ?? 0) + perNucleusAmount(fi.kg_per_nucleus, hundredths);
     if (deltaBags || deltaWeight)
       movement({
         item_type: "PRODUCT",
@@ -238,8 +243,8 @@ export function productionCorrectQuantities(context) {
       });
   }
   requireValue(
-    totalNuclei > 0,
-    "Debe quedar al menos un núcleo. Para eliminar toda la producción use anulación.",
+    totalNucleusHundredths > 0,
+    "Debe quedar una cantidad de núcleos mayor que cero. Para eliminar toda la producción use anulación.",
   );
   for (const old of before.ingredients) {
     const total_kg = amounts[old.ingredient_id] ?? 0;
@@ -276,7 +281,7 @@ export function productionCorrectQuantities(context) {
     const c = pick(state, "productionCosts", input.id);
     requireValue(c.production_id === production.id && c.is_current !== false, "Costo ajeno a producción.");
     c.amount = scaled(input.amount);
-    if (c.category === "NUCLEUS") c.quantity = totalNuclei;
+    if (c.category === "NUCLEUS") c.quantity = totalNucleusHundredths / 100;
     if (c.category === "PACKAGING") c.quantity = totalBags;
   }
   correction("PRODUCTION", production.id, before, productionSummary(state, production), why);

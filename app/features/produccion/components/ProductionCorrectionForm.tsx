@@ -37,9 +37,9 @@ export function ProductionCorrectionForm({ s: state, record, submit, close, busy
               <input
                 aria-label={"Núcleos corregidos " + find(state, "products", x.product_id)?.name}
                 required
-                type="number"
-                min="0"
-                step="1"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]+([.,][0-9]{1,2})?"
                 value={x.nuclei_count}
                 onChange={(e) =>
                   setProducts((r) => r.map((v, j) => (i === j ? { ...v, nuclei_count: e.target.value } : v)))

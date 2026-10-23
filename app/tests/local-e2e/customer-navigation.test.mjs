@@ -172,10 +172,9 @@ test(
     await settle();
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.getByRole("button", { name: "Borradores", exact: true }).click();
-    assert.equal(
-      await page.locator("main .subtab-content").evaluate((node) => node.getAnimations().length),
-      0,
-    );
+    await expect
+      .poll(() => page.locator("main .subtab-content").evaluate((node) => node.getAnimations().length))
+      .toBe(0);
     assert.equal(
       await page.locator("main .tab-indicator").evaluate((node) => getComputedStyle(node).transitionDuration),
       "0s",
@@ -183,10 +182,9 @@ test(
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.getByRole("button", { name: "Historial", exact: true }).click();
     await page.emulateMedia({ reducedMotion: "reduce" });
-    assert.equal(
-      await page.locator("main .subtab-content").evaluate((node) => node.getAnimations().length),
-      0,
-    );
+    await expect
+      .poll(() => page.locator("main .subtab-content").evaluate((node) => node.getAnimations().length))
+      .toBe(0);
     await page.emulateMedia({ reducedMotion: "no-preference" });
 
     await page.setViewportSize({ width: 390, height: 844 });
