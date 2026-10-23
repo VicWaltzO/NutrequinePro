@@ -1,6 +1,6 @@
 {
   "baseCommit": "54a4ef7",
-  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones.",
+  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría.",
   "snapshots": {
     "ADMIN:dashboard": "f63f327371847be1f5670be60c4359bd1cec8628289a826a87a8ee394535deb7",
     "ADMIN:sales": "970f542136365c03e3878a6e286fafb7b86026bacb59d5085d6ee12a56e8fa2b",
@@ -24,7 +24,7 @@
     "ADMIN:config": "687ee908fcd7e87d55b80e5e6a4c067dfffbc00de80f5c342fc85da589c3c678",
     "ADMIN:config/products": "9caf3b1d8bcc85bc58c428fe5be4430be0b3c18a3bfe2bea9062a20b13a62f55",
     "ADMIN:config/users": "2ef66fe77ae516d1a2c09ea5b1729a406e0b8415e3b33fa49187f671ba426429",
-    "ADMIN:config/audit": "294945dd3c03adb5d957044ffba7cb535e086c2b12ffcbee9a8ffe905f6545e9",
+    "ADMIN:config/audit": "9638109887259b68f7aebcd22674cec79f4534004fd3b766480247b18d31f3b9",
     "ADMIN:config/appearance": "ff736e09e6547466f6630e5cd3c158ab1c03172f0125221f508eaac20640255f",
     "ADMIN:sites": "04806ef4b77652547aaf5ea771b6fba17fcb5f8478dd28641c8b65cd0556fb6b",
     "ADMIN:products": "9caf3b1d8bcc85bc58c428fe5be4430be0b3c18a3bfe2bea9062a20b13a62f55",

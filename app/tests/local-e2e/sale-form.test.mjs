@@ -46,7 +46,12 @@ test(
           exact: true,
         })
         .click();
-      assert.equal((await response).status(), 200);
+      const result = await response;
+      assert.deepEqual(
+        Object.keys(result.request().postDataJSON().payload).sort(),
+        type === "CUSTOMER_SAVE" ? ["confirm_duplicate", "is_active", "name"] : ["is_active", "name"],
+      );
+      assert.equal(result.status(), 200, await result.text());
       await expect(dialog.getByLabel(field, { exact: true })).toHaveCount(0);
     };
     await runQuick(

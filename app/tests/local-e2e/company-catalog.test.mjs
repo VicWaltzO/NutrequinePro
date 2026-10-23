@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { chromium } from "playwright";
+import { chromium, expect } from "playwright/test";
 import { localAppFixture, appRoot } from "../helpers/local-app-server.mjs";
 import { originalCompanyCatalog, catalogTables } from "../../lib/company-catalog.mjs";
 
@@ -122,8 +122,9 @@ test(
       const row = page
         .getByRole("row")
         .filter({ has: page.getByRole("cell", { name: product.name, exact: true }) });
-      const cells = await row.getByRole("cell").allTextContents();
-      assert.deepEqual(cells.slice(0, 7), [
+      // Reading text contents does not wait for the hash navigation to render.
+      await expect(row.getByRole("cell").nth(6)).toBeVisible();
+      await expect(row.locator("td:nth-child(-n+7)")).toHaveText([
         product.name,
         money(product.default_sale_price) + " / saco",
         "saco · " + kg(product.standard_bag_weight_kg) + " kg · Variable",
@@ -150,7 +151,7 @@ test(
       const row = page
         .getByRole("row")
         .filter({ has: page.getByRole("cell", { name: ingredient.name, exact: true }) });
-      assert.deepEqual((await row.getByRole("cell").allTextContents()).slice(0, 3), [
+      await expect(row.locator("td:nth-child(-n+3)")).toHaveText([
         ingredient.name,
         money(ingredient.current_price_per_kg),
         "Activo",
@@ -164,16 +165,14 @@ test(
         .locator(".formula-list details")
         .filter({ has: page.locator("summary").filter({ hasText: product.name + " · v1" }) });
       await details.waitFor();
+      await expect(details.locator("tbody tr")).toHaveCount(10);
       const rows = await details.locator("tbody tr").all();
       const lines = catalog.formulaIngredients.filter((row) => row.formula_id === formula.id);
       assert.equal(rows.length, 10);
       for (let index = 0; index < lines.length; index++) {
         const line = lines[index];
         const ingredient = catalog.ingredients.find((row) => row.id === line.ingredient_id);
-        assert.deepEqual(await rows[index].getByRole("cell").allTextContents(), [
-          ingredient.name,
-          kg(line.kg_per_nucleus),
-        ]);
+        await expect(rows[index].getByRole("cell")).toHaveText([ingredient.name, kg(line.kg_per_nucleus)]);
       }
       assert.match(
         await details.locator(".formula-total").innerText(),
