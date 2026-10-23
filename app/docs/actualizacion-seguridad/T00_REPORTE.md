@@ -14,7 +14,7 @@ T00 completada: línea base reproducible de la revisión actual, sin cambios fun
 - Copia aislada: `C:/Users/vicve/.codex/worktrees/t00-linea-base/Nutrequine Pro`.
 - La carpeta original tenía borrados previos en `app/demo-linkedin/`. No se copiaron, restauraron ni incluyeron en T00. El worktree empezó limpio.
 - Las fuentes versionadas permanecieron sin modificaciones durante todos los ensayos, comprobado con `git status --short` y `git diff --exit-code`.
-- El commit de cierre incorpora únicamente este informe. Su SHA se obtiene con `git log -1 --format=%H -- app/docs/auditoria-local/T00_REPORTE.md`; no se incrusta su propio hash en el archivo.
+- El commit de cierre incorpora únicamente este informe. Su SHA se obtiene con `git log -1 --format=%H -- app/docs/actualizacion-seguridad/T00_REPORTE.md`; no se incrusta su propio hash en el archivo.
 
 Los adjuntos son planes y auditoría en Markdown; no contienen el ZIP de fuentes original citado por la auditoría. La referencia reproducible de código es el commit anterior.
 

@@ -8,6 +8,10 @@ y persistencia SQLite en `lib/`. No reintroducir entradas Next, Workers ni ident
 simuladas. Consultar `docs/INSTALACION_LOCAL.md` para preparar bases privadas.
 El servidor nunca crea datos o credenciales al arrancar.
 
+## Informes de tareas
+
+Guardar siempre los informes de tareas y auditoría en "docs/actualizacion-seguridad/" dentro de app/, incluidos los informes Txx_REPORTE.md. No usar docs/auditoria-local/ para informes nuevos.
+
 ## Al finalizar cada tarea
 
 1. **Verificar el funcionamiento del código.** Revisar el diff y ejecutar las pruebas, la comprobación de tipos, el lint y la compilación que correspondan. El repositorio Git está en la carpeta padre; ejecutar los comandos de Git desde allí. Para cambios de código en esta aplicación, ejecutar los siguientes comandos desde `app/`:
