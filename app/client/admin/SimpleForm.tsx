@@ -12,6 +12,7 @@ import type { HTMLInputTypeAttribute } from "react";
 import type { SimpleFields, FormProps } from "@/shared/types/forms";
 import { Input, Check } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
+import { productPresentation } from "@/shared/domain/presentation.mjs";
 
 export default function SimpleForm({ s: state, record, kind, submit, close, busy }: FormProps) {
   const initial = simpleFormInitial({ s: state, record, kind });
@@ -57,6 +58,10 @@ export default function SimpleForm({ s: state, record, kind, submit, close, busy
         e.preventDefault();
         await submit(operations[kind ?? ""] ?? record?._operation ?? "", {
           ...v,
+          ...(kind === "adjust" &&
+          productPresentation(state.products.find((x) => x.id === v.product_id)).weight_policy === "FIXED"
+            ? { weight_kg: undefined }
+            : {}),
           ...(kind === "config"
             ? { expense_categories: categories, default_expense_category: defaultCategory }
             : {}),

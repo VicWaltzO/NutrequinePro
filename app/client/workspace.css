@@ -420,6 +420,16 @@ main:focus {
   background-color: var(--surface-subtle);
   color: var(--muted);
 }
+.product-photo.product-upload {
+  object-fit: contain;
+  background: none;
+}
+.sale-picker-photo .product-photo.product-upload,
+.sale-line-photo .product-photo.product-upload {
+  width: 100%;
+  height: 100%;
+  transform: none;
+}
 .dashboard-columns {
   grid-template-columns: minmax(0, 1fr) 280px;
   gap: 20px;

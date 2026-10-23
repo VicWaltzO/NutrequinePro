@@ -3,6 +3,7 @@ import type { NumericInput } from "@/lib/domain-types";
 import { Input, Select, Table, day } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import type { FormProps } from "@/shared/types/forms";
+import { isNucleusProduct } from "@/shared/domain/presentation.mjs";
 export function FormulaForm({ s: state, record, submit, close, busy }: FormProps) {
   const [product, setProduct] = useState(record?.product_id ?? state.products[0]?.id ?? "");
   const f = state.formulas.find((x) => x.product_id === product && x.is_active);
@@ -28,7 +29,7 @@ export function FormulaForm({ s: state, record, submit, close, busy }: FormProps
           required
           empty={false}
           value={product}
-          options={state.products}
+          options={state.products.filter(isNucleusProduct)}
           onChange={(id) => {
             setProduct(id);
             const nf = state.formulas.find((x) => x.product_id === id && x.is_active);

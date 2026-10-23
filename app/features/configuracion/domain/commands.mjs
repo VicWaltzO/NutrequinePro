@@ -1,5 +1,10 @@
 import { requireValue, normalize, scaled, positiveInt, text, pick } from "../../../shared/domain/core.mjs";
 import { saveCustomerSites } from "../../clientes/domain/sites.mjs";
+import {
+  productPresentation,
+  validatePresentation,
+  isNucleusProduct,
+} from "../../../shared/domain/presentation.mjs";
 export function customerSave(context) {
   const { s: state, type, p: payload, actor, clock, add, code, correction } = context;
   let result = null;
@@ -28,19 +33,74 @@ export function customerSave(context) {
     );
   }
   if (table === "products") {
+    requireValue(
+      old || payload.unit_weight_grams !== undefined || payload.standard_bag_weight_kg !== undefined,
+      "Registre el contenido neto por unidad.",
+    );
+    requireValue(
+      !state.products.some((x) => x.id !== payload.id && normalize(x.name) === normalize(v.name)),
+      "Ya existe un producto con ese nombre; edite su ficha.",
+    );
+    const previousPresentation = productPresentation(old ?? {});
+    let unitWeight = previousPresentation.unit_weight_grams;
+    if (payload.unit_weight_grams !== undefined)
+      unitWeight = positiveInt(payload.unit_weight_grams, "Contenido neto en gramos");
+    else if (payload.standard_bag_weight_kg !== undefined)
+      unitWeight = scaled(payload.standard_bag_weight_kg, 3);
+    const presentation = {
+      ...productPresentation(old ?? {}),
+      ...Object.fromEntries(
+        ["presentation_unit", "weight_policy", "stock_entry_mode"]
+          .filter((key) => payload[key] !== undefined)
+          .map((key) => [key, payload[key]]),
+      ),
+      unit_weight_grams: unitWeight,
+    };
+    validatePresentation(presentation);
+    if (
+      old &&
+      (state.saleItems.some((x) => x.product_id === old.id) ||
+        state.inventoryMovements.some((x) => x.item_type === "PRODUCT" && x.item_id === old.id) ||
+        state.productionProducts.some((x) => x.product_id === old.id))
+    ) {
+      requireValue(
+        JSON.stringify(productPresentation(old)) === JSON.stringify(presentation),
+        "La presentación tiene historial. Cree otra presentación para cambiar unidad, peso o modalidad de ingreso.",
+      );
+    }
+    const priceInput = payload.default_sale_price;
+    const price = priceInput === "" || priceInput == null ? null : scaled(priceInput);
+    requireValue(
+      !payload.is_sellable || price !== null,
+      "Registre el precio base antes de habilitar la venta.",
+    );
+    const image = payload.image === undefined ? (old?.image ?? null) : payload.image || null;
+    requireValue(
+      image === null ||
+        (typeof image === "string" &&
+          (["nutrelin", "hi-performance", "potripregnant"].includes(image) ||
+            (image.length <= 200024 &&
+              /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(image)))),
+      "Use una fotografía JPEG, PNG o WebP de hasta 150 KB.",
+    );
     Object.assign(v, {
       category: payload.category ?? "PREMIUM",
-      default_sale_price: scaled(payload.default_sale_price),
-      standard_bag_weight_kg: scaled(payload.standard_bag_weight_kg, 3),
-      bags_per_nucleus: positiveInt(payload.bags_per_nucleus, "Sacos por núcleo"),
-      commercial_weight_per_nucleus_kg: scaled(payload.commercial_weight_per_nucleus_kg, 3),
+      ...presentation,
+      default_sale_price: price,
+      ...(presentation.presentation_unit === "BAG"
+        ? { standard_bag_weight_kg: presentation.unit_weight_grams }
+        : {}),
       is_sellable: !!payload.is_sellable,
-      image: old?.image ?? null,
+      image,
     });
-    requireValue(
-      v.standard_bag_weight_kg > 0 && v.commercial_weight_per_nucleus_kg > 0,
-      "Los pesos deben ser mayores que cero.",
-    );
+    if (isNucleusProduct(v)) {
+      v.bags_per_nucleus = positiveInt(payload.bags_per_nucleus ?? old?.bags_per_nucleus, "Sacos por núcleo");
+      v.commercial_weight_per_nucleus_kg =
+        payload.commercial_weight_per_nucleus_kg === undefined && old
+          ? old.commercial_weight_per_nucleus_kg
+          : scaled(payload.commercial_weight_per_nucleus_kg, 3);
+      requireValue(v.commercial_weight_per_nucleus_kg > 0, "Los pesos deben ser mayores que cero.");
+    }
   }
   if (table === "ingredients") v.current_price_per_kg = scaled(payload.current_price_per_kg);
   if (old) {

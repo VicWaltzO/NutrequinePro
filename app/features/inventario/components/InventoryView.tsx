@@ -4,6 +4,7 @@ import { stock } from "@/lib/domain-preview.mjs";
 import { Table, kg, num, label, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";
+import { unitLabels } from "@/shared/domain/presentation.mjs";
 export default function InventoryView({
   s: state,
   tab,
@@ -33,15 +34,19 @@ export default function InventoryView({
           <>
             {productCards}
             <section className="panel">
-              <Table heads={["Producto", "Sacos físicos", "Kg físicos", "Sacos comprometidos"]}>
+              <Table heads={["Producto", "Cantidad física", "Kg físicos", "Cantidad comprometida"]}>
                 {state.products.map((p) => {
                   const a = stock(state, p.id);
                   return (
                     <tr key={p.id}>
                       <td>{p.name}</td>
-                      <td>{num(a.quantity)}</td>
+                      <td>
+                        {num(a.quantity)} {unitLabels(p).plural}
+                      </td>
                       <td>{kg(a.weight_kg)}</td>
-                      <td>{num(a.committed)}</td>
+                      <td>
+                        {num(a.committed)} {unitLabels(p).plural}
+                      </td>
                     </tr>
                   );
                 })}
@@ -51,7 +56,7 @@ export default function InventoryView({
         ) : (
           <>
             <section className="panel flush">
-              <Table heads={["Fecha", "Ítem", "Movimiento", "Sacos", "Kg", "Origen", "Notas"]}>
+              <Table heads={["Fecha", "Ítem", "Movimiento", "Cantidad", "Kg", "Origen", "Notas"]}>
                 {state.inventoryMovements
                   .filter(match)
                   .slice()
@@ -65,7 +70,7 @@ export default function InventoryView({
                       <td>{label(x.movement_type)}</td>
                       <td>
                         {x.quantity > 0 ? "+" : ""}
-                        {x.quantity}
+                        {x.quantity} {x.item_type === "PRODUCT" ? unitLabels(x).plural : ""}
                       </td>
                       <td>{kg(x.weight_kg)}</td>
                       <td>

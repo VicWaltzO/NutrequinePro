@@ -4,6 +4,7 @@ import type { ReturnValues, FormProps } from "@/shared/types/forms";
 import { saleSummary } from "@/lib/domain-preview.mjs";
 import { Input, Table, day, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
+import { unitLabels } from "@/shared/domain/presentation.mjs";
 
 export function ReturnForm({ s: state, record, submit, close, busy }: FormProps) {
   const id = recordId(record);
@@ -39,7 +40,7 @@ export function ReturnForm({ s: state, record, submit, close, busy }: FormProps)
         value={v.return_date}
         onChange={(x) => set("return_date", x)}
       />
-      <Table heads={["Producto", "Entregado", "Ya devuelto", "Devolver sacos"]}>
+      <Table heads={["Producto", "Entregado", "Ya devuelto", "Devolver cantidad"]}>
         {a.items.map((x) => {
           const returned = state.returnItems
             .filter((r) => r.sale_item_id === x.id)
@@ -47,11 +48,17 @@ export function ReturnForm({ s: state, record, submit, close, busy }: FormProps)
           return (
             <tr key={x.id}>
               <td>{find(state, "products", x.product_id)?.name}</td>
-              <td>{x.quantity}</td>
-              <td>{returned}</td>
+              <td>
+                {x.quantity} {unitLabels(x).plural}
+              </td>
+              <td>
+                {returned} {unitLabels(x).plural}
+              </td>
               <td>
                 <input
-                  aria-label="Sacos a devolver"
+                  aria-label={
+                    (unitLabels(x).plural === "sacos" ? "Sacos" : unitLabels(x).plural) + " a devolver"
+                  }
                   type="number"
                   min="0"
                   step="1"

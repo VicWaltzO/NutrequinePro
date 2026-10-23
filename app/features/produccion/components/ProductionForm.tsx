@@ -7,6 +7,7 @@ import { Boxes, CalendarDays, Coins, Wheat } from "lucide-react";
 import { FormSection } from "@/shared/ui/FormSection";
 import { ProductName } from "@/shared/ui/ProductMarker";
 import { ProductionIngredients } from "./ProductionIngredients";
+import { isNucleusProduct } from "@/shared/domain/presentation.mjs";
 export function ProductionForm({ s: state, record, submit, close, busy }: FormProps) {
   const {
     v: values,
@@ -63,7 +64,7 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
       >
         <div className="form-grid">
           {state.products
-            .filter((x) => x.is_active)
+            .filter((x) => x.is_active && isNucleusProduct(x))
             .map((x) => (
               <Input
                 key={x.id}

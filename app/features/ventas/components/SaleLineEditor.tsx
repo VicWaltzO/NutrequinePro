@@ -7,6 +7,7 @@ import { stock } from "../../inventario/domain/stock.mjs";
 import { Input, ProductImage, money, kg, find, num } from "@/shared/ui";
 import { addSaleProduct, createSaleLine } from "../hooks/sale-lines";
 import { ProductName } from "@/shared/ui/ProductMarker";
+import { unitLabels, productPresentation } from "@/shared/domain/presentation.mjs";
 
 export function SaleLineEditor({
   state,
@@ -64,12 +65,19 @@ export function SaleLineEditor({
                     <strong>
                       <ProductName name={product.name} />
                     </strong>
-                    <span>{money(product.default_sale_price)} / saco</span>
-                    <small>{num(available.quantity)} sacos en stock</small>
+                    <span>
+                      {product.default_sale_price == null
+                        ? "Precio pendiente"
+                        : money(product.default_sale_price)}{" "}
+                      / {unitLabels(product).singular}
+                    </span>
+                    <small>
+                      {num(available.quantity)} {unitLabels(product).plural} en stock
+                    </small>
                     {quantity > 0 && (
                       <small className="sale-picker-selected">
                         <Check size={12} />
-                        {num(quantity)} sacos en la venta
+                        {num(quantity)} {unitLabels(product).plural} en la venta
                       </small>
                     )}
                   </span>
@@ -88,12 +96,16 @@ export function SaleLineEditor({
           {announcement}
         </span>
         <p className="sale-weight-help">
-          Peso inicial: <strong>25 kg por saco</strong>. Puedes ajustarlo en cada línea.
+          El contenido neto se toma del producto. Las presentaciones de peso fijo no se pueden modificar.
         </p>
         <ul className="sale-lines line-editor" aria-label="Productos de la venta">
           {rows.map((row, index) => {
             const product = find(state, "products", row.product_id);
             const available = product ? stock(state, product.id) : null;
+            const unit = unitLabels(row.original_item_id ? row : product);
+            const fixed = row.original_item_id
+              ? row.weight_policy_snapshot === "FIXED"
+              : product && productPresentation(product).weight_policy === "FIXED";
             return (
               <li className="sale-line" key={index}>
                 <div className="sale-line-heading">
@@ -119,7 +131,7 @@ export function SaleLineEditor({
                     </select>
                     {available && (
                       <small>
-                        Stock: {num(available.quantity)} sacos · {kg(available.weight_kg)} kg
+                        Stock: {num(available.quantity)} {unit.plural} · {kg(available.weight_kg)} kg
                       </small>
                     )}
                   </label>
@@ -139,8 +151,8 @@ export function SaleLineEditor({
                 </div>
                 <div className="sale-line-values">
                   <Input
-                    label="Sacos"
-                    aria-label="Cantidad de sacos"
+                    label={unit.plural === "sacos" ? "Sacos" : "Cantidad de " + unit.plural}
+                    aria-label={"Cantidad de " + unit.plural}
                     type="number"
                     min="1"
                     step="1"
@@ -149,19 +161,20 @@ export function SaleLineEditor({
                     onChange={(value) => update(index, "quantity", value)}
                   />
                   <Input
-                    label="Kg / saco"
-                    aria-label="Peso por saco"
+                    label={"Kg / " + unit.singular}
+                    aria-label={"Peso por " + unit.singular}
                     type="number"
                     min="0.001"
                     step="0.001"
                     required
                     value={row.unit_weight_kg}
+                    readOnly={!!fixed}
                     onChange={(value) => update(index, "unit_weight_kg", value)}
                   />
                   <div>
                     <Input
-                      label="Precio S/"
-                      aria-label="Precio por saco"
+                      label={"S/ por " + unit.singular}
+                      aria-label={"Precio por " + unit.singular}
                       type="number"
                       min="0"
                       step="0.01"
@@ -169,9 +182,11 @@ export function SaleLineEditor({
                       value={row.unit_price}
                       onChange={(value) => update(index, "unit_price", value)}
                     />
-                    {product && Math.round(Number(row.unit_price) * 100) !== product.default_sale_price && (
-                      <small className="price-change">Lista: {money(product.default_sale_price)}</small>
-                    )}
+                    {product &&
+                      product.default_sale_price != null &&
+                      Math.round(Number(row.unit_price) * 100) !== product.default_sale_price && (
+                        <small className="price-change">Lista: {money(product.default_sale_price)}</small>
+                      )}
                   </div>
                   <div className="sale-line-subtotal">
                     <span>Subtotal</span>

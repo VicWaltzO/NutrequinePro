@@ -1,5 +1,6 @@
 import type { FormProps, SimpleFields } from "@/shared/types/forms";
 import { day } from "@/shared/lib/format";
+import { productPresentation } from "@/shared/domain/presentation.mjs";
 export function simpleFormInitial({ s, record, kind }: Pick<FormProps, "s" | "record" | "kind">) {
   const defaults: Record<string, SimpleFields> = {
     customer: { name: "", is_active: true, site_ids: [] },
@@ -8,7 +9,11 @@ export function simpleFormInitial({ s, record, kind }: Pick<FormProps, "s" | "re
     product: {
       name: "",
       category: "PREMIUM",
-      default_sale_price: 0,
+      default_sale_price: "",
+      presentation_unit: "BAG",
+      unit_weight_grams: 25000,
+      weight_policy: "VARIABLE",
+      stock_entry_mode: "NUCLEUS_PRODUCTION",
       standard_bag_weight_kg: 25,
       bags_per_nucleus: 40,
       commercial_weight_per_nucleus_kg: 1000,
@@ -41,7 +46,8 @@ export function simpleFormInitial({ s, record, kind }: Pick<FormProps, "s" | "re
   };
   const initial = { ...defaults[kind ?? "reason"], ...record };
   if (kind === "product" && record) {
-    initial.default_sale_price = (record.default_sale_price ?? 0) / 100;
+    Object.assign(initial, productPresentation(record));
+    initial.default_sale_price = record.default_sale_price == null ? "" : record.default_sale_price / 100;
     for (const k of ["standard_bag_weight_kg", "commercial_weight_per_nucleus_kg"] as const)
       initial[k] = (record[k] ?? 0) / 1000;
   }

@@ -1,5 +1,6 @@
 import { UserRound, CreditCard, Plus, X } from "lucide-react";
 import { useSaleFormState } from "../hooks/useSaleFormState";
+import { unitLabels } from "@/shared/domain/presentation.mjs";
 import { SaleLineEditor } from "./SaleLineEditor";
 import { stock } from "@/lib/domain-preview.mjs";
 import { Input, Select, Check, PaymentFields, money, kg, find } from "@/shared/ui";
@@ -218,12 +219,19 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
                 {missing.map(([id, required]) => (
                   <p key={id}>
                     {find(state, "products", id)?.name}: stock {stock(state, id).quantity}, solicitado{" "}
-                    {required.q}, faltan {Math.max(0, required.q - stock(state, id).quantity)} sacos. Peso
-                    disponible: {kg(stock(state, id).weight_kg)} kg.
+                    {required.q}, faltan {Math.max(0, required.q - stock(state, id).quantity)}{" "}
+                    {unitLabels(find(state, "products", id)).plural}. Peso disponible:{" "}
+                    {kg(stock(state, id).weight_kg)} kg.
                   </p>
                 ))}
                 <p>Elija venta futura para continuar. El stock saldrá al entregar.</p>
               </div>
+            )}
+            {values.mode !== "immediate" && (
+              <p className="notice">
+                Los productos de ingreso directo quedan pendientes de existencias físicas. Solo los productos
+                fabricables se incluyen en el lote a producir.
+              </p>
             )}
             {values.mode !== "immediate" && (
               <Select

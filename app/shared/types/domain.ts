@@ -29,12 +29,24 @@ export interface CustomerSite extends Entity {
   is_active: boolean;
   is_default: boolean;
 }
+export type PresentationUnit = "BAG" | "BOTTLE" | "UNIT";
+export type WeightPolicy = "FIXED" | "VARIABLE";
+export type StockEntryMode = "NUCLEUS_PRODUCTION" | "DIRECT_STOCK";
+export interface PresentationSnapshot {
+  presentation_unit_snapshot?: PresentationUnit;
+  unit_weight_grams_snapshot?: number;
+  weight_policy_snapshot?: WeightPolicy;
+}
 export interface Product extends Site {
   category: string;
-  default_sale_price: number;
-  standard_bag_weight_kg: number;
-  bags_per_nucleus: number;
-  commercial_weight_per_nucleus_kg: number;
+  default_sale_price: number | null;
+  presentation_unit?: PresentationUnit;
+  unit_weight_grams?: number;
+  weight_policy?: WeightPolicy;
+  stock_entry_mode?: StockEntryMode;
+  standard_bag_weight_kg?: number;
+  bags_per_nucleus?: number;
+  commercial_weight_per_nucleus_kg?: number;
   is_sellable: boolean;
   image: string | null;
 }
@@ -71,7 +83,7 @@ export interface Sale extends Operation {
   fulfillment_status: string;
   financial_status: string;
 }
-export interface SaleItem extends Entity {
+export interface SaleItem extends Entity, PresentationSnapshot {
   sale_id: string;
   product_id: string;
   quantity: number;
@@ -187,7 +199,7 @@ export interface Expense extends Entity {
   status: string;
   reason?: string;
 }
-export interface InventoryMovement extends Entity {
+export interface InventoryMovement extends Entity, PresentationSnapshot {
   date: string;
   item_type: string;
   item_id: string;
