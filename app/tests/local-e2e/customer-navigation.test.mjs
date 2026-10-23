@@ -86,6 +86,8 @@ test(
     };
     const settle = async () =>
       page.locator("main .subtab-content").evaluate(async (node) => {
+        // Let the selected tab commit before collecting its running animations.
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         await Promise.all(node.getAnimations().map((animation) => animation.finished.catch(() => {})));
       });
     const capture = async (name) => {
@@ -104,6 +106,7 @@ test(
         const before = await page.evaluate(() => window.subtabAnimations.length);
         await buttons.nth(index).click();
         await expect(buttons.nth(index)).toHaveAttribute("aria-current", "page");
+        await expect.poll(() => page.evaluate(() => window.subtabAnimations.length)).toBe(before + 1);
         const frames = await page.evaluate((before) => window.subtabAnimations.slice(before), before);
         assert.equal(frames.length, 1, route + " must animate exactly one content node");
         assert.equal(frames[0].duration, 440);
@@ -129,6 +132,7 @@ test(
     const animationsBeforeData = await page.evaluate(() => window.subtabAnimations.length);
     await page.getByRole("button", { name: "Actualizar datos", exact: true }).click();
     await page.getByRole("button", { name: "Ventas futuras", exact: true }).click();
+    await settle();
     assert.equal(await page.evaluate(() => window.subtabAnimations.length), animationsBeforeData);
     assert.equal(
       await page.locator("main .subtab-content").evaluate((node) => node.getAnimations().length),

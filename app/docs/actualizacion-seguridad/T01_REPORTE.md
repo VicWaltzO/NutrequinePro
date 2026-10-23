@@ -139,3 +139,7 @@ Se sustituyó la lectura inmediata del catálogo por una aserción Playwright qu
 El PR documental T00 (#8) se dirige a main y conserva la referencia al commit histórico probado. Su integración es independiente del código T01.
 
 Validación local posterior a la corrección: npm.cmd run verify aprobado (227 pruebas, tres chequeos TypeScript, lint, formato, build y distribución); npm.cmd run test:e2e con Chrome aprobado (29 pruebas, cero fallos, cancelaciones u omisiones; 746,37 segundos). git diff --check aprobado. La confirmación en Ubuntu corresponde a la nueva ejecución de GitHub Actions del commit de seguimiento.
+
+La ejecución Ubuntu 39987866008 aprobó verify pero detectó otras lecturas prematuras en las mismas pruebas: tabla de insumos y animación aún activa. Se aplicaron aserciones con espera también a insumos y fórmulas; la espera de animaciones deja pasar el renderizado en dos frames antes de recoger las animaciones activas y esperar su finalización. Se conserva la comprobación de que actualizar datos o volver a pulsar la pestaña activa no crea animaciones adicionales. La primera corrección local aprobada no se considera aprobación de Ubuntu.
+
+La ampliación de esperas pasó los dos archivos E2E completos afectados (3 pruebas, cero fallos/cancelaciones/omisiones), lint, formato y git diff --check. No cambió la aplicación compilada que aprobó verify y las 29 E2E locales; GitHub repetirá ambas suites completas sobre el nuevo commit.
