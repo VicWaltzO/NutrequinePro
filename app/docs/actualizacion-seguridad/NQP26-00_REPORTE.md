@@ -1,6 +1,6 @@
 # NQP26-00 · Diagnóstico y punto de partida
 
-Fecha de trabajo: 24 de octubre de 2026, America/Bogota.
+Fecha de trabajo: 24 de octubre de 2026, America/Lima.
 Estado: en revisión; diagnóstico y controles locales terminados, pendiente de revisión técnica externa. No acredita implementación de NQP26-01–40.
 
 ## Alcance y base comprobada
@@ -148,3 +148,11 @@ Cambios: únicamente este informe; ninguna modificación de lógica, esquema, de
 Criterios NQP26-00 cubiertos: base y entorno anotados, PR consultados, arquitectura y migraciones inspeccionadas, mapa de operaciones, brechas reproducidas, matriz de las 41 tareas y suite base real. Pendiente: aprobación técnica externa; no marcar Completada hasta obtenerla. NQP26-01 queda identificado como siguiente paso de diseño, sin implementación anticipada.
 
 Commit y enlace de PR: se registran tras publicar en la copia local 03_REPORTES/NQP26-00_REPORTE.md y 05_BITACORA/REGISTRO_TAREAS.csv; en Git se obtienen con git log -- app/docs/actualizacion-seguridad/NQP26-00_REPORTE.md. No hay issue independiente. Las evidencias no se versionan. No se fusiona ni despliega.
+
+## Revisión documental posterior
+
+La revisión técnica externa del 24 de octubre de 2026 considera el diagnóstico conforme para comenzar NQP26-01. NQP26-00 permanece En revisión y el PR no se fusiona. No se atribuye a esa revisión ejecución del código ni verificación de logs locales.
+
+Entrega original: commit 62d3fdf3903d1028ccd071deb5b7bd1c534305e2; PR https://github.com/VicWaltzO/NutrequinePro/pull/11. Este apartado sincroniza los identificadores ya registrados en la copia local. El SHA identifica la entrega original, no el commit posterior que añade esta nota. Zona operativa del proyecto: America/Lima; la fecha anterior se había expresado con la zona de la sesión.
+
+Las 233 pruebas generales y 29 E2E acreditan únicamente los escenarios cubiertos en la base indicada. No son garantía de ausencia de defectos. Continúan sin corregir la deduplicación de request_id sin comprobar contenido, las reservas parciales efectivas y la recepción del rendimiento real del molino. NQP26-01 definirá sus contratos; no implementará esas funciones.
