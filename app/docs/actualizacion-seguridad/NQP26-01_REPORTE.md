@@ -55,7 +55,7 @@ Tabla de transiciones, reintentos/concurrencia/atomicidad, unidades 25/50/2,2 kg
 
 Siguientes tareas: 02/03 para carrito, 06 para fecha, y 04/05 después de la revisión del contrato. Micros 20/21 antes de compra/consumo/costo. No se inicia implementación cruzada ni se crean PR/Issues anticipados.
 
-Commit, PR y cierre de resultados se incorporan al terminar. La copia local se guarda en Actualizacion_2026-10-24_Codex/03_REPORTES; el estado se actualiza a En revisión solamente cuando termine la verificación y se presente el PR independiente. No fusionar ni desplegar.
+Entrega inicial de contratos y pruebas: commit 53a8c19cb92d41af33dcab51104347e7dc28385b. PR independiente en borrador: https://github.com/VicWaltzO/NutrequinePro/pull/12, sin fusionar. Estado En revisión. Este apartado se añade en un commit documental posterior; el SHA inicial identifica la entrega del código de pruebas validado. El commit documental final queda en git log y en el registro local de tareas. Copias locales: Actualizacion_2026-10-24_Codex/03_REPORTES/NQP26-01_REPORTE.md y los dos documentos de consulta en esa misma carpeta; sincronización manual desde estos archivos versionados, no automática. No desplegar.
 
 ## Cierre de verificación y límites
 
