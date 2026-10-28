@@ -28,6 +28,7 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
     dup,
     paid,
   } = useSaleFormState({ s: state, record, kind });
+  const hasProducts = rows.length > 0 && rows.every((row) => !!row.product_id);
   let submitLabel = "Confirmar venta";
   if (edit) submitLabel = "Registrar rectificación";
   else if (kind === "draft") submitLabel = "Guardar borrador";
@@ -54,6 +55,7 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
       className="sale-form"
       onSubmit={async (event) => {
         event.preventDefault();
+        if (!hasProducts) return;
         await submit(edit ? "SALE_CORRECT" : "SALE_SAVE", {
           ...values,
           paid_amount: paidAmount ?? total / 100,
@@ -199,6 +201,11 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
         </div>
       </section>
       <SaleLineEditor state={state} rows={rows} setRows={setRows} update={update} total={total}>
+        {!hasProducts && (
+          <p className="notice" role="status">
+            Agrega al menos un producto y completa todas las líneas.
+          </p>
+        )}
         {!edit && (
           <div className="sale-delivery">
             <Select
@@ -328,7 +335,9 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
       </section>
       <Footer
         busy={busy}
-        disabled={!edit && kind !== "draft" && values.mode === "immediate" && missing.length > 0}
+        disabled={
+          !hasProducts || (!edit && kind !== "draft" && values.mode === "immediate" && missing.length > 0)
+        }
         close={close}
         label={submitLabel}
       />

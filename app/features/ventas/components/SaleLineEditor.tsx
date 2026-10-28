@@ -14,6 +14,7 @@ import {
 } from "../hooks/sale-lines";
 import { ProductName } from "@/shared/ui/ProductMarker";
 import { unitLabels, productPresentation } from "@/shared/domain/presentation.mjs";
+import { saleLineSubtotal } from "../hooks/sale-form-preview";
 
 export function SaleLineEditor({
   state,
@@ -31,14 +32,21 @@ export function SaleLineEditor({
   children?: ReactNode;
 }) {
   const [announcement, setAnnouncement] = useState("");
-  const [choosing, setChoosing] = useState("");
+  const [choosing, setChoosing] = useState<{ productId: string; rows: SaleLine[] } | null>(null);
+  const addButton = useRef<HTMLButtonElement>(null);
   const cardButtons = useRef<Record<string, HTMLButtonElement | null>>({});
   const closeChoice = () => {
-    cardButtons.current[choosing]?.focus({ preventScroll: true });
-    setChoosing("");
+    if (choosing) cardButtons.current[choosing.productId]?.focus({ preventScroll: true });
+    setChoosing(null);
+  };
+  const editLine = (index: number, field: keyof SaleLine, value: string) => {
+    setChoosing(null);
+    update(index, field, value);
   };
   const products = state.products.filter((product) => product.is_active && product.is_sellable);
-  const choiceProduct = products.find((product) => product.id === choosing);
+  // Choices only apply to the exact rows that were displayed when the picker opened.
+  const choiceProduct =
+    choosing?.rows === rows ? products.find((product) => product.id === choosing.productId) : undefined;
   const choices = choiceProduct ? saleProductCandidates(rows, choiceProduct) : [];
   const selectedLines = rows.filter((row) => row.product_id).length;
   return (
@@ -76,10 +84,10 @@ export function SaleLineEditor({
                       candidates.length > 1 ||
                       candidates.some((index) => !canIncrementSaleLine(rows[index], product))
                     ) {
-                      setChoosing(product.id);
+                      setChoosing({ productId: product.id, rows });
                       return;
                     }
-                    setChoosing("");
+                    setChoosing(null);
                     setRows((current) => addSaleProduct(current, product));
                     setAnnouncement(product.name + " agregado a la venta.");
                   }}
@@ -128,7 +136,9 @@ export function SaleLineEditor({
                 disabled={!canIncrementSaleLine(rows[index], choiceProduct)}
                 aria-label={"Agregar a línea " + (index + 1) + " de " + choiceProduct.name}
                 onClick={() => {
-                  setRows((current) => incrementSaleLine(current, index, choiceProduct));
+                  setRows((current) =>
+                    current === choosing?.rows ? incrementSaleLine(current, index, choiceProduct) : current,
+                  );
                   closeChoice();
                   setAnnouncement(choiceProduct.name + " agregado a la línea " + (index + 1) + ".");
                 }}
@@ -155,6 +165,7 @@ export function SaleLineEditor({
         <p className="sale-weight-help">
           El contenido neto se toma del producto. Las presentaciones de peso fijo no se pueden modificar.
         </p>
+        {rows.length === 0 && <p className="notice">Aún no hay productos agregados</p>}
         <ul className="sale-lines line-editor" aria-label="Productos de la venta">
           {rows.map((row, index) => {
             const product = find(state, "products", row.product_id);
@@ -177,7 +188,7 @@ export function SaleLineEditor({
                       aria-label="Producto"
                       required
                       value={row.product_id}
-                      onChange={(event) => update(index, "product_id", event.target.value)}
+                      onChange={(event) => editLine(index, "product_id", event.target.value)}
                     >
                       <option value="">Seleccionar producto</option>
                       {products.map((option) => (
@@ -197,10 +208,11 @@ export function SaleLineEditor({
                     className="icon-button danger"
                     aria-label="Quitar producto"
                     title={"Quitar " + (product?.name ?? "línea")}
-                    disabled={rows.length === 1}
                     onClick={() => {
+                      setChoosing(null);
                       setRows((current) => current.filter((_, position) => position !== index));
                       setAnnouncement((product?.name ?? "Producto") + " quitado de la venta.");
+                      addButton.current?.focus({ preventScroll: true });
                     }}
                   >
                     <Trash2 size={17} aria-hidden="true" />
@@ -215,7 +227,7 @@ export function SaleLineEditor({
                     step="1"
                     required
                     value={row.quantity}
-                    onChange={(value) => update(index, "quantity", value)}
+                    onChange={(value) => editLine(index, "quantity", value)}
                   />
                   <Input
                     label={"Kg / " + unit.singular}
@@ -226,7 +238,7 @@ export function SaleLineEditor({
                     required
                     value={row.unit_weight_kg}
                     readOnly={!!fixed}
-                    onChange={(value) => update(index, "unit_weight_kg", value)}
+                    onChange={(value) => editLine(index, "unit_weight_kg", value)}
                   />
                   <div>
                     <Input
@@ -237,7 +249,7 @@ export function SaleLineEditor({
                       step="0.01"
                       required
                       value={row.unit_price}
-                      onChange={(value) => update(index, "unit_price", value)}
+                      onChange={(value) => editLine(index, "unit_price", value)}
                     />
                     {product &&
                       product.default_sale_price != null &&
@@ -247,7 +259,7 @@ export function SaleLineEditor({
                   </div>
                   <div className="sale-line-subtotal">
                     <span>Subtotal</span>
-                    <strong>{money(Math.round(Number(row.quantity) * Number(row.unit_price) * 100))}</strong>
+                    <strong>{money(saleLineSubtotal(row))}</strong>
                   </div>
                 </div>
               </li>
@@ -255,9 +267,13 @@ export function SaleLineEditor({
           })}
         </ul>
         <button
+          ref={addButton}
           type="button"
           className="text-button sale-add-line"
-          onClick={() => setRows((current) => [...current, createSaleLine()])}
+          onClick={() => {
+            setChoosing(null);
+            setRows((current) => [...current, createSaleLine()]);
+          }}
         >
           <Plus size={16} aria-hidden="true" />
           Agregar producto
