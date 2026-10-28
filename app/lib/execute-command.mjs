@@ -30,6 +30,7 @@ import { createProductionOperations } from "../features/produccion/domain/operat
 import { createCommandContext } from "./command-context.mjs";
 import { assertCommandPermission } from "../shared/domain/permissions.mjs";
 import { validateMasterCommand } from "./master-command-contracts.mjs";
+import { guardCoverageMode } from "../features/ventas/domain/coverage.mjs";
 const handlers = {
   CUSTOMER_SAVE: customerSave,
   CUSTOMER_SITES_SAVE: customerSitesSave,
@@ -59,12 +60,13 @@ const handlers = {
   CONFIG_SAVE: configSave,
   USER_SAVE: userSave,
 };
-export function executeCommand(original, command, actor, clock = new Date().toISOString()) {
+export function executeCommand(original, command, actor, clock = new Date().toISOString(), options = {}) {
   const state = structuredClone(original);
   const { type, payload: payload = {} } = command;
   assertCommandPermission(actor, type);
+  guardCoverageMode(state, type, options.partialReservations === true);
   validateMasterCommand(state, type, payload);
-  const context = createCommandContext(state, type, payload, actor, clock);
+  const context = createCommandContext(state, type, payload, actor, clock, options);
   Object.assign(
     context,
     createPaymentOperations(context),

@@ -106,18 +106,13 @@ persistenceTest(
 
 // These are future acceptance contracts, not evidence that the features work.
 // See docs/actualizacion-seguridad/NQP26-01_MATRIZ_PRUEBAS.md before activating them.
+// I01/I02/I10/I12/I13 now run in nqp26-reservations.test.mjs;
+// I07 in nqp26-reservations-http.test.mjs; I09 in command-replay.test.mjs and HTTP.
 const futureContracts = [
-  ["I01", "35 sacos cubiertos y 5 faltantes para pedido de 40", "04"],
-  ["I02", "un segundo pedido no vuelve a asignar los 35 sacos protegidos", "04"],
   ["I03", "entrada de 10 completa primero el faltante de 5 según fecha", "05/06"],
   ["I04", "fecha igual desempata por registro e identificador estable", "05/06"],
   ["I06", "cancelación libera exactamente la cobertura y la reasigna", "05"],
-  ["I07", "dos operadores no reservan dos veces la última unidad por HTTP", "04"],
-  ["I09", "mismo request_id con contenido distinto rechaza sin cambios", "04/T03"],
-  ["I10", "guardar venta sin cambios no duplica cobertura ni movimientos", "04/05"],
   ["I11", "ingreso directo atiende frascos sin planificar sacos", "05"],
-  ["I12", "reservas conservan presentaciones de 25/50 kg y frascos de 2,2 kg", "04/15"],
-  ["I13", "activación de nuevas reservas no modifica ventas históricas", "04/21"],
   ["I14", "compra previa al corte no incrementa el saldo inicial", "21"],
   ["I15", "plan 20 y real 12 consume solo 12 y cierra preparación", "28"],
   ["I16", "preparar núcleos no ingresa sacos antes del cierre del molino", "28/30"],

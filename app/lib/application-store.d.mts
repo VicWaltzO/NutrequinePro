@@ -10,4 +10,7 @@ export interface ApplicationStore {
   ensureState: (identity: Identity) => Promise<AppState>;
   runCommand: (input: unknown, identity: Identity) => Promise<CommandResult>;
 }
-export function createStore(binding: () => PersistenceDatabase): ApplicationStore;
+export interface StoreOptions {
+  partialReservations?: boolean;
+}
+export function createStore(binding: () => PersistenceDatabase, options?: StoreOptions): ApplicationStore;

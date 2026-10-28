@@ -307,6 +307,7 @@ test("Node permisos: ADMIN, OPERATOR y VIEWER, cambios de rol, desactivación y 
     { name: "Operador permitido" },
     operatorRequest,
   );
+  assert.equal(typeof operatorResult, "string");
   assert.equal(
     (
       await operator.call("/api/command", {
@@ -321,8 +322,13 @@ test("Node permisos: ADMIN, OPERATOR y VIEWER, cambios de rol, desactivación y 
   await operator.login("login-writer", operator.password);
   const afterRoleChange = await app.client.state();
   assert.equal(
-    await operator.command("CUSTOMER_SAVE", { name: "Operador permitido" }, operatorRequest),
-    operatorResult,
+    (
+      await operator.call("/api/command", {
+        method: "POST",
+        body: { type: "CUSTOMER_SAVE", payload: { name: "Operador permitido" }, request_id: operatorRequest },
+      })
+    ).status,
+    403,
   );
   assert.deepEqual(await app.client.state(), afterRoleChange);
   assert.equal(
