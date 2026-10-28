@@ -34,6 +34,12 @@ test(
     for (const section of ["Datos del cliente", "Productos", "Pagos"])
       await expect(dialog.getByRole("region", { name: section, exact: true })).toBeAttached();
     await expect(dialog.getByLabel("Peso por saco", { exact: true })).toHaveValue("25");
+    await dialog.getByRole("button", { name: "Agregar Potripregnant", exact: true }).click({ clickCount: 5 });
+    await expect(dialog.getByLabel("Producto", { exact: true })).toHaveCount(1);
+    await expect(dialog.getByLabel("Cantidad de sacos", { exact: true })).toHaveValue("5");
+    await dialog.getByLabel("Cantidad de sacos", { exact: true }).fill("7");
+    await dialog.getByRole("button", { name: "Agregar Potripregnant", exact: true }).click();
+    await expect(dialog.getByLabel("Cantidad de sacos", { exact: true })).toHaveValue("8");
     const runQuick = async (button, field, name, type) => {
       await dialog.getByRole("button", { name: button, exact: true }).click();
       await dialog.getByLabel(field, { exact: true }).fill(name);
@@ -72,8 +78,33 @@ test(
     await dialog.getByRole("button", { name: "Agregar Hi-Performance", exact: true }).click();
     await expect(dialog.getByLabel("Peso por saco", { exact: true }).nth(1)).toHaveValue("25");
     await dialog.getByRole("button", { name: "Agregar Potripregnant", exact: true }).click();
-    await expect(dialog.getByLabel("Peso por saco", { exact: true })).toHaveCount(3);
+    await expect(dialog.getByLabel("Peso por saco", { exact: true })).toHaveCount(2);
     await expect(dialog.getByLabel("Peso por saco", { exact: true }).first()).toHaveValue("17.001");
+    await expect(dialog.getByLabel("Cantidad de sacos", { exact: true }).first()).toHaveValue("3");
+    await expect(dialog.getByLabel("Precio por saco", { exact: true }).first()).toHaveValue("73.01");
+    await dialog.getByRole("button", { name: "Agregar producto", exact: true }).click();
+    await dialog.getByLabel("Producto", { exact: true }).last().selectOption("prod-1");
+    await dialog.getByLabel("Precio por saco", { exact: true }).last().fill("70");
+    await dialog.getByRole("button", { name: "Agregar Potripregnant", exact: true }).click();
+    await expect(dialog.getByRole("group", { name: "Elige la línea de Potripregnant" })).toBeVisible();
+    await dialog.getByRole("group", { name: "Elige la línea de Potripregnant" }).scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: join(server.evidence, "sale-line-choice-desktop.png"),
+      animations: "disabled",
+    });
+    await expect(dialog.getByLabel("Cantidad de sacos", { exact: true }).first()).toHaveValue("3");
+    await dialog.getByRole("button", { name: "Agregar a línea 3 de Potripregnant", exact: true }).click();
+    await expect(dialog.getByLabel("Cantidad de sacos", { exact: true }).last()).toHaveValue("2");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await dialog.getByRole("button", { name: "Agregar Potripregnant", exact: true }).click();
+    await dialog.getByRole("group", { name: "Elige la línea de Potripregnant" }).scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: join(server.evidence, "sale-line-choice-mobile.png"),
+      animations: "disabled",
+    });
+    await dialog.getByRole("button", { name: "Cancelar selección de línea", exact: true }).click();
+    await expect(dialog.getByRole("button", { name: "Agregar Potripregnant", exact: true })).toBeFocused();
+    await page.setViewportSize({ width: 1440, height: 1000 });
     await dialog.getByRole("button", { name: "Quitar producto", exact: true }).last().click();
     await expect(dialog.getByLabel("Producto", { exact: true })).toHaveCount(2);
     await dialog.getByLabel("Entrega", { exact: true }).selectOption("future");
@@ -126,13 +157,29 @@ test(
     const summary = saleSummary(body.state, { id: body.result });
     assert.equal(summary.items[0].unit_weight_kg, 17001);
     assert.equal(summary.items[0].unit_price, 7301);
-    assert.equal(summary.items[0].quantity, 2);
+    assert.equal(summary.items[0].quantity, 3);
     assert.equal(summary.items[1].unit_weight_kg, 25000);
     assert.equal(summary.paid, 1001);
     await page.getByRole("button", { name: "Rectificar", exact: true }).click();
     const correction = page.getByRole("dialog", { name: "Rectificar venta", exact: true });
     await expect(correction.getByLabel("Peso por saco", { exact: true }).first()).toHaveValue("17.001");
     await expect(correction.getByLabel("Peso por saco", { exact: true }).nth(1)).toHaveValue("25");
+    await correction.getByRole("button", { name: "Agregar Potripregnant", exact: true }).click();
+    await expect(correction.getByLabel("Cantidad de sacos", { exact: true }).first()).toHaveValue("4");
+    await correction
+      .getByLabel("Motivo de rectificación", { exact: true })
+      .fill("Incremento sintético de la misma línea");
+    const corrected = page.waitForResponse(
+      (result) =>
+        result.url().endsWith("/api/command") && result.request().postDataJSON()?.type === "SALE_CORRECT",
+    );
+    await correction.getByRole("button", { name: "Registrar rectificación", exact: true }).click();
+    const correctedResponse = await corrected;
+    assert.equal(correctedResponse.status(), 200, await correctedResponse.text());
+    assert.equal(
+      correctedResponse.request().postDataJSON().payload.items[0].original_item_id,
+      summary.items[0].id,
+    );
     assert.deepEqual(errors, []);
     console.log("Sale form evidence: " + server.evidence);
   },

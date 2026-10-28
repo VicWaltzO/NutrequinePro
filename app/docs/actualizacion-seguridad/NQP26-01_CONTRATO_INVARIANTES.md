@@ -1,6 +1,6 @@
 # NQP26-01 · Contrato de invariantes
 
-Estado: diseño propuesto para revisión técnica, sin implementación del nuevo dominio.
+Estado: conforme para el alcance de diseño y pruebas de base, con reservas de arquitectura. Modelo A preseleccionado, no ratificado como arquitectura persistente; su aprobación corresponde a NQP26-04. Los 17 test.todo son compromisos de pruebas futuras, no regresiones introducidas por 01.
 Base inspeccionada: main `43206560277b704b5c16da5c01702f0cffb97e3f`. Fecha: 24 de octubre de 2026; zona operativa America/Lima.
 
 Este contrato convierte las fuentes A (UX/logística v1.1) y B (R01–R54) en reglas comprobables. La revisión externa de NQP26-00 permite comenzar el diseño; el PR #11 permanece separado, en borrador. Las pruebas verdes solo acreditan su alcance ejecutado. Los contratos nuevos siguen pendientes según la [matriz](NQP26-01_MATRIZ_PRUEBAS.md).

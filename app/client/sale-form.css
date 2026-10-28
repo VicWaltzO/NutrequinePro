@@ -51,6 +51,27 @@
   font-size: 0.8125rem;
   margin-bottom: 14px;
 }
+.sale-line-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-width: 0;
+  margin-block: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+}
+.sale-line-choice legend {
+  font-weight: 650;
+}
+.sale-line-choice p {
+  flex-basis: 100%;
+  margin: 0;
+}
+.sale-line-choice button {
+  min-height: 44px;
+  white-space: normal;
+}
 .sale-date {
   max-width: 240px;
 }

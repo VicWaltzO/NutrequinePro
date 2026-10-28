@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { Check, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import type { AppState } from "@/lib/domain-types";
 import type { SaleLine } from "@/shared/types/forms";
 import { stock } from "../../inventario/domain/stock.mjs";
 import { Input, ProductImage, money, kg, find, num } from "@/shared/ui";
-import { addSaleProduct, createSaleLine } from "../hooks/sale-lines";
+import {
+  addSaleProduct,
+  createSaleLine,
+  saleProductCandidates,
+  canIncrementSaleLine,
+  incrementSaleLine,
+} from "../hooks/sale-lines";
 import { ProductName } from "@/shared/ui/ProductMarker";
 import { unitLabels, productPresentation } from "@/shared/domain/presentation.mjs";
 
@@ -25,7 +31,15 @@ export function SaleLineEditor({
   children?: ReactNode;
 }) {
   const [announcement, setAnnouncement] = useState("");
+  const [choosing, setChoosing] = useState("");
+  const cardButtons = useRef<Record<string, HTMLButtonElement | null>>({});
+  const closeChoice = () => {
+    cardButtons.current[choosing]?.focus({ preventScroll: true });
+    setChoosing("");
+  };
   const products = state.products.filter((product) => product.is_active && product.is_sellable);
+  const choiceProduct = products.find((product) => product.id === choosing);
+  const choices = choiceProduct ? saleProductCandidates(rows, choiceProduct) : [];
   const selectedLines = rows.filter((row) => row.product_id).length;
   return (
     <section className="sale-section sale-products" aria-labelledby="sale-products-title">
@@ -50,10 +64,22 @@ export function SaleLineEditor({
               return (
                 <button
                   key={product.id}
+                  ref={(element) => {
+                    cardButtons.current[product.id] = element;
+                  }}
                   type="button"
                   className={"sale-product-option " + (quantity > 0 ? "included" : "")}
                   aria-label={"Agregar " + product.name}
                   onClick={() => {
+                    const candidates = saleProductCandidates(rows, product);
+                    if (
+                      candidates.length > 1 ||
+                      candidates.some((index) => !canIncrementSaleLine(rows[index], product))
+                    ) {
+                      setChoosing(product.id);
+                      return;
+                    }
+                    setChoosing("");
                     setRows((current) => addSaleProduct(current, product));
                     setAnnouncement(product.name + " agregado a la venta.");
                   }}
@@ -90,6 +116,37 @@ export function SaleLineEditor({
           <p className="notice">
             No hay productos activos disponibles para venta. Configúralos antes de continuar.
           </p>
+        )}
+        {choiceProduct && choices.length > 0 && (
+          <fieldset className="sale-line-choice">
+            <legend>Elige la línea de {choiceProduct.name}</legend>
+            <p>Se conservarán el precio y el peso de la línea que elijas.</p>
+            {choices.map((index) => (
+              <button
+                key={index}
+                type="button"
+                disabled={!canIncrementSaleLine(rows[index], choiceProduct)}
+                aria-label={"Agregar a línea " + (index + 1) + " de " + choiceProduct.name}
+                onClick={() => {
+                  setRows((current) => incrementSaleLine(current, index, choiceProduct));
+                  closeChoice();
+                  setAnnouncement(choiceProduct.name + " agregado a la línea " + (index + 1) + ".");
+                }}
+              >
+                Línea {index + 1} · {rows[index].unit_weight_kg} kg / {unitLabels(choiceProduct).singular}
+                {" · "}
+                {money(Math.round(Number(rows[index].unit_price) * 100))}
+              </button>
+            ))}
+            {choices.some((index) => !canIncrementSaleLine(rows[index], choiceProduct)) && (
+              <p role="alert">
+                Revisa cantidad, precio y peso antes de añadir otra unidad. La cantidad máxima es 10 000 000.
+              </p>
+            )}
+            <button type="button" className="text-button" onClick={closeChoice}>
+              Cancelar selección de línea
+            </button>
+          </fieldset>
         )}
         <p className="sale-picker-mobile-hint">Desliza para ver las presentaciones.</p>
         <span className="sale-live-message" role="status">
