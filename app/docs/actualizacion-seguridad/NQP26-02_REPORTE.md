@@ -71,4 +71,4 @@ Se conservaron los 17 todo de 01: reservas parciales, reintentos con otro conten
 
 Informe versionado y copia local: app/docs/actualizacion-seguridad/NQP26-02_REPORTE.md y C:/Users/vicve/Documents/ChatGPT/Nutrequine Pro/Actualizacion_2026-10-24_Codex/03_REPORTES/NQP26-02_REPORTE.md. Los logs quedan en 04_EVIDENCIAS. Las capturas sintéticas se copian allí desde outputs (excluido de Git). Se conserva el commit documental previo e030a79 como atención separada de la revisión de 01 dentro de esta entrega; no cambia su arquitectura propuesta ni sus pruebas.
 
-SHA de implementación y URL de PR se incorporan después de crear la entrega. No fusionar ni desplegar.
+Entrega de implementación verificada: e96cc01eb6f6f327436254b993727c90a936e8e0. PR #13 en borrador: https://github.com/VicWaltzO/NutrequinePro/pull/13. Este registro se añade en un commit documental posterior; su SHA final se conserva en git log y en REGISTRO_TAREAS.csv. Rama codex/nqp26-02-lineas-unicas-venta, base main b8651ecc600cd94cc5275b6d0b1bec21b101eb55. Estado En revisión; no fusionar ni desplegar.
