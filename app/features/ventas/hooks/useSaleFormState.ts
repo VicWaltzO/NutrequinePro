@@ -31,6 +31,7 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
           original_item_id: x.id,
           presentation_unit_snapshot: x.presentation_unit_snapshot ?? "BAG",
           weight_policy_snapshot: x.weight_policy_snapshot ?? "VARIABLE",
+          unit_weight_grams_snapshot: x.unit_weight_grams_snapshot ?? x.unit_weight_kg,
           product_id: x.product_id,
           quantity: x.quantity,
           unit_weight_kg: x.unit_weight_kg / 1000,

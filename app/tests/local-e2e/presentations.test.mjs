@@ -147,6 +147,24 @@ test(
       { production_date: "2026-10-22", products: [{ product_id: product, nuclei_count: 1 }] },
       422,
     );
+    for (const product_id of ["prod-1", product]) {
+      const item = {
+        product_id,
+        quantity: 1,
+        unit_weight_kg: product_id === product ? 2.2 : 25,
+        unit_price: 12.34,
+      };
+      await run(
+        "SALE_SAVE",
+        { ...salePayload, items: [item, { ...item, presentation_unit_snapshot: "UNIT" }] },
+        422,
+      );
+    }
+    await run(
+      "SALE_SAVE",
+      { ...salePayload, items: [{ product_id: "prod-4", quantity: 1, unit_weight_kg: 50 }] },
+      422,
+    );
     assert.deepEqual(await state(), before);
     await page.reload();
     await go("#inventory");
@@ -183,6 +201,9 @@ test(
     await dialog.getByLabel("Producto", { exact: true }).selectOption(product);
     await expect(dialog.getByLabel("Peso por frasco", { exact: true })).toHaveValue("2.2");
     await expect(dialog.getByLabel("Peso por frasco", { exact: true })).toHaveAttribute("readonly", "");
+    await dialog.getByRole("button", { name: "Agregar CascoPlus+", exact: true }).click({ clickCount: 2 });
+    await expect(dialog.getByLabel("Cantidad de frascos", { exact: true })).toHaveValue("3");
+    await expect(dialog.getByLabel("Producto", { exact: true })).toHaveCount(1);
     await dialog.getByLabel("Cantidad de frascos", { exact: true }).fill("2");
     await dialog.getByRole("button", { name: "Agregar Potripregnant", exact: true }).click();
     await expect(dialog.getByLabel("Peso por saco", { exact: true })).toHaveValue("25");

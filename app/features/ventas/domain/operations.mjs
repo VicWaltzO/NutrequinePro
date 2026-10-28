@@ -1,5 +1,6 @@
 import { requireValue, scaled, positiveInt, pick, multiply } from "../../../shared/domain/core.mjs";
 import { deliveryAvailability } from "../../inventario/domain/stock.mjs";
+import { saleLineCompatibilityKey } from "../../../shared/domain/sale-line-compatibility.mjs";
 import {
   presentationSnapshot,
   productPresentation,
@@ -10,7 +11,8 @@ export function createSaleOperations(context) {
   const { movement, s: state, p: payload } = context;
   const saleItems = (sale_id, rows, old = []) => {
     requireValue(Array.isArray(rows) && rows.length > 0, "Agregue al menos un producto.");
-    return rows.map((r) => {
+    const history = [];
+    const items = rows.map((r) => {
       const product = pick(state, "products", r.product_id);
       requireValue(
         product.is_active && product.is_sellable,
@@ -18,6 +20,7 @@ export function createSaleOperations(context) {
       );
       const quantity = positiveInt(r.quantity);
       const prev = old.find((x) => x.id === r.original_item_id && x.product_id === product.id);
+      history.push(prev);
       const snapshot = presentationSnapshot(prev ?? product, !!prev);
       const weight = scaled(
         r.unit_weight_kg ?? (prev?.unit_weight_kg ?? productPresentation(product).unit_weight_grams) / 1000,
@@ -45,6 +48,26 @@ export function createSaleOperations(context) {
         is_current: true,
       };
     });
+    const seen = new Map();
+    const identities = new Set();
+    items.forEach((item, index) => {
+      const original = history[index];
+      if (original) {
+        requireValue(!identities.has(original.id), "La línea histórica está repetida.");
+        identities.add(original.id);
+      }
+      const key = saleLineCompatibilityKey(item);
+      const prior = seen.get(key);
+      const unchangedHistorical =
+        original &&
+        saleLineCompatibilityKey({ ...original, ...presentationSnapshot(original, true) }) === key;
+      requireValue(
+        !prior || (unchangedHistorical && prior.every(Boolean)),
+        "Hay líneas iguales del mismo producto y presentación. Aumente la cantidad en una sola línea.",
+      );
+      seen.set(key, [...(prior ?? []), !!unchangedHistorical]);
+    });
+    return items;
   };
   const assertStock = (rows, allowOld = []) => {
     const missing = deliveryAvailability(state, rows, allowOld).filter(

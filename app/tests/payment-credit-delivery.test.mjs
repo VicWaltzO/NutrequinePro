@@ -197,7 +197,13 @@ test("stock exige también peso y agrupa líneas del mismo producto", () => {
     products: [{ product_id: "prod-1", nuclei_count: 1 }],
     confirm: true,
   });
-  const id = f.run("SALE_SAVE", sale(f.customer, { paid_amount: 0, items: [...items(20), ...items(21)] }));
+  const id = f.run(
+    "SALE_SAVE",
+    sale(f.customer, {
+      paid_amount: 0,
+      items: [...items(20), ...items(21).map((row) => ({ ...row, unit_price: 72 }))],
+    }),
+  );
   assert.throws(() => f.run("SALE_DELIVER", { id }), /faltan 1 sacos/);
   const heavy = f.run(
     "SALE_SAVE",
