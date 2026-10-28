@@ -1,6 +1,6 @@
 {
   "baseCommit": "54a4ef7",
-  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría. Núcleos decimales: solo los campos de cantidad de producción y rectificación admiten coma/punto con dos decimales.",
+  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría. Núcleos decimales: solo los campos de cantidad de producción y rectificación admiten coma/punto con dos decimales. NQP26-03: última línea eliminable y bloqueo accesible sin productos; solo sale/sale:correct actualizados tras inspección visual sintética.",
   "snapshots": {
     "ADMIN:dashboard": "f63f327371847be1f5670be60c4359bd1cec8628289a826a87a8ee394535deb7",
     "ADMIN:sales": "970f542136365c03e3878a6e286fafb7b86026bacb59d5085d6ee12a56e8fa2b",
@@ -46,8 +46,8 @@
     "VIEWER:balance": "dbce759a1cfa451660ee8d86364601cc6cd1497cec5c47fe1923d8ec8123092a",
     "VIEWER:customers": "34f93dbe6479a2780de97af12553c913d2c51d8a9a8c01be765f7449df369fb8",
     "VIEWER:config": "e2570a96913e7279e9cb16e4e637a03b0e2fa875ce4bf7ed891973fe01fb5679",
-    "modal:sale": "d834153f50709b81ae3ee9abcf8530867520a589d23184c5c8f1db43c668d673",
-    "modal:sale:correct": "b03115c5e70ca834eca9095c864281cfdc4a0edb59278da2fa655e5171f2f87c",
+    "modal:sale": "e96d9143bef1fb2d3f4cf7fce01733e17097eb6029799a0b4e04fc7ece4fbbf9",
+    "modal:sale:correct": "f06a45dad92a4c81f1040d351c75d0ad230e9bade5d1db926d64c3028df7df7d",
     "modal:payment": "bbe80a5303fe1651345a2f03d1d7004da3f21e52e9c978ae4f23633e229b501a",
     "modal:credit": "0310fb4a7d7fe6cfe1cfedf4000047cabe75bccf483d01bf6e3be167d8e01b21",
     "modal:production": "ba5d9dc9a54157935082427149e8f1eb71808f90f663d43b8136823ed771952d",
