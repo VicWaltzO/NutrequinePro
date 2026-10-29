@@ -1,0 +1,72 @@
+.pending-stock {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border: 1px solid var(--warning);
+  border-radius: 12px;
+  color: var(--warning);
+  background: var(--warning-soft);
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.pending-stock-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.pending-stock-summary > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.pending-stock-summary p {
+  margin: 0;
+}
+.pending-stock summary {
+  cursor: pointer;
+  padding-block: 10px;
+  min-height: 44px;
+  width: fit-content;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.pending-stock summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.pending-stock-help {
+  margin: 0 0 12px;
+}
+.pending-stock-products,
+.pending-stock-orders {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pending-stock-products > li {
+  padding-block: 12px;
+  border-top: 1px solid currentColor;
+}
+.pending-stock-product,
+.pending-stock-orders > li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+.pending-stock .text-button {
+  min-height: 44px;
+  color: inherit;
+  text-align: start;
+}
+@media (max-width: 760px) {
+  .pending-stock {
+    padding: 14px;
+  }
+  .pending-stock-orders > li {
+    display: block;
+  }
+  .pending-stock-orders span {
+    display: block;
+  }
+}
