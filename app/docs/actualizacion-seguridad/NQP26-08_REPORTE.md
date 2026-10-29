@@ -1,7 +1,7 @@
 # NQP26-08 · Aviso global de faltantes netos
 
 2026-10-29, America/Bogota. Calendario operativo: America/Lima.
-Estado: validación local conforme para Capa 1; CI y entrega en curso. Aceptación empresarial pendiente de Capa 2.
+Estado: **CONFORME PARA CAPA 1 / PARCIAL PARA ACEPTACIÓN EMPRESARIAL**. A08-15 y A08-16 permanecen parciales por Capa 2.
 
 ## Base y diagnóstico
 
@@ -38,7 +38,7 @@ Navegación/recarga/actualización modernas, roles y render del banner son evide
 - UI-01 dirigida: 1/1 aprobada. Navegación/recarga, roles, teclado, aria, retiro tras reposición/cancelación y cuatro capturas 1440/390 claro/oscuro. El estado ordinario legacy no muestra aviso K/N. Se conserva distinción de transporte sintético.
 - E2E-01 completo: 33/33 aprobadas en una corrida después del build final; cero fallidas/omitidas/canceladas/todo, salida 0. Incluye flujos ordinarios de fechas, Entrega legacy, lote, pagos, reapertura, CascoPlus+, BASE no vendible y formularios; el control nuevo A08 declara explícitamente su segmento sintético. No se suman UI-01 ni dirigidas al total.
 - Después de verify, el único cambio de prueba fue capturar fullPage en lugar del viewport; el E2E completo usa esa línea final. Lint y formato del ensayo repetidos correctamente. Código funcional sin cambios desde 17e8836.
-- CI: pendiente de publicación del borrador.
+- CI de la cabeza af1d4f8dbc9e65e2cb9f6562ae82a3c6fed83b48: [workflow 40960962132](https://github.com/VicWaltzO/NutrequinePro/actions/runs/40960962132), completed/success, incluidos verify y E2E en Linux. Consultada después de finalizar; no se imputa a otro SHA.
 
 Logs completos de todos los intentos y capturas sintéticas en `04_EVIDENCIAS`, fuera de Git. No se cambian timeouts ni huellas de regresión HTML.
 
@@ -60,4 +60,8 @@ Revisión visual independiente final: **ship** para esta extensión operativa, s
 - app/docs/actualizacion-seguridad/NQP26-08_REPORTE.md
 - app/docs/actualizacion-seguridad/NQP26-08_MATRIZ_ACEPTACION.csv
 
-El cierre se calificará conforme para Capa 1 solo después de las comprobaciones reales; sin aceptación empresarial ni activación del motor.
+## Entrega y cierre
+
+[PR #19](https://github.com/VicWaltzO/NutrequinePro/pull/19) abierto en borrador, base codex/nqp26-07-entrega-ux, sin conflictos ni fusión, comprobado en GitHub. Commits 17e8836 (implementación) y af1d4f8 (reporte/matriz y captura fullPage) publicados y cotejados mediante ls-remote. Revisión estática independiente adicional del delta fijo 17e8836..af1d4f8: sin P0–P2; solo documentación y captura completa. El cierre documental posterior no cambia código y su SHA/CI se registra en la bitácora y el PR.
+
+Matriz completa: **20 controles técnicos aprobados y dos parciales (A08-15/16)**, con nivel de evidencia por escenario. No quedan controles sin resultado. La franja moderna sigue inerte en aplicación ordinaria: no se habilita el motor para obtener aprobación. E07-14 e I14–I19 conservan su estado. Conforme para Capa 1; sin aceptación empresarial, fusión ni despliegue.

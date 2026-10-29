@@ -19,5 +19,5 @@ A08-17,Responsive y accesibilidad,Texto foco teclado y detalle sin superposició
 A08-18,Roles,Lectura sin nuevos permisos ni escrituras,Aprobado,Roles UI sintéticos y seguridad ordinaria de regresión,ui-01; verify-01; diff,Roles modernos no habilitados comercialmente
 A08-19,Microinsumos,No mezclar causas ni métricas,Aprobado,Componente y arquitectura,Selector exclusivo ventas; PendingStockBanner.tsx,No se adelantan alertas globales38
 A08-20,Reservas no habilitadas,Sin flag ni UI experimental empresarial,Aprobado,Arquitectura y regresión HTTP,verify-01; nqp26-reservations-http.test.mjs; diff,Guardas ordinarias intactas
-A08-21,Regresión completa,verify E2E CI y seis todo,Pendiente,Automatizada,verify-01 355 aprobadas y 6todo; E2E-01 33/33; CI pendiente,Sin sumar dirigidas al total
-A08-22,Gobernanza,Draft evidencias revisión independiente y sin merge,Pendiente,Proceso,Revisión estática 17e8836 sin P0-P2; draft pendiente,No fusión ni despliegue
+A08-21,Regresión completa,verify E2E CI y seis todo,Aprobado,Automatizada,verify-01 355 aprobadas y 6todo; E2E-01 33/33; CI40960962132 success en af1d4f8,Sin sumar dirigidas al total
+A08-22,Gobernanza,Draft evidencias revisión independiente y sin merge,Aprobado,Proceso,Revisión estática 17e8836 y delta af1d4f8 sin P0-P2; PR19 draft https://github.com/VicWaltzO/NutrequinePro/pull/19,No fusión ni despliegue
