@@ -340,6 +340,7 @@ export interface CommandResult {
   result: string | null;
 }
 export interface SaleSummary {
+  coverage_lines?: { item: SaleItem; covered: number; missing: number }[];
   coverage_status?: "READY_BY_STOCK" | "PENDING_STOCK";
   coverage_label?: string;
   covered_quantity?: number;

@@ -229,50 +229,60 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
           </p>
         )}
         {!edit && (
-          <div className="sale-delivery">
-            <Select
-              label="Entrega"
-              required
-              empty={false}
-              value={values.mode}
-              onChange={(value) => set("mode", value)}
-              options={[
-                { id: "immediate", name: "Entregar ahora" },
-                { id: "future", name: "Venta futura · pendiente" },
-                { id: "planned", name: "Venta futura + lote a producir" },
-              ]}
-            />
-            {missing.length > 0 && (
-              <div className="warning">
-                <strong>Stock insuficiente</strong>
-                {missing.map(([id, required]) => (
-                  <p key={id}>
-                    {find(state, "products", id)?.name}: stock {stock(state, id).quantity}, solicitado{" "}
-                    {required.q}, faltan {Math.max(0, required.q - stock(state, id).quantity)}{" "}
-                    {unitLabels(find(state, "products", id)).plural}. Peso disponible:{" "}
-                    {kg(stock(state, id).weight_kg)} kg.
-                  </p>
-                ))}
-                <p>Elija venta futura para continuar. El stock saldrá al entregar.</p>
-              </div>
-            )}
-            {values.mode !== "immediate" && (
-              <p className="notice">
-                Los productos de ingreso directo quedan pendientes de existencias físicas. Solo los productos
-                fabricables se incluyen en el lote a producir.
-              </p>
-            )}
-            {values.mode !== "immediate" && (
+          <>
+            <section className="sale-inventory" aria-label="Aviso de inventario" aria-live="polite">
+              {missing.length > 0 && (
+                <div className="warning">
+                  <strong>Stock insuficiente</strong>
+                  {missing.map(([id, required]) => (
+                    <p key={id}>
+                      {find(state, "products", id)?.name}: saldo {stock(state, id).quantity}, solicitado{" "}
+                      {required.q}; faltan {Math.max(0, required.q - stock(state, id).quantity)}{" "}
+                      {unitLabels(find(state, "products", id)).plural} y{" "}
+                      {kg(Math.max(0, required.w - stock(state, id).weight_kg))} kg.
+                    </p>
+                  ))}
+                  <p>Elija venta futura para continuar. El stock saldrá al entregar.</p>
+                  <p>Saldo según movimientos; no acredita reserva ni recuento físico.</p>
+                </div>
+              )}
+            </section>
+            <section className="sale-delivery" aria-label="Entrega de productos">
               <Select
-                label="Asociar a un lote existente (opcional)"
-                value={values.production_id}
-                onChange={(value) => set("production_id", value)}
-                options={state.productions
-                  .filter((row) => row.status !== "CANCELLED")
-                  .map((row) => ({ id: row.id, name: row.code }))}
+                label="Entrega"
+                required
+                empty={false}
+                value={values.mode}
+                onChange={(value) => set("mode", value)}
+                options={[
+                  { id: "immediate", name: "Entregar ahora" },
+                  { id: "future", name: "Venta futura · pendiente" },
+                  { id: "planned", name: "Venta futura + lote a producir" },
+                ]}
               />
+              <p className="sale-section-help">
+                {values.mode === "immediate"
+                  ? "Al confirmar, se registrará la entrega de los productos."
+                  : "La venta quedará pendiente hasta registrar su entrega. El pago no la entrega."}
+              </p>
+            </section>
+            {values.mode !== "immediate" && (
+              <section className="sale-lot" aria-label="Vínculo a lote">
+                <Select
+                  label="Asociar a un lote existente (opcional)"
+                  value={values.production_id}
+                  onChange={(value) => set("production_id", value)}
+                  options={state.productions
+                    .filter((row) => row.status !== "CANCELLED")
+                    .map((row) => ({ id: row.id, name: row.code }))}
+                />
+                <p className="sale-section-help">
+                  Solo los productos fabricables se incluyen en el lote a producir. Los de ingreso directo
+                  requieren su propio abastecimiento. Vincular un lote no registra una entrega.
+                </p>
+              </section>
             )}
-          </div>
+          </>
         )}
       </SaleLineEditor>
       <section className="sale-section sale-payments" aria-labelledby="sale-payments-title">

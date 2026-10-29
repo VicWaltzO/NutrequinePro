@@ -30,6 +30,11 @@ export function saleSummary(state, sale) {
             : "Pendiente por stock",
           covered_quantity: sum(items, (row) => row.coverage?.quantity ?? 0),
           missing_quantity: sum(items, (row) => row.quantity - (row.coverage?.quantity ?? 0)),
+          coverage_lines: items.map((row) => ({
+            item: row,
+            covered: row.coverage?.quantity ?? 0,
+            missing: row.quantity - (row.coverage?.quantity ?? 0),
+          })),
         }
       : {}),
     items,
