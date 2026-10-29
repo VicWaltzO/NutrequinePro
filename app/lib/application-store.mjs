@@ -1,6 +1,8 @@
 import { TABLES, SQL_NAMES, seedState, executeCommand, DomainError } from "./domain.mjs";
 import { writePlan } from "./persistence.mjs";
-export function createStore(getDatabase) {
+import { assertCommandPermission } from "../shared/domain/permissions.mjs";
+import { assertEquivalentReplay } from "./command-replay.mjs";
+export function createStore(getDatabase, options = {}) {
   async function loadState() {
     const binding = getDatabase();
     const results = await binding.batch([
@@ -74,14 +76,19 @@ export function createStore(getDatabase) {
     )
       throw new DomainError("Datos de operación inválidos.");
     const command = input;
+    assertCommandPermission(actor, command.type);
     const duplicate = before.audit.find(
       (entry) => entry.request_id === command.request_id && entry.created_by === actor.id,
     );
-    if (duplicate) return { state: before, result: duplicate.entity_id };
-    const outcome = executeCommand(before, command, actor);
+    if (duplicate) {
+      assertEquivalentReplay(duplicate, command);
+      return { state: before, result: duplicate.entity_id };
+    }
+    const outcome = executeCommand(before, command, actor, undefined, options);
     const audit = outcome.state.audit.at(-1);
     if (!audit) throw new Error("La operación no generó auditoría.");
     audit.request_id = command.request_id;
+    audit.request_contract_version = 1;
     await persistState(before, outcome.state);
     return outcome;
   }

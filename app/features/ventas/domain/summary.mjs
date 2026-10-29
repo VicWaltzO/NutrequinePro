@@ -1,4 +1,5 @@
 import { sum } from "../../../shared/domain/core.mjs";
+/** @returns {import("../../../shared/types/domain.ts").SaleSummary} */
 export function saleSummary(state, sale) {
   const items = state.saleItems.filter((x) => x.sale_id === sale.id && x.is_current !== false);
   const gross = sum(items, (x) => x.subtotal);
@@ -19,6 +20,18 @@ export function saleSummary(state, sale) {
   else if (balance === 0) financialStatus = "PAID";
   else if (paid > 0) financialStatus = "PARTIAL";
   return {
+    ...(sale.coverage_version === 1
+      ? {
+          coverage_status: items.every((row) => row.coverage?.quantity === row.quantity)
+            ? "READY_BY_STOCK"
+            : "PENDING_STOCK",
+          coverage_label: items.every((row) => row.coverage?.quantity === row.quantity)
+            ? "Listo por stock"
+            : "Pendiente por stock",
+          covered_quantity: sum(items, (row) => row.coverage?.quantity ?? 0),
+          missing_quantity: sum(items, (row) => row.quantity - (row.coverage?.quantity ?? 0)),
+        }
+      : {}),
     items,
     gross,
     total,

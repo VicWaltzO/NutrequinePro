@@ -2,6 +2,7 @@ import { requireValue, scaled, positiveInt, date, pick, sum } from "../../../sha
 import { saleSummary } from "./summary.mjs";
 import { stock } from "../../inventario/domain/stock.mjs";
 import { isNucleusProduct, presentationSnapshot } from "../../../shared/domain/presentation.mjs";
+import { coverSale } from "./coverage.mjs";
 export function saleSave(context) {
   const {
     s: state,
@@ -21,13 +22,17 @@ export function saleSave(context) {
   const site = pick(state, "sites", payload.site_id);
   requireValue(customer.is_active && site.is_active, "Cliente y sede deben estar activos.");
   requireValue(["CASH", "CREDIT"].includes(payload.payment_condition), "Condición inválida.");
+  requireValue(
+    !context.partialReservations || !payload.create_production,
+    "La planificación automática de producción desde reservas requiere integración de abastecimiento. Registre el pedido sin crear producción.",
+  );
   const sale = payload.id
     ? pick(state, "sales", payload.id)
     : add("sales", { code: code("sales", "V"), commercial_status: "DRAFT" });
   requireValue(sale.commercial_status === "DRAFT", "Use rectificación para ventas confirmadas.");
   const rows = saleItems(sale.id, payload.items);
   state.saleItems.filter((x) => x.sale_id === sale.id).forEach((x) => (x.is_current = false));
-  rows.forEach((x) => add("saleItems", x));
+  const savedRows = rows.map((x) => add("saleItems", x));
   Object.assign(sale, {
     customer_id: customer.id,
     site_id: site.id,
@@ -41,7 +46,9 @@ export function saleSave(context) {
     sale.commercial_status = "CONFIRMED";
     sale.confirmed_at = clock;
     sale.confirmed_by = actor.id;
-    if (payload.deliver) {
+    if (context.partialReservations) {
+      coverSale(context, sale, savedRows);
+    } else if (payload.deliver) {
       assertStock(rows);
       outputSale(sale, rows);
       sale.fulfillment_status = "DELIVERED";
@@ -116,8 +123,19 @@ export function saleDeliver(context) {
     "Esta venta no puede entregarse.",
   );
   const rows = saleSummary(state, sale).items;
-  assertStock(rows);
-  outputSale(sale, rows);
+  if (sale.coverage_version === 1) {
+    requireValue(
+      rows.every((row) => row.coverage?.quantity === row.quantity),
+      "Pedido pendiente por stock: complete su cobertura antes de entregar.",
+    );
+  } else {
+    requireValue(
+      !context.partialReservations,
+      "Pedido legado pendiente: requiere adopción explícita antes de entregar con reservas.",
+    );
+    assertStock(rows);
+    outputSale(sale, rows);
+  }
   sale.fulfillment_status = "DELIVERED";
   sale.delivered_at = clock;
   sale.delivered_by = actor.id;
@@ -138,6 +156,32 @@ export function saleCorrect(context) {
   } = context;
   let result = null;
   const sale = pick(state, "sales", payload.id);
+  if (sale.coverage_version === 1) {
+    const old = saleSummary(state, sale).items;
+    const proposed = saleItems(sale.id, payload.items, old);
+    const fields = [
+      "product_id",
+      "quantity",
+      "unit_weight_kg",
+      "unit_price",
+      "presentation_unit_snapshot",
+      "unit_weight_grams_snapshot",
+      "weight_policy_snapshot",
+    ];
+    const same =
+      proposed.length === old.length &&
+      proposed.every(
+        (row, index) =>
+          payload.items[index].original_item_id === old[index].id &&
+          fields.every((field) => row[field] === old[index][field]),
+      );
+    requireValue(
+      same && (payload.notes ?? sale.notes) === sale.notes,
+      "Rectificación de reservas bloqueada hasta NQP26-05: requiere liberación y redistribución auditadas.",
+    );
+    reason();
+    return sale.id;
+  }
   requireValue(
     ["CONFIRMED", "RECTIFIED"].includes(sale.commercial_status),
     "Esta venta no puede rectificarse.",
@@ -172,6 +216,10 @@ export function saleCancel(context) {
   const { s: state, p: payload, actor, clock, reason, movement } = context;
   let result = null;
   const sale = pick(state, "sales", payload.id);
+  requireValue(
+    sale.coverage_version !== 1,
+    "Anulación de reservas bloqueada hasta NQP26-05: requiere liberación y redistribución auditadas.",
+  );
   requireValue(sale.commercial_status !== "CANCELLED", "Ya anulada.");
   requireValue(saleSummary(state, sale).paid === 0, "Revierta explícitamente los pagos antes de anular.");
   const why = reason();

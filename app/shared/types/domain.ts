@@ -75,6 +75,7 @@ export interface Operation extends Entity {
   cancelled_at?: string;
 }
 export interface Sale extends Operation {
+  coverage_version?: 1;
   customer_id: string;
   site_id: string;
   sale_date: string;
@@ -84,6 +85,7 @@ export interface Sale extends Operation {
   financial_status: string;
 }
 export interface SaleItem extends Entity, PresentationSnapshot {
+  coverage?: { version: 1; quantity: number; weight_grams: number; movement_id: string | null };
   sale_id: string;
   product_id: string;
   quantity: number;
@@ -200,6 +202,8 @@ export interface Expense extends Entity {
   reason?: string;
 }
 export interface InventoryMovement extends Entity, PresentationSnapshot {
+  sale_item_id?: string;
+  coverage_version?: 1;
   date: string;
   item_type: string;
   item_id: string;
@@ -211,6 +215,7 @@ export interface InventoryMovement extends Entity, PresentationSnapshot {
   notes?: string;
 }
 export interface Audit extends Entity {
+  request_contract_version?: 1;
   action: string;
   entity_id: string | null;
   payload: unknown;
@@ -319,6 +324,10 @@ export interface CommandResult {
   result: string | null;
 }
 export interface SaleSummary {
+  coverage_status?: "READY_BY_STOCK" | "PENDING_STOCK";
+  coverage_label?: string;
+  covered_quantity?: number;
+  missing_quantity?: number;
   items: SaleItem[];
   gross: number;
   total: number;

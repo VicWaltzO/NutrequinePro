@@ -17,7 +17,13 @@ export function normalize(value: unknown): string;
 export function scaled(value: unknown, digits?: number): number;
 export function emptyState(): AppState;
 export function seedState(): AppState;
-export function executeCommand(state: AppState, command: Command, actor: User, clock?: string): CommandResult;
+export function executeCommand(
+  state: AppState,
+  command: Command,
+  actor: User,
+  clock?: string,
+  options?: { partialReservations?: boolean },
+): CommandResult;
 export function saleSummary(state: AppState, sale: { id: string }): SaleSummary;
 export function productionSummary(state: AppState, production: { id: string }): ProductionSummary;
 export function stock(state: AppState, productId: string): StockSummary;

@@ -8,6 +8,7 @@ import { openSqliteDatabase } from "../lib/adapters/node-sqlite.mjs";
 import { verifyDatabase } from "../lib/sqlite/migrations.mjs";
 import { selectedFile } from "../lib/sqlite/files.mjs";
 import { DomainError } from "../lib/domain.mjs";
+import { CommandConflictError } from "../lib/command-replay.mjs";
 import { assertCommandPermission } from "../shared/domain/permissions.mjs";
 import type { PersistenceDatabase } from "../lib/persistence-port.ts";
 import { createAuthentication, HttpError } from "./authentication.mts";
@@ -37,6 +38,7 @@ export async function createLocalServer(
   dependencies: {
     clock?: () => number;
     diagnostic?: (event: { request_id: string; category: string }) => void;
+    partialReservations?: boolean;
   } = {},
 ) {
   const config = validateConfig(input, true);
@@ -57,8 +59,17 @@ export async function createLocalServer(
       },
       batch: (statements) => connection.batch(statements),
     };
-    const store = createStore(() => existingOnly);
+    const store = createStore(() => existingOnly, {
+      partialReservations: dependencies.partialReservations === true,
+    });
     const initial = await store.loadState();
+    if (dependencies.partialReservations === true && config.frontend_directory)
+      throw new Error("El prototipo de reservas solo admite pruebas de API sin interfaz operativa.");
+    if (
+      initial?.sales.some((sale) => sale.coverage_version === 1) &&
+      dependencies.partialReservations !== true
+    )
+      throw new Error("La base contiene reservas del prototipo aislado; no admite arranque operativo.");
     if (
       !initial ||
       !initial.users.some(
@@ -126,6 +137,9 @@ export async function createLocalServer(
       let message = "No se pudo completar la operación. Vuelva a intentar.";
       if (error instanceof HttpError) {
         status = error.status;
+        message = error.message;
+      } else if (error instanceof CommandConflictError) {
+        status = 409;
         message = error.message;
       } else if (error instanceof DomainError) {
         status = 422;
@@ -201,7 +215,7 @@ export async function createLocalServer(
           state.audit.some(
             (entry) => entry.request_id === command.request_id && entry.created_by === session.actor.id,
           );
-        if (!duplicate && typeof command.type === "string") {
+        if (typeof command.type === "string") {
           try {
             assertCommandPermission(session.actor, command.type);
           } catch {

@@ -305,7 +305,7 @@ export function productionClose(context) {
   return result;
 }
 export function productionCancel(context) {
-  const { s: state, p: payload, actor, clock, uid, reason, movement } = context;
+  const { s: state, p: payload, actor, clock, uid, reason, movementBatch } = context;
   let result = null;
   const production = pick(state, "productions", payload.id);
   requireValue(production.status !== "CANCELLED", "Ya anulada.");
@@ -319,20 +319,21 @@ export function productionCancel(context) {
         "No puede revertir producción cuyo stock ya se consumió.",
       );
     }
-    for (const m of state.inventoryMovements.filter(
-      (x) => x.source_type === "PRODUCTION" && x.source_id === production.id,
-    ))
-      movement({
-        ...m,
-        id: uid(),
-        created_at: clock,
-        created_by: actor.id,
-        date: date(payload.date ?? today()),
-        movement_type: "CANCELLATION_REVERSAL",
-        quantity: -m.quantity,
-        weight_kg: -m.weight_kg,
-        notes: why,
-      });
+    movementBatch(
+      state.inventoryMovements
+        .filter((x) => x.source_type === "PRODUCTION" && x.source_id === production.id)
+        .map((m) => ({
+          ...m,
+          id: uid(),
+          created_at: clock,
+          created_by: actor.id,
+          date: date(payload.date ?? today()),
+          movement_type: "CANCELLATION_REVERSAL",
+          quantity: -m.quantity,
+          weight_kg: -m.weight_kg,
+          notes: why,
+        })),
+    );
   }
   production.status = "CANCELLED";
   production.cancellation_reason = why;
