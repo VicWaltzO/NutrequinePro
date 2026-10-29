@@ -30,9 +30,15 @@ import { createProductionOperations } from "../features/produccion/domain/operat
 import { createCommandContext } from "./command-context.mjs";
 import { assertCommandPermission } from "../shared/domain/permissions.mjs";
 import { validateMasterCommand } from "./master-command-contracts.mjs";
-import { guardCoverageMode } from "../features/ventas/domain/coverage.mjs";
+import {
+  guardCoverageMode,
+  allocatePendingCoverage,
+  assertCoverageIntegrity,
+} from "../features/ventas/domain/coverage.mjs";
 import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-delivery-date.mjs";
+import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 const handlers = {
+  SALE_COVERAGE_ADOPT: saleCoverageAdopt,
   SALE_DELIVERY_DATE_UPDATE: saleDeliveryDateUpdate,
   CUSTOMER_SAVE: customerSave,
   CUSTOMER_SITES_SAVE: customerSitesSave,
@@ -68,7 +74,10 @@ export function executeCommand(original, command, actor, clock = new Date().toIS
   assertCommandPermission(actor, type);
   guardCoverageMode(state, type, options.partialReservations === true);
   validateMasterCommand(state, type, payload);
-  const context = createCommandContext(state, type, payload, actor, clock, options);
+  const context = createCommandContext(state, type, payload, actor, clock, {
+    ...options,
+    request_id: command.request_id,
+  });
   Object.assign(
     context,
     createPaymentOperations(context),
@@ -84,6 +93,11 @@ export function executeCommand(original, command, actor, clock = new Date().toIS
   const handler = Object.hasOwn(handlers, type) ? handlers[type] : null;
   if (!handler) fail("Operación desconocida.");
   const result = handler(context);
+  if (context.partialReservations) {
+    const changedInventory = state.inventoryMovements.length !== original.inventoryMovements.length;
+    if (changedInventory) allocatePendingCoverage(context);
+    assertCoverageIntegrity(state);
+  }
   for (const table of TABLES)
     for (const row of state[table])
       for (const [field, value] of Object.entries(row)) {

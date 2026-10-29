@@ -10,6 +10,7 @@ export function assertCommandPermission(actor, type) {
     "USER_SAVE",
     "SALE_CORRECT",
     "SALE_DELIVERY_DATE_UPDATE",
+    "SALE_COVERAGE_ADOPT",
     "SALE_CANCEL",
     "PAYMENT_REVERSE",
     "PRODUCTION_CONFIRM",

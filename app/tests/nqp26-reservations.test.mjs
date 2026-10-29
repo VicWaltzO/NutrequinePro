@@ -175,13 +175,15 @@ persistenceTest("NQP26 I01/I02: 35/40 y segundo pedido conservan K/N, gramos y r
   }
   assert.equal(saleSummary(await f.state(), { id: a }).balance, 0);
   await rejected(f, () => f.run("SALE_DELIVER", { id: a }), /pendiente por stock/i);
-  await rejected(f, () => f.adjust(10), /05\/06/);
-  await rejected(f, () => f.run("PRODUCTION_SAVE", productionPayload()), /05\/06/);
-  await rejected(f, () => f.run("SALE_CANCEL", { id: a, reason: "Prueba" }), /05/);
+  await f.adjust(10);
+  assert.equal(rows(await f.state(), a)[0].coverage.quantity, 40);
+  assert.equal(rows(await f.state(), b)[0].coverage.quantity, 5);
+  await f.run("PRODUCTION_SAVE", productionPayload());
+  await rejected(f, () => f.run("SALE_CANCEL", { id: a, reason: "Prueba" }), /pagos/);
   await rejected(
     f,
     () => f.run("SALE_CORRECT", { id: a, reason: "Prueba", items: [{ product_id: "prod-1", quantity: 2 }] }),
-    /05/,
+    /pago excedente/,
   );
 });
 
@@ -231,7 +233,7 @@ persistenceTest(
     assert.equal(after.sales.find((x) => x.id === id).fulfillment_status, "DELIVERED");
     await f.run("SALE_DELIVER", { id }, "delivery");
     assert.deepEqual(await f.state(), after);
-    await rejected(f, () => f.run("SALE_CANCEL", { id, reason: "Sin retiro probado" }), /05|pagos/);
+    await rejected(f, () => f.run("SALE_CANCEL", { id, reason: "Sin retiro probado" }), /devolución física/);
     await rejected(f, () => f.adjust(2, 50, "prod-1", "OUT"), /insuficiente/i);
   },
 );
@@ -278,8 +280,10 @@ persistenceTest("NQP26 I12: variantes 25/50/24 kg, frascos 2,2 y BASE no interca
     items: [{ product_id: "prod-1", quantity: 1, unit_weight_kg: 50, unit_price: 90 }],
   });
   assert.equal(rows(await f.state(), a)[0].coverage.quantity, 0);
-  // La obligación incompatible anterior también cierra nuevas asignaciones hasta 05/06.
-  await rejected(f, () => f.sell(1), /05\/06/);
+  // 05 permite asignación compatible sin consumir la presentación de 50 kg pendiente.
+  const compatible = await f.sell(1);
+  assert.equal(rows(await f.state(), compatible)[0].coverage.quantity, 1);
+  assert.equal(rows(await f.state(), a)[0].coverage.quantity, 0);
   const bottle = await f.run("PRODUCT_SAVE", {
     name: "Frasco sintético",
     presentation_unit: "BOTTLE",

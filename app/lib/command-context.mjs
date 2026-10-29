@@ -16,6 +16,7 @@ export function createCommandContext(state, type, payload, actor, clock, options
       ? presentationSnapshot(state.products.find((x) => x.id === v.item_id))
       : {}),
     ...v,
+    ...(options.partialReservations === true ? { request_id: options.request_id } : {}),
   });
   const movement = (v) => {
     const value = movementValue(v);
