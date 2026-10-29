@@ -124,6 +124,7 @@ const inventoryCommands = new Set([
   "SALE_SAVE",
   "SALE_DELIVER",
   "SALE_CORRECT",
+  "SALE_DELIVERY_DATE_UPDATE",
   "SALE_CANCEL",
   "RETURN_CREATE",
   "INVENTORY_ADJUST",

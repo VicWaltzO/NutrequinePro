@@ -46,8 +46,8 @@
     "VIEWER:balance": "dbce759a1cfa451660ee8d86364601cc6cd1497cec5c47fe1923d8ec8123092a",
     "VIEWER:customers": "34f93dbe6479a2780de97af12553c913d2c51d8a9a8c01be765f7449df369fb8",
     "VIEWER:config": "e2570a96913e7279e9cb16e4e637a03b0e2fa875ce4bf7ed891973fe01fb5679",
-    "modal:sale": "e96d9143bef1fb2d3f4cf7fce01733e17097eb6029799a0b4e04fc7ece4fbbf9",
-    "modal:sale:correct": "f06a45dad92a4c81f1040d351c75d0ad230e9bade5d1db926d64c3028df7df7d",
+    "modal:sale": "1d654f144b36aee5d1398c728e200cf2ee4922366ea7cf9f221d78afb8375749",
+    "modal:sale:correct": "2b505561276a0a78c925613a6b8520b4c814f173694f10c41771e07cc91c4d89",
     "modal:payment": "bbe80a5303fe1651345a2f03d1d7004da3f21e52e9c978ae4f23633e229b501a",
     "modal:credit": "0310fb4a7d7fe6cfe1cfedf4000047cabe75bccf483d01bf6e3be167d8e01b21",
     "modal:production": "ba5d9dc9a54157935082427149e8f1eb71808f90f663d43b8136823ed771952d",
@@ -64,7 +64,7 @@
     "modal:adjust": "b88bf129790617bd1293c7bd8e25459f9582639ac0183ce09dacc19826ca3d10",
     "modal:config": "0c2e892811c03f76df8806de50890db44534ad6832b058051a1f60322323ed7d",
     "modal:reason": "4ba15cd5c0eddef49c3c705dc2bbc7838095296a5195235c18518b534dbcd412",
-    "modal:sale-detail": "473ddbe7e0e8e31a178473c82967838c09a65160218260236d5075734488ae28",
+    "modal:sale-detail": "b6fa836c16057bac02fc29523d23f870ab5e1ca9c81d0cf7b1ed617ffc72aa86",
     "modal:production-detail": "4f0e7e971a31c32971530959f686a982e88240632d7a61aae80606254972377a",
     "modal:payment-detail": "1b476102a958f8bb1adf3afe466b1e9a0b80d4ba1f060ace5109b208a4de3ba5",
     "modal:customer-detail": "a221dcb130917b19e0926c7b2be8c297d70612a1cd72e58516a7d27f41c0b5ff"
@@ -73,5 +73,6 @@
   "operationFormsReview": "Pago, gasto, producción y ajuste comparten la jerarquía por tarjetas de venta; etiquetas y contratos comerciales conservados. El icono de agregar costo se comparte con conciliación. Apertura/cierre y estados con movimiento breve y alternativa de movimiento reducido.",
   "productionEntryReview": "Registro operativo: precio exclusivo del lote, descuento opcional, cobro automático/manual y estado pagado explícito para nuevas filas; históricos conservados. Marcadores secundarios en producción y venta. Referencia anterior conservada en las capturas de docs/ux-operativa/antes.",
   "navigationReview": "Navegación y clientes: indicador único, contenedores de transición, perfil y sedes contextuales. Se contrastó origin/main y se conservaron todas las huellas fuera del alcance. Datos, roles y operaciones existentes verificados por dominio y E2E.",
-  "documentExportReview": "Diez escenarios actualizados para botones PDF de lectura y selector mensual, contrastados con main y capturas en claro/oscuro de escritorio y móvil. Los demás hashes se conservan."
+  "documentExportReview": "Diez escenarios actualizados para botones PDF de lectura y selector mensual, contrastados con main y capturas en claro/oscuro de escritorio y móvil. Los demás hashes se conservan.",
+  "deliveryDateReview": "NQP26-06: solo modal:sale, modal:sale:correct y modal:sale-detail cambian para fechas independientes e historial JSON aditivo. Base ead53fa contrastada; demás huellas idénticas. Capturas sintéticas Chrome 1440/390 claro/oscuro y persistencia real verificadas. Sin cambios en ui-baseline histórico ni documentos de negocio."
 }

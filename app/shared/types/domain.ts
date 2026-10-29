@@ -79,6 +79,8 @@ export interface Sale extends Operation {
   customer_id: string;
   site_id: string;
   sale_date: string;
+  delivery_date?: string;
+  delivery_date_manual_override?: boolean;
   payment_condition: string;
   commercial_status: string;
   fulfillment_status: string;

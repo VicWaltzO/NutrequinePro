@@ -1,3 +1,4 @@
+import { initialSaleDates, changeSaleDateFields } from "./sale-dates.mjs";
 import { useState } from "react";
 import type { SaleFields, SaleLine, FormProps } from "@/shared/types/forms";
 import type { SaleItem } from "@/lib/domain-types";
@@ -12,7 +13,7 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
   const old: SaleItem[] = record?.id ? saleSummary(state, { id: record.id }).items : [];
   const edit = kind === "correct";
   const [values, setValues] = useState<SaleFields>({
-    sale_date: record?.sale_date ?? day(),
+    ...initialSaleDates(record, day()),
     customer_id: record?.customer_id ?? "",
     site_id: record?.site_id ?? "",
     payment_condition: record?.payment_condition ?? state.config.default_payment_condition ?? "CREDIT",
@@ -24,7 +25,7 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
     production_id: "",
     id: record?.id,
   });
-  const set = (k: string, x: string | boolean) => setValues((a) => ({ ...a, [k]: x }));
+  const set = (k: string, x: string | boolean) => setValues((a) => changeSaleDateFields(a, k, x));
   const [rows, setRows] = useState<SaleLine[]>(
     old.length
       ? old.map((x) => ({

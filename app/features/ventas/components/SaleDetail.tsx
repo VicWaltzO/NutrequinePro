@@ -28,6 +28,16 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
           <Badge value={sale.fulfillment_status} />
         </div>
       </div>
+      <dl className="sale-original-client">
+        <div>
+          <dt>Fecha de venta</dt>
+          <dd>{sale.sale_date}</dd>
+        </div>
+        <div>
+          <dt>Fecha de entrega</dt>
+          <dd>{sale.delivery_date ?? `${sale.sale_date} (sin fecha propia registrada)`}</dd>
+        </div>
+      </dl>
       <Metrics
         items={[
           { label: "Total comercial", value: money(a.total) },
@@ -36,6 +46,11 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
         ]}
       />
       <div className="detail-actions">
+        {admin &&
+          ["CONFIRMED", "RECTIFIED"].includes(sale.commercial_status) &&
+          sale.fulfillment_status === "PENDING" && (
+            <button onClick={() => open("sale-delivery-date", sale)}>Cambiar fecha de entrega</button>
+          )}
         <DownloadPdfButton kind="sale" id={id}>
           Descargar nota de venta PDF
         </DownloadPdfButton>

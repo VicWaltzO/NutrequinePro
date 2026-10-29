@@ -1,6 +1,6 @@
 # NQP26-04 · Reservas parciales protegidas
 
-Fecha: 28 de octubre de 2026, America/Bogota. Estado: en revisión; prototipo aislado verificado, uso empresarial deshabilitado. Sin fusión en main ni despliegue empresarial.
+Fecha: 28 de octubre de 2026, America/Lima. Estado: en revisión; prototipo aislado verificado, uso empresarial deshabilitado. Sin fusión en main ni despliegue empresarial.
 
 ## Qué se abordó
 
