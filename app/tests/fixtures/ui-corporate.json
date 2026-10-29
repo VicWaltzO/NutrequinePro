@@ -1,6 +1,6 @@
 {
   "baseCommit": "54a4ef7",
-  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría. Núcleos decimales: solo los campos de cantidad de producción y rectificación admiten coma/punto con dos decimales. NQP26-03: última línea eliminable y bloqueo accesible sin productos; solo sale/sale:correct actualizados tras inspección visual sintética.",
+  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría. Núcleos decimales: solo los campos de cantidad de producción y rectificación admiten coma/punto con dos decimales. NQP26-03: última línea eliminable y bloqueo accesible sin productos; solo sale/sale:correct actualizados tras inspección visual sintética. NQP26-07: solo modal:sale y modal:sale-detail tras comparar DOM de main 2219f98 y capturas sintéticas 1440/390 claro/oscuro; fechas y rectificación intactas. Huellas en NQP26-07_REPORTE.md.",
   "snapshots": {
     "ADMIN:dashboard": "f63f327371847be1f5670be60c4359bd1cec8628289a826a87a8ee394535deb7",
     "ADMIN:sales": "970f542136365c03e3878a6e286fafb7b86026bacb59d5085d6ee12a56e8fa2b",
@@ -46,7 +46,7 @@
     "VIEWER:balance": "dbce759a1cfa451660ee8d86364601cc6cd1497cec5c47fe1923d8ec8123092a",
     "VIEWER:customers": "34f93dbe6479a2780de97af12553c913d2c51d8a9a8c01be765f7449df369fb8",
     "VIEWER:config": "e2570a96913e7279e9cb16e4e637a03b0e2fa875ce4bf7ed891973fe01fb5679",
-    "modal:sale": "1d654f144b36aee5d1398c728e200cf2ee4922366ea7cf9f221d78afb8375749",
+    "modal:sale": "a4788f41732ba4d66d5e2d82d2b70fceb3f43f242f3666fd36e58c670396b756",
     "modal:sale:correct": "2b505561276a0a78c925613a6b8520b4c814f173694f10c41771e07cc91c4d89",
     "modal:payment": "bbe80a5303fe1651345a2f03d1d7004da3f21e52e9c978ae4f23633e229b501a",
     "modal:credit": "0310fb4a7d7fe6cfe1cfedf4000047cabe75bccf483d01bf6e3be167d8e01b21",
@@ -64,7 +64,7 @@
     "modal:adjust": "b88bf129790617bd1293c7bd8e25459f9582639ac0183ce09dacc19826ca3d10",
     "modal:config": "0c2e892811c03f76df8806de50890db44534ad6832b058051a1f60322323ed7d",
     "modal:reason": "4ba15cd5c0eddef49c3c705dc2bbc7838095296a5195235c18518b534dbcd412",
-    "modal:sale-detail": "b6fa836c16057bac02fc29523d23f870ab5e1ca9c81d0cf7b1ed617ffc72aa86",
+    "modal:sale-detail": "2c216235d4ff999b784ead2ef5d926e3a9edba09e76647f6f9587f6cca911326",
     "modal:production-detail": "4f0e7e971a31c32971530959f686a982e88240632d7a61aae80606254972377a",
     "modal:payment-detail": "1b476102a958f8bb1adf3afe466b1e9a0b80d4ba1f060ace5109b208a4de3ba5",
     "modal:customer-detail": "a221dcb130917b19e0926c7b2be8c297d70612a1cd72e58516a7d27f41c0b5ff"

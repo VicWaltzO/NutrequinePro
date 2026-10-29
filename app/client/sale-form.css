@@ -281,9 +281,10 @@
 .sale-add-line {
   margin: 4px 0 0;
 }
-.sale-delivery {
-  padding-top: 20px;
-  margin-top: 20px;
+.sale-delivery,
+.sale-lot {
+  padding-top: 16px;
+  margin-top: 16px;
   border-top: 1px solid var(--border);
 }
 .sale-delivery > .field:last-child {
@@ -411,4 +412,32 @@
   .sale-line {
     animation: none;
   }
+}
+
+.sale-inventory:empty {
+  display: none;
+}
+.sale-inventory .warning {
+  margin: 16px 0 0;
+}
+.sale-delivery .sale-section-help,
+.sale-lot .sale-section-help {
+  margin-bottom: 0;
+}
+.sale-supply {
+  margin-block: 20px;
+  padding-block: 16px;
+  border-block: 1px solid var(--border);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.sale-supply h3 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+.sale-supply p {
+  margin-block: 8px;
+}
+.sale-supply-line {
+  font-variant-numeric: tabular-nums;
 }

@@ -3,6 +3,7 @@ import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@
 import type { DetailProps } from "@/shared/types/details";
 import DownloadPdfButton from "@/features/documentos/components/DownloadPdfButton.tsx";
 import { unitLabels } from "@/shared/domain/presentation.mjs";
+import { SaleSupplyStatus } from "./SaleSupplyStatus";
 export default function SaleDetail({ s: state, actor, id, open, run }: DetailProps) {
   const admin = actor.role === "ADMIN";
   const write = actor.role !== "VIEWER";
@@ -10,8 +11,11 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
   if (!sale) return null;
   const a = saleSummary(state, sale);
   const payments = state.paymentApplications.filter((x) => x.sale_id === id);
-  const availability = deliveryAvailability(state, a.items);
-  const shortage = availability.some((x) => x.missing_quantity || x.missing_weight);
+  const availability = sale.coverage_version === 1 ? [] : deliveryAvailability(state, a.items);
+  const shortage =
+    sale.coverage_version === 1
+      ? a.coverage_status !== "READY_BY_STOCK"
+      : availability.some((x) => x.missing_quantity || x.missing_weight);
   return (
     <>
       <div className="detail-heading">
@@ -83,48 +87,51 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
           </button>
         )}
       </div>
-      {sale.fulfillment_status === "PENDING" && !["DRAFT", "CANCELLED"].includes(sale.commercial_status) && (
-        <section className="panel">
-          <h3>Stock para esta entrega</h3>
-          {shortage ? (
-            <p className="warning">
-              Falta stock de uno o más productos. Registre el ingreso o la producción pendiente, o rectifique
-              las cantidades antes de registrar la entrega.
-            </p>
-          ) : (
-            <p className="notice">
-              Stock suficiente para entregar. Las unidades comprometidas no se descuentan otra vez del stock
-              físico.
-            </p>
-          )}
-          <Table
-            heads={[
-              "Producto",
-              "Venta (cantidad / kg)",
-              "Stock físico (cantidad / kg)",
-              "Faltan (cantidad / kg)",
-            ]}
-          >
-            {availability.map((x) => (
-              <tr key={x.product_id}>
-                <td>
-                  {find(state, "products", x.product_id)?.name} ·{" "}
-                  {unitLabels(a.items.find((row) => row.product_id === x.product_id)).plural}
-                </td>
-                <td>
-                  {x.requested} / {kg(x.weight)}
-                </td>
-                <td>
-                  {x.quantity} / {kg(x.weight_kg)}
-                </td>
-                <td>
-                  {x.missing_quantity} / {kg(x.missing_weight)}
-                </td>
-              </tr>
-            ))}
-          </Table>
-        </section>
-      )}
+      <SaleSupplyStatus sale={sale} summary={a} state={state} />
+      {sale.coverage_version !== 1 &&
+        sale.fulfillment_status === "PENDING" &&
+        !["DRAFT", "CANCELLED"].includes(sale.commercial_status) && (
+          <section className="panel">
+            <h3>Disponibilidad para esta entrega · legacy</h3>
+            {shortage ? (
+              <p className="warning">
+                Falta stock de uno o más productos. Registre el ingreso o la producción pendiente, o
+                rectifique las cantidades antes de registrar la entrega.
+              </p>
+            ) : (
+              <p className="notice">
+                Saldo suficiente según movimientos. No acredita reserva ni recuento físico; registrar la
+                entrega requiere una acción explícita.
+              </p>
+            )}
+            <Table
+              heads={[
+                "Producto",
+                "Venta (cantidad / kg)",
+                "Saldo según movimientos (cantidad / kg)",
+                "Faltan (cantidad / kg)",
+              ]}
+            >
+              {availability.map((x) => (
+                <tr key={x.product_id}>
+                  <td>
+                    {find(state, "products", x.product_id)?.name} ·{" "}
+                    {unitLabels(a.items.find((row) => row.product_id === x.product_id)).plural}
+                  </td>
+                  <td>
+                    {x.requested} / {kg(x.weight)}
+                  </td>
+                  <td>
+                    {x.quantity} / {kg(x.weight_kg)}
+                  </td>
+                  <td>
+                    {x.missing_quantity} / {kg(x.missing_weight)}
+                  </td>
+                </tr>
+              ))}
+            </Table>
+          </section>
+        )}
       <section className="panel">
         <h3>Detalle comercial</h3>
         <Table

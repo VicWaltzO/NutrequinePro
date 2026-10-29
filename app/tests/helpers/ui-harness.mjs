@@ -230,6 +230,11 @@ export function createUiHarness(readSource = (file) => readFileSync(path.join(ap
     "products",
   ];
   return {
+    renderComponent(file, name, props) {
+      injectAdminState = false;
+      hookIndex = 0;
+      return renderToStaticMarkup(React.createElement(load(file)[name], props));
+    },
     snapshots() {
       const result = {};
       for (const role of ["ADMIN", "OPERATOR", "VIEWER"])
