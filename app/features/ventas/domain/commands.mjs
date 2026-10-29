@@ -3,7 +3,8 @@ import { saleSummary } from "./summary.mjs";
 import { stock } from "../../inventario/domain/stock.mjs";
 import { isNucleusProduct, presentationSnapshot } from "../../../shared/domain/presentation.mjs";
 import { savedDeliveryFields } from "./delivery-date.mjs";
-import { coverSale } from "./coverage.mjs";
+import { coverSale, releaseCoverage } from "./coverage.mjs";
+import { correctReservedSale } from "./correct-coverage.mjs";
 export function saleSave(context) {
   const {
     s: state,
@@ -168,31 +169,12 @@ export function saleCorrect(context) {
     "Cambie la fecha mediante la operación específica de fecha de entrega.",
   );
   if (sale.coverage_version === 1) {
-    const old = saleSummary(state, sale).items;
-    const proposed = saleItems(sale.id, payload.items, old);
-    const fields = [
-      "product_id",
-      "quantity",
-      "unit_weight_kg",
-      "unit_price",
-      "presentation_unit_snapshot",
-      "unit_weight_grams_snapshot",
-      "weight_policy_snapshot",
-    ];
-    const same =
-      proposed.length === old.length &&
-      proposed.every(
-        (row, index) =>
-          payload.items[index].original_item_id === old[index].id &&
-          fields.every((field) => row[field] === old[index][field]),
-      );
-    requireValue(
-      same && (payload.notes ?? sale.notes) === sale.notes,
-      "Rectificación de reservas bloqueada hasta NQP26-05: requiere liberación y redistribución auditadas.",
-    );
-    reason();
-    return sale.id;
+    return correctReservedSale(context, sale);
   }
+  requireValue(
+    !context.partialReservations || sale.fulfillment_status !== "DELIVERED",
+    "Pedido legado entregado: rectificación bloqueada; requiere devolución física explícita.",
+  );
   requireValue(
     ["CONFIRMED", "RECTIFIED"].includes(sale.commercial_status),
     "Esta venta no puede rectificarse.",
@@ -228,12 +210,15 @@ export function saleCancel(context) {
   let result = null;
   const sale = pick(state, "sales", payload.id);
   requireValue(
-    sale.coverage_version !== 1,
-    "Anulación de reservas bloqueada hasta NQP26-05: requiere liberación y redistribución auditadas.",
+    (!context.partialReservations && sale.coverage_version !== 1) || sale.fulfillment_status !== "DELIVERED",
+    "Pedido entregado: requiere devolución física explícita; la anulación no acredita retorno.",
   );
   requireValue(sale.commercial_status !== "CANCELLED", "Ya anulada.");
   requireValue(saleSummary(state, sale).paid === 0, "Revierta explícitamente los pagos antes de anular.");
   const why = reason();
+  if (sale.coverage_version === 1)
+    for (const row of saleSummary(state, sale).items)
+      releaseCoverage(context, sale, row, row.coverage?.quantity ?? 0);
   if (sale.fulfillment_status === "DELIVERED") {
     for (const row of saleSummary(state, sale).items) {
       const returned = state.returnItems.filter((x) => x.sale_item_id === row.id);

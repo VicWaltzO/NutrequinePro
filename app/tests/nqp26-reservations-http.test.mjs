@@ -10,6 +10,7 @@ import { openSqliteDatabase } from "../lib/adapters/node-sqlite.mjs";
 import { createStore } from "../lib/application-store.mjs";
 import { temporaryDataDirectory } from "./helpers/persistence-fixtures.mjs";
 import { salePayload } from "./helpers/regression-scenarios.mjs";
+import { stock } from "../lib/domain.mjs";
 
 async function fixture(t) {
   const applications = [];
@@ -158,6 +159,207 @@ test("F06-07/08/12/13/14: HTTP de fecha preserva K/N, permisos actuales y replay
   const snapshot = await f.store.loadState();
   assert.equal((await f.send(degraded, "SALE_DELIVERY_DATE_UPDATE", payload, request)).status, 403);
   assert.deepEqual(await f.store.loadState(), snapshot);
+});
+
+test("R05-03/08/09/17/18/19/23/29: HTTP reposición, fecha, liberación y reducción reales", async (t) => {
+  const f = await fixture(t);
+  const customer = (await f.valid("CUSTOMER_SAVE", { name: "Cliente cola HTTP" })).result;
+  const adjustment = (quantity) => ({
+    product_id: "prod-1",
+    quantity,
+    weight_kg: quantity * 25,
+    direction: "IN",
+    date: "2026-10-29",
+    reason: "Ingreso sintético cola",
+  });
+  await f.valid("INVENTORY_ADJUST", adjustment(35));
+  const sell = (quantity, delivery_date, extra = {}) =>
+    f.valid(
+      "SALE_SAVE",
+      salePayload(customer, {
+        delivery_date,
+        items: [{ product_id: "prod-1", quantity, unit_weight_kg: 25, unit_price: 73 }],
+        ...extra,
+      }),
+    );
+  const a = (await sell(40, "2026-11-01")).result;
+  const b = (
+    await sell(35, "2026-11-02", { payment_condition: "CASH", payment_method: "TRANSFER", paid_amount: 10 })
+  ).result;
+  const rows = (s, id) => s.saleItems.filter((r) => r.sale_id === id && r.is_current !== false);
+  const request = randomUUID();
+  await f.valid("INVENTORY_ADJUST", adjustment(10), f.admin, request);
+  let state = await f.store.loadState();
+  assert.deepEqual(
+    [a, b].map((id) => rows(state, id)[0].coverage.quantity),
+    [40, 5],
+  );
+  await f.valid("INVENTORY_ADJUST", adjustment(10), f.admin, request);
+  assert.deepEqual(await f.store.loadState(), state);
+  assert.equal((await f.send(f.admin, "INVENTORY_ADJUST", adjustment(11), request)).status, 409);
+  assert.deepEqual(await f.store.loadState(), state);
+  await f.valid("SALE_DELIVERY_DATE_UPDATE", {
+    id: b,
+    delivery_date: "2026-10-30",
+    reason: "Prioridad HTTP",
+  });
+  assert.deepEqual((await f.store.loadState()).saleItems, state.saleItems);
+  const c = (await sell(1, "2026-10-29")).result;
+  assert.equal(rows(await f.store.loadState(), c)[0].coverage.quantity, 0);
+  await f.valid("SALE_CANCEL", { id: a, reason: "Libera cuarenta HTTP" });
+  state = await f.store.loadState();
+  assert.equal(rows(state, a)[0].coverage.quantity, 0);
+  assert.equal(rows(state, b)[0].coverage.quantity, 35);
+  assert.equal(rows(state, c)[0].coverage.quantity, 1);
+  assert.equal(stock(state, "prod-1").quantity, 9);
+  assert.equal((await f.send(f.admin, "SALE_CANCEL", { id: b, reason: "Pago aplicado" })).status, 422);
+  assert.deepEqual(await f.store.loadState(), state);
+  const row = rows(state, b)[0];
+  await f.valid("SALE_CORRECT", {
+    id: b,
+    reason: "Reducir HTTP",
+    items: [
+      { original_item_id: row.id, product_id: "prod-1", quantity: 20, unit_weight_kg: 25, unit_price: 73 },
+    ],
+  });
+  state = await f.store.loadState();
+  assert.equal(rows(state, b)[0].coverage.quantity, 20);
+  assert.equal(stock(state, "prod-1").quantity, 24);
+  assert.ok(state.sales.filter((s) => s.id !== a).every((s) => s.fulfillment_status === "PENDING"));
+  const product_id = (
+    await f.valid("PRODUCT_SAVE", {
+      name: "CascoPlus+ HTTP sintético",
+      presentation_unit: "BOTTLE",
+      unit_weight_grams: 2200,
+      weight_policy: "FIXED",
+      stock_entry_mode: "DIRECT_STOCK",
+      default_sale_price: 10,
+      is_sellable: true,
+    })
+  ).result;
+  const bottle = (
+    await f.valid(
+      "SALE_SAVE",
+      salePayload(customer, { items: [{ product_id, quantity: 2, unit_weight_kg: 2.2 }] }),
+    )
+  ).result;
+  await f.valid("INVENTORY_ADJUST", {
+    product_id,
+    quantity: 2,
+    weight_kg: 4.4,
+    direction: "IN",
+    date: "2026-10-29",
+    reason: "Frascos directos",
+  });
+  state = await f.store.loadState();
+  assert.equal(rows(state, bottle)[0].coverage.quantity, 2);
+  assert.equal(rows(state, bottle)[0].coverage.weight_grams, 4400);
+  assert.equal(state.productions.length, 0);
+});
+
+test("R05-24: dos administradores HTTP reponen último faltante sin doble cargo", async (t) => {
+  const f = await fixture(t);
+  const customer = (await f.valid("CUSTOMER_SAVE", { name: "Cliente concurrencia cola" })).result;
+  const sale = (
+    await f.valid(
+      "SALE_SAVE",
+      salePayload(customer, { items: [{ product_id: "prod-1", quantity: 1, unit_weight_kg: 25 }] }),
+    )
+  ).result;
+  await f.valid("USER_SAVE", { id: "queue-admin-b", name: "Segundo administrador cola", role: "ADMIN" });
+  assert.equal(
+    (
+      await f.admin("/api/auth/credentials", {
+        user_id: "queue-admin-b",
+        login: "queue-admin-b",
+        password: f.secret,
+      })
+    ).status,
+    200,
+  );
+  const b = await f.login("queue-admin-b", f.secret, 1);
+  const actors = [f.admin, b];
+  const requests = [randomUUID(), randomUUID()];
+  const payload = {
+    product_id: "prod-1",
+    quantity: 1,
+    weight_kg: 25,
+    direction: "IN",
+    date: "2026-10-29",
+    reason: "Concurrencia sintética",
+  };
+  const results = await Promise.all(
+    actors.map((actor, i) => f.send(actor, "INVENTORY_ADJUST", payload, requests[i])),
+  );
+  for (let i = 0; i < results.length; i++) {
+    if (results[i].status !== 200) {
+      assert.match(results[i].body.error, /Otra operación/);
+      await f.valid("INVENTORY_ADJUST", payload, actors[i], requests[i]);
+    }
+  }
+  const state = await f.store.loadState();
+  assert.equal(state.saleItems.find((r) => r.sale_id === sale).coverage.quantity, 1);
+  assert.equal(state.inventoryMovements.filter((m) => m.coverage_action === "ASSIGN").length, 1);
+  assert.equal(stock(state, "prod-1").quantity, 1);
+  for (let i = 0; i < actors.length; i++) await f.valid("INVENTORY_ADJUST", payload, actors[i], requests[i]);
+  assert.deepEqual(await f.store.loadState(), state);
+});
+
+test("R05-27: adopción HTTP administrativa, replay y permiso degradado", async (t) => {
+  let connection;
+  t.after(() => connection?.close());
+  const f = await fixture(t);
+  const customer = (await f.valid("CUSTOMER_SAVE", { name: "Cliente legacy cola HTTP" })).result;
+  connection = openSqliteDatabase(f.configuration.database);
+  const legacy = createStore(() => connection);
+  const id = (
+    await legacy.runCommand(
+      {
+        type: "SALE_SAVE",
+        request_id: "legacy-http",
+        payload: salePayload(customer, {
+          items: [{ product_id: "prod-1", quantity: 2, unit_weight_kg: 25 }],
+        }),
+      },
+      { userId: "http-admin04", displayName: "Admin sintético" },
+    )
+  ).result;
+  await f.valid("INVENTORY_ADJUST", {
+    product_id: "prod-1",
+    quantity: 1,
+    weight_kg: 25,
+    direction: "IN",
+    date: "2026-10-29",
+    reason: "Saldo conciliado",
+  });
+  const payload = { id, delivery_date: "2026-11-01", reason: "Adopción sin cargos previos" };
+  const request = randomUUID();
+  await f.valid("SALE_COVERAGE_ADOPT", payload, f.admin, request);
+  const adopted = await f.store.loadState();
+  assert.equal(adopted.saleItems.find((r) => r.sale_id === id).coverage.quantity, 1);
+  await f.valid("SALE_COVERAGE_ADOPT", payload, f.admin, request);
+  assert.deepEqual(await f.store.loadState(), adopted);
+  assert.equal(
+    (await f.send(f.admin, "SALE_COVERAGE_ADOPT", { ...payload, reason: "Otro" }, request)).status,
+    409,
+  );
+  assert.deepEqual(await f.store.loadState(), adopted);
+  await f.valid("USER_SAVE", { id: "adopt-other-admin", name: "Admin restante", role: "ADMIN" });
+  assert.equal(
+    (
+      await f.admin("/api/auth/credentials", {
+        user_id: "adopt-other-admin",
+        login: "adopt-other-admin",
+        password: f.secret,
+      })
+    ).status,
+    200,
+  );
+  await f.valid("USER_SAVE", { id: "http-admin04", name: "Degradado", role: "OPERATOR" });
+  const operator = await f.login("admin04", f.secret);
+  const before = await f.store.loadState();
+  assert.equal((await f.send(operator, "SALE_COVERAGE_ADOPT", payload, request)).status, 403);
+  assert.deepEqual(await f.store.loadState(), before);
 });
 
 test("NQP26 I07 / R04-07: dos operadores, dos servidores HTTP y último saco sin sobreventa", async (t) => {

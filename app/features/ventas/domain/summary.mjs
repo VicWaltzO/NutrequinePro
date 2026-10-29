@@ -20,7 +20,7 @@ export function saleSummary(state, sale) {
   else if (balance === 0) financialStatus = "PAID";
   else if (paid > 0) financialStatus = "PARTIAL";
   return {
-    ...(sale.coverage_version === 1
+    ...(sale.coverage_version === 1 && sale.commercial_status !== "CANCELLED"
       ? {
           coverage_status: items.every((row) => row.coverage?.quantity === row.quantity)
             ? "READY_BY_STOCK"
