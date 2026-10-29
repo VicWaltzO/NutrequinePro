@@ -155,7 +155,19 @@ Impeccable; no se modifica ni se amplía el alcance para regenerarla.
 
 ## Entrega
 
-Validación local completa. Rama codex/nqp26-07-entrega-ux sobre 2219f98; publicación
-y CI de la cabeza propia pendientes al preparar el commit funcional. Las copias
-locales de reporte/matriz y la bitácora se guardan fuera de Git. El PR deberá
-permanecer en borrador y sin fusión. No se certifica despliegue ni aceptación humana.
+Validación local completa. Rama `codex/nqp26-07-entrega-ux` sobre
+`2219f98fea2db06fc341e9b0c7e383f657aac89e`; commit funcional
+`369ffae42f49cce6aff0423e4f92c1b80cc3ceb1` publicado y cotejado mediante
+git ls-remote. [PR #18](https://github.com/VicWaltzO/NutrequinePro/pull/18),
+open/draft, base main, sin conflictos ni fusión, comprobado al publicar. La primera
+consulta inmediata al push aún no devolvía ejecuciones. Después se comprobaron
+los dos controles de esa cabeza: [CI de PR 40924854767](https://github.com/VicWaltzO/NutrequinePro/actions/runs/40924854767)
+y [CI de push 40924803485](https://github.com/VicWaltzO/NutrequinePro/actions/runs/40924803485),
+ambos completed/success, incluidos verify y E2E en Linux.
+
+Matriz final: **19 controles técnicos aprobados y E07-14 parcial**, conservando
+los 20 requisitos, métodos y prioridades aportados. Son comprobaciones de Capa 1,
+no aprobación humana ni aceptación empresarial de reservas. El cierre documental
+posterior conserva exactamente el código probado; su SHA y la comprobación de
+GitHub se registran también en la bitácora local. Las copias de reporte/matriz,
+logs y capturas se guardan fuera de Git. No se certifica despliegue.
