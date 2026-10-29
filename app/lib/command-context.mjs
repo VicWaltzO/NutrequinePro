@@ -1,6 +1,6 @@
 import { text, today } from "../shared/domain/core.mjs";
 import { presentationSnapshot } from "../shared/domain/presentation.mjs";
-import { guardCoverageMovement } from "../features/ventas/domain/coverage.mjs";
+import { guardCoverageMovement, guardCoverageMovementBatch } from "../features/ventas/domain/coverage.mjs";
 export function createCommandContext(state, type, payload, actor, clock, options = {}) {
   const uid = () => crypto.randomUUID();
   const add = (t, v) => {
@@ -10,16 +10,22 @@ export function createCommandContext(state, type, payload, actor, clock, options
   };
   const code = (t, prefix) => `${prefix}-${String(state[t].length + 1).padStart(6, "0")}`;
   const reason = () => text(payload.reason, "Motivo");
+  const movementValue = (v) => ({
+    date: payload.date ?? today(),
+    ...(v.item_type === "PRODUCT"
+      ? presentationSnapshot(state.products.find((x) => x.id === v.item_id))
+      : {}),
+    ...v,
+  });
   const movement = (v) => {
-    const value = {
-      date: payload.date ?? today(),
-      ...(v.item_type === "PRODUCT"
-        ? presentationSnapshot(state.products.find((x) => x.id === v.item_id))
-        : {}),
-      ...v,
-    };
+    const value = movementValue(v);
     if (options.partialReservations === true) guardCoverageMovement(state, value);
     return add("inventoryMovements", value);
+  };
+  const movementBatch = (rows) => {
+    const values = rows.map(movementValue);
+    if (options.partialReservations === true) guardCoverageMovementBatch(state, values);
+    return values.map((value) => add("inventoryMovements", value));
   };
   const correction = (entity_type, entity_id, old_value, new_value, why) => {
     const c = add("corrections", {
@@ -52,6 +58,7 @@ export function createCommandContext(state, type, payload, actor, clock, options
     code,
     reason,
     movement,
+    movementBatch,
     correction,
     partialReservations: options.partialReservations === true,
   };

@@ -99,6 +99,27 @@ export function guardCoverageMovement(state, value) {
   }
 }
 
+// Historical reversals are one operation: validate their net effect per compatible unit,
+// while retaining every original reversal in the ledger.
+export function guardCoverageMovementBatch(state, values) {
+  const groups = new Map();
+  for (const value of values) {
+    if (value.item_type !== "PRODUCT") continue;
+    const grams = value.weight_kg / value.quantity;
+    requireValue(Number.isSafeInteger(grams), "Peso comercial inválido en la compensación.");
+    const groupKey = JSON.stringify([value.item_id, key(value, grams)]);
+    const group = groups.get(groupKey) ?? { ...value, quantity: 0, weight_kg: 0 };
+    group.quantity += value.quantity;
+    group.weight_kg += value.weight_kg;
+    groups.set(groupKey, group);
+  }
+  const projected = { ...state, inventoryMovements: [...state.inventoryMovements] };
+  for (const value of groups.values()) {
+    guardCoverageMovement(projected, value);
+    projected.inventoryMovements.push(value);
+  }
+}
+
 const inventoryCommands = new Set([
   "SALE_SAVE",
   "SALE_DELIVER",

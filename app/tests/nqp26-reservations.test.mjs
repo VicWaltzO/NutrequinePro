@@ -42,6 +42,82 @@ async function rejected(f, action, pattern) {
   assert.deepEqual(await f.state(), before);
 }
 
+for (const pending of [false, true])
+  persistenceTest(`NQP26: anular producción reducida con saldo libre (faltante: ${pending})`, async (t) => {
+    const f = await fixture(t);
+    const id = await f.run(
+      "PRODUCTION_SAVE",
+      productionPayload({
+        products: [{ product_id: "prod-1", nuclei_count: 2 }],
+      }),
+    );
+    await f.run("PRODUCTION_CORRECT_QUANTITIES", {
+      id,
+      reason: "Reducir producción sintética",
+      products: [{ product_id: "prod-1", nuclei_count: 1 }],
+    });
+    if (pending) await f.sell(1, { items: [{ product_id: "prod-1", quantity: 1, unit_weight_kg: 50 }] });
+    const before = await f.state();
+    const history = before.inventoryMovements.filter((x) => x.source_id === id);
+    await f.run("PRODUCTION_CANCEL", { id, reason: "Anular saldo libre" }, "cancel-reduced");
+    const after = await f.state();
+    assert.equal(after.productions.find((x) => x.id === id).status, "CANCELLED");
+    assert.equal(stock(after, "prod-1").quantity, 0);
+    assert.equal(stock(after, "prod-1").weight_kg, 0);
+    assert.deepEqual(after.saleItems, before.saleItems);
+    const reversals = after.inventoryMovements.filter((x) => x.source_id === id).slice(history.length);
+    assert.equal(reversals.length, history.length);
+    for (const [i, move] of history.entries()) {
+      assert.equal(reversals[i].quantity + move.quantity, 0);
+      assert.equal(reversals[i].weight_kg + move.weight_kg, 0);
+      assert.equal(reversals[i].item_id, move.item_id);
+    }
+    await f.run("PRODUCTION_CANCEL", { id, reason: "Anular saldo libre" }, "cancel-reduced");
+    assert.deepEqual(await f.state(), after);
+    assert.deepEqual(await createStore(() => f.database.binding, options).loadState(), after);
+  });
+
+persistenceTest("NQP26: anular rectificaciones sucesivas de varios productos", async (t) => {
+  const f = await fixture(t);
+  const products = (count) => ["prod-1", "prod-2"].map((product_id) => ({ product_id, nuclei_count: count }));
+  const id = await f.run("PRODUCTION_SAVE", productionPayload({ products: products(2) }));
+  for (const count of [3, 1])
+    await f.run("PRODUCTION_CORRECT_QUANTITIES", {
+      id,
+      reason: "Rectificar ambos productos",
+      products: products(count),
+    });
+  await f.run("PRODUCTION_CANCEL", { id, reason: "Anular rectificaciones sucesivas" });
+  const state = await f.state();
+  for (const productId of ["prod-1", "prod-2"]) {
+    assert.equal(stock(state, productId).quantity, 0);
+    assert.equal(stock(state, productId).weight_kg, 0);
+  }
+});
+
+persistenceTest("NQP26: anular producción reducida no consume reservas ni pesos incompatibles", async (t) => {
+  const f = await fixture(t);
+  const id = await f.run(
+    "PRODUCTION_SAVE",
+    productionPayload({
+      products: [{ product_id: "prod-1", nuclei_count: 2 }],
+    }),
+  );
+  await f.run("PRODUCTION_CORRECT_QUANTITIES", {
+    id,
+    reason: "Reducir producción sintética",
+    products: [{ product_id: "prod-1", nuclei_count: 1 }],
+  });
+  await f.sell(1);
+  await rejected(f, () => f.run("PRODUCTION_CANCEL", { id, reason: "Saldo reservado" }), /consumió/);
+  await f.adjust(20, 480);
+  await rejected(
+    f,
+    () => f.run("PRODUCTION_CANCEL", { id, reason: "Peso incompatible" }),
+    /compatible insuficiente/,
+  );
+});
+
 persistenceTest("NQP26 I01/I02: 35/40 y segundo pedido conservan K/N, gramos y replay", async (t) => {
   const f = await fixture(t);
   await f.adjust(35);
