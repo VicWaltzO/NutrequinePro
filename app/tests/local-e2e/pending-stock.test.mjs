@@ -109,6 +109,7 @@ test(
         assert.equal(await banner.evaluate((el) => getComputedStyle(el).position), "static");
         await page.screenshot({
           path: join(server.evidence, `pending-stock-${width}-${colorScheme}.png`),
+          fullPage: true,
           animations: "disabled",
         });
       }
