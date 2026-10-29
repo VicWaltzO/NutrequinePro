@@ -1,5 +1,6 @@
 export const titles: Record<string, string> = {
   sale: "Nueva venta",
+  "sale-delivery-date": "Cambiar fecha de entrega",
   production: "Registrar producción",
   payment: "Registrar pago",
   credit: "Aplicar saldo a favor",

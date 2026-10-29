@@ -77,7 +77,7 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
         <div className="sale-section-body">
           {!edit ? (
             <>
-              <div className="sale-date">
+              <div className="sale-dates">
                 <Input
                   label="Fecha de venta"
                   type="date"
@@ -85,7 +85,25 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
                   value={values.sale_date}
                   onChange={(value) => set("sale_date", value)}
                 />
+                <Input
+                  label="Fecha de entrega"
+                  type="date"
+                  required
+                  value={values.delivery_date}
+                  onInput={() => set("delivery_date_manual_override", true)}
+                  onChange={(value) => set("delivery_date", value)}
+                />
               </div>
+              <Check
+                label="Mantener esta fecha de entrega al cambiar la fecha de venta"
+                value={values.delivery_date_manual_override}
+                onChange={(value) => set("delivery_date_manual_override", value)}
+              />
+              {values.delivery_date < values.sale_date && (
+                <p className="warning" role="status">
+                  La entrega es anterior a la venta. Se guardará como regularización con ambas fechas.
+                </p>
+              )}
               <div className="sale-party-grid">
                 {(["customer", "site"] as const).map((field) => {
                   const customer = field === "customer";
@@ -195,6 +213,10 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
               <div>
                 <dt>Fecha de venta</dt>
                 <dd>{values.sale_date}</dd>
+              </div>
+              <div>
+                <dt>Fecha de entrega</dt>
+                <dd>{record?.delivery_date ?? `${values.sale_date} (sin fecha propia registrada)`}</dd>
               </div>
             </dl>
           )}

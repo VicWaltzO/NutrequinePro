@@ -1,5 +1,6 @@
 import { recordId } from "@/lib/domain-types";
 import type { AppState, User, Sale, OpenModal, Submit } from "@/lib/domain-types";
+import { SaleDeliveryDateForm } from "@/features/ventas/components/SaleDeliveryDateForm";
 import { SaleForm } from "@/features/ventas/components/SaleForm";
 import { PaymentForm } from "@/features/cobranza/components/PaymentForm";
 import { ReturnForm } from "@/features/ventas/components/ReturnForm";
@@ -49,6 +50,7 @@ export default function ModalContent({
     close,
     busy,
   };
+  if (modal.type === "sale-delivery-date") return <SaleDeliveryDateForm {...props} />;
   if (modal.type === "sale") return <SaleForm {...props} />;
   if (modal.type === "production") return <ProductionForm {...props} />;
   if (modal.type === "credit") return <PaymentForm {...props} record={modal.record} kind="credit" />;

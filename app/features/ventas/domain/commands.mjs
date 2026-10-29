@@ -2,6 +2,7 @@ import { requireValue, scaled, positiveInt, date, pick, sum } from "../../../sha
 import { saleSummary } from "./summary.mjs";
 import { stock } from "../../inventario/domain/stock.mjs";
 import { isNucleusProduct, presentationSnapshot } from "../../../shared/domain/presentation.mjs";
+import { savedDeliveryFields } from "./delivery-date.mjs";
 import { coverSale } from "./coverage.mjs";
 export function saleSave(context) {
   const {
@@ -30,13 +31,16 @@ export function saleSave(context) {
     ? pick(state, "sales", payload.id)
     : add("sales", { code: code("sales", "V"), commercial_status: "DRAFT" });
   requireValue(sale.commercial_status === "DRAFT", "Use rectificación para ventas confirmadas.");
+  const saleDate = date(payload.sale_date);
+  const delivery = savedDeliveryFields(payload, saleDate, sale);
   const rows = saleItems(sale.id, payload.items);
   state.saleItems.filter((x) => x.sale_id === sale.id).forEach((x) => (x.is_current = false));
   const savedRows = rows.map((x) => add("saleItems", x));
   Object.assign(sale, {
     customer_id: customer.id,
     site_id: site.id,
-    sale_date: date(payload.sale_date),
+    sale_date: saleDate,
+    ...delivery,
     payment_condition: payload.payment_condition,
     notes: payload.notes ?? "",
     fulfillment_status: "PENDING",
@@ -156,6 +160,13 @@ export function saleCorrect(context) {
   } = context;
   let result = null;
   const sale = pick(state, "sales", payload.id);
+  requireValue(
+    (!Object.hasOwn(payload, "delivery_date") ||
+      payload.delivery_date === (sale.delivery_date ?? sale.sale_date)) &&
+      (!Object.hasOwn(payload, "delivery_date_manual_override") ||
+        payload.delivery_date_manual_override === (sale.delivery_date_manual_override ?? false)),
+    "Cambie la fecha mediante la operación específica de fecha de entrega.",
+  );
   if (sale.coverage_version === 1) {
     const old = saleSummary(state, sale).items;
     const proposed = saleItems(sale.id, payload.items, old);

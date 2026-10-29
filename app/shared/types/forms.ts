@@ -25,6 +25,8 @@ export interface PaymentFieldsValue {
 export interface SaleFields extends PaymentFieldsValue {
   id?: string;
   sale_date: string;
+  delivery_date: string;
+  delivery_date_manual_override: boolean;
   customer_id: string;
   site_id: string;
   payment_condition: string;

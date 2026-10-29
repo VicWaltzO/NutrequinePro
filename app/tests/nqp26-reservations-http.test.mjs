@@ -73,6 +73,93 @@ async function fixture(t) {
   return { store, admin, send, valid, login, secret, configuration: { database, auth_database, port: 0 } };
 }
 
+test("F06-07/08/12/13/14: HTTP de fecha preserva K/N, permisos actuales y replay 409", async (t) => {
+  const f = await fixture(t);
+  const customer = (await f.valid("CUSTOMER_SAVE", { name: "Cliente sintético fecha 06" })).result;
+  await f.valid("INVENTORY_ADJUST", {
+    product_id: "prod-1",
+    quantity: 1,
+    weight_kg: 25,
+    direction: "IN",
+    date: "2026-10-28",
+    reason: "Sintético",
+  });
+  const id = (
+    await f.valid(
+      "SALE_SAVE",
+      salePayload(customer, {
+        items: [{ product_id: "prod-1", quantity: 2, unit_weight_kg: 25, unit_price: 73 }],
+        payment_condition: "CASH",
+        payment_method: "TRANSFER",
+        paid_amount: 10,
+      }),
+    )
+  ).result;
+  const before = await f.store.loadState();
+  await assert.rejects(createLocalServer(f.configuration), /no admite arranque operativo/);
+  const payload = { id, delivery_date: "2026-11-04", reason: "Pedido reprogramado" };
+  const request = randomUUID();
+  await f.valid("SALE_DELIVERY_DATE_UPDATE", payload, f.admin, request);
+  const after = await f.store.loadState();
+  assert.deepEqual(after.saleItems, before.saleItems);
+  assert.equal(after.saleItems[0].coverage.quantity, 1);
+  for (const key of ["inventoryMovements", "payments", "paymentApplications", "productionCosts"]) {
+    assert.deepEqual(after[key], before[key], key);
+  }
+  await f.valid("SALE_DELIVERY_DATE_UPDATE", { ...payload }, f.admin, request);
+  assert.deepEqual(await f.store.loadState(), after);
+  assert.equal(
+    (
+      await f.send(
+        f.admin,
+        "SALE_DELIVERY_DATE_UPDATE",
+        {
+          ...payload,
+          delivery_date: "2026-11-05",
+        },
+        request,
+      )
+    ).status,
+    409,
+  );
+  for (const value of ["2026-02-29", "2026-10-28T00:00:00-05:00", null, {}]) {
+    assert.equal(
+      (await f.send(f.admin, "SALE_DELIVERY_DATE_UPDATE", { ...payload, delivery_date: value })).status,
+      422,
+    );
+  }
+  assert.equal((await f.send(f.admin, "SALE_DELIVERY_DATE_UPDATE", { ...payload, items: [] })).status, 422);
+  assert.deepEqual(await f.store.loadState(), after);
+  for (const role of ["OPERATOR", "VIEWER"]) {
+    const user = "date-" + role.toLowerCase();
+    await f.valid("USER_SAVE", { id: user, name: user, role });
+    assert.equal(
+      (await f.admin("/api/auth/credentials", { user_id: user, login: user, password: f.secret })).status,
+      200,
+    );
+    const actor = await f.login(user, f.secret);
+    const snapshot = await f.store.loadState();
+    assert.equal((await f.send(actor, "SALE_DELIVERY_DATE_UPDATE", payload, request)).status, 403);
+    assert.deepEqual(await f.store.loadState(), snapshot);
+  }
+  await f.valid("USER_SAVE", { id: "date-other-admin", name: "Segundo admin sintético", role: "ADMIN" });
+  assert.equal(
+    (
+      await f.admin("/api/auth/credentials", {
+        user_id: "date-other-admin",
+        login: "date-other-admin",
+        password: f.secret,
+      })
+    ).status,
+    200,
+  );
+  await f.valid("USER_SAVE", { id: "http-admin04", name: "Admin degradado", role: "OPERATOR" });
+  const degraded = await f.login("admin04", f.secret);
+  const snapshot = await f.store.loadState();
+  assert.equal((await f.send(degraded, "SALE_DELIVERY_DATE_UPDATE", payload, request)).status, 403);
+  assert.deepEqual(await f.store.loadState(), snapshot);
+});
+
 test("NQP26 I07 / R04-07: dos operadores, dos servidores HTTP y último saco sin sobreventa", async (t) => {
   const f = await fixture(t);
   const customer = (await f.valid("CUSTOMER_SAVE", { name: "Cliente HTTP sintético" })).result;

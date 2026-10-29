@@ -72,8 +72,10 @@
   min-height: 44px;
   white-space: normal;
 }
-.sale-date {
-  max-width: 240px;
+.sale-dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 }
 .sale-party-grid {
   display: grid;
@@ -355,8 +357,8 @@
   .sale-section-body {
     padding: 16px;
   }
-  .sale-date {
-    max-width: none;
+  .sale-dates {
+    grid-template-columns: 1fr;
   }
   .sale-party-grid {
     grid-template-columns: 1fr;

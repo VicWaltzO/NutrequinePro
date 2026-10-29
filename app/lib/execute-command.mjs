@@ -31,7 +31,9 @@ import { createCommandContext } from "./command-context.mjs";
 import { assertCommandPermission } from "../shared/domain/permissions.mjs";
 import { validateMasterCommand } from "./master-command-contracts.mjs";
 import { guardCoverageMode } from "../features/ventas/domain/coverage.mjs";
+import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-delivery-date.mjs";
 const handlers = {
+  SALE_DELIVERY_DATE_UPDATE: saleDeliveryDateUpdate,
   CUSTOMER_SAVE: customerSave,
   CUSTOMER_SITES_SAVE: customerSitesSave,
   SITE_SAVE: customerSave,
