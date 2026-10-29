@@ -61,4 +61,4 @@ R04-21 sigue parcial. No se certifica inventario físico observado ni aceptació
 
 ## Entrega
 
-Rama independiente `codex/nqp26-06-fecha-entrega`. Commit y enlace del PR se registrarán tras la publicación. La matriz conserva sin alteración los 18 escenarios, resultados esperados, métodos y prioridades originales. Evidencias y capturas quedan en la carpeta local del responsable, fuera de Git. La bitácora registra por separado la revisión humana pendiente.
+Rama independiente `codex/nqp26-06-fecha-entrega`. Commit funcional `f4252381fac6e2bcbb6801f204797aac532db045`, publicado y comprobado en el remoto. [PR #16](https://github.com/VicWaltzO/NutrequinePro/pull/16), abierto en borrador, sin fusionar. La actualización documental posterior registra este enlace y el cierre de la matriz; no cambia código funcional. La matriz conserva sin alteración los 18 escenarios, resultados esperados, métodos y prioridades originales. Evidencias y capturas quedan en la carpeta local del responsable, fuera de Git. La bitácora registra por separado la revisión humana pendiente.
