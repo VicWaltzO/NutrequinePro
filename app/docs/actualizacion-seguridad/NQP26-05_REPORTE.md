@@ -91,9 +91,18 @@ unicidad de enlaces activos. Cambiar fecha o cobrar sin movimientos no asigna.
 - Dirigidas finales de cola: directed-08, 39/39 aprobadas. Invariantes reforzados:
   16 aprobadas y los 6 todo futuros; no se suman como pruebas distintas a verify.
 - E2E-01 Chrome completa después del build final: 31/31 aprobadas en una corrida,
-  cero fallidas, canceladas, omitidas o todo. CI de 05: pendiente del push y PR.
+  cero fallidas, canceladas, omitidas o todo.
+- CI de código c1aa50e5051d1118d85771461a9d197457f1e624: workflow
+  [40886602114](https://github.com/VicWaltzO/NutrequinePro/actions/runs/40886602114),
+  Calidad de Nutrequine Pro, completed/success. Incluye verify y E2E en Linux.
 
-Matriz local antes de CI: 27 aprobados, 2 parciales (21/28) y 1 pendiente (30).
+Matriz final: **28 aprobados de 30 y 2 parciales (R05-21/R05-28)**, sin controles
+pendientes. Esto no constituye aceptación empresarial ni habilita las reservas.
+
+GitHub sincronizado: [PR #17](https://github.com/VicWaltzO/NutrequinePro/pull/17)
+abierto en borrador, base codex/nqp26-06-fecha-entrega; sin conflictos al verificar.
+Commit funcional c1aa50e5051d1118d85771461a9d197457f1e624. El cierre documental
+posterior conserva exactamente ese código y sus pruebas; su SHA queda en la bitácora.
 
 I03, I04, I06 e I11 tienen escenarios ejecutables reales en memoria y SQLite.
 I14, I15, I16, I17, I18 e I19 permanecen todo intactos. Las pruebas dirigidas no
