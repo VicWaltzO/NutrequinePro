@@ -83,6 +83,7 @@ export interface SimpleFields {
   address?: string;
   notes?: string;
   confirm_duplicate?: boolean;
+  duplicate_review?: string;
   category?: string;
   presentation_unit?: string;
   unit_weight_grams?: NumericInput;

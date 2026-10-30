@@ -1,0 +1,42 @@
+.customer-name-field {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.customer-name-warning {
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid var(--warning);
+  border-radius: 7px;
+  background: var(--warning-soft);
+  color: var(--warning);
+  overflow-wrap: anywhere;
+}
+.customer-name-warning p {
+  margin: 4px 0 8px;
+  color: inherit;
+}
+.customer-name-warning ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+.customer-name-warning li + li {
+  margin-top: 8px;
+}
+.customer-name-warning summary {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding-block: 8px;
+}
+.customer-name-warning dl {
+  margin: 8px 0;
+}
+.customer-name-warning dt {
+  font-weight: 600;
+}
+.customer-name-warning dd {
+  margin: 0 0 8px;
+}
+.customer-name-warning .check {
+  color: inherit;
+}

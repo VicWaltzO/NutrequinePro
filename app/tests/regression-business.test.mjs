@@ -1,3 +1,4 @@
+import { customerDuplicateReview } from "../features/clientes/domain/name-matches.mjs";
 import { persistenceTest as test } from "./helpers/persistence-fixtures.mjs";
 import assert from "node:assert/strict";
 import { createStore } from "../lib/application-store.mjs";
@@ -84,7 +85,11 @@ test("R04: duplicados normalizados requieren confirmación y sedes se reasocian 
     () => f.run("CUSTOMER_SAVE", { name: "  CLIENTE   SINTETICO 02 " }),
     /duplicado/,
   );
-  const duplicate = await f.run("CUSTOMER_SAVE", { name: "Cliente sintetico 02", confirm_duplicate: true });
+  const duplicate = await f.run("CUSTOMER_SAVE", {
+    name: "Cliente sintetico 02",
+    confirm_duplicate: true,
+    duplicate_review: customerDuplicateReview((await f.state()).customers, "Cliente sintetico 02"),
+  });
   assert.notEqual(duplicate, f.customer);
   const site = await f.run("SITE_SAVE", { name: "Sede sintética nueva" });
   await f.run("CUSTOMER_SAVE", {
@@ -92,6 +97,11 @@ test("R04: duplicados normalizados requieren confirmación y sedes se reasocian 
     name: "Cliente sintético 02",
     site_ids: [site],
     confirm_duplicate: true,
+    duplicate_review: customerDuplicateReview(
+      (await f.state()).customers,
+      "Cliente sintético 02",
+      f.customer,
+    ),
   });
   const state = await f.state();
   const links = state.customerSites.filter((row) => row.customer_id === f.customer);

@@ -1,3 +1,4 @@
+import { ApiError } from "../../session-api";
 import { useEffect, useState } from "react";
 import { errorMessage } from "@/lib/domain-types";
 import type { AppState, User, EditorRecord } from "@/lib/domain-types";
@@ -85,6 +86,17 @@ export function useAdminOperations() {
       }
       return responseBody.result ?? true;
     } catch (e) {
+      if (type === "CUSTOMER_SAVE" && e instanceof ApiError && e.status === 422) {
+        // Only an explicit rejection is safe to refresh. An uncertain transport
+        // outcome must preserve the original payload and request ID for T03 replay.
+        try {
+          const current = await fetchAdminState();
+          setState(current.state);
+          setActor(current.actor);
+        } catch {
+          /* Keep the original command error; the user can retry/reload. */
+        }
+      }
       setError(errorMessage(e, "No se pudo guardar. Vuelva a intentar."));
       return null;
     } finally {
