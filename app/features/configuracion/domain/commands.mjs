@@ -1,4 +1,5 @@
 import { requireValue, normalize, scaled, positiveInt, text, pick } from "../../../shared/domain/core.mjs";
+import { customerNameMatches, customerDuplicateReview } from "../../clientes/domain/name-matches.mjs";
 import { saveCustomerSites } from "../../clientes/domain/sites.mjs";
 import {
   productPresentation,
@@ -27,10 +28,15 @@ export function customerSave(context) {
       address: payload.address ?? "",
       notes: payload.notes ?? "",
     });
-    const dup = state.customers.find((x) => x.id !== payload.id && normalize(x.name) === normalize(v.name));
+    const matches = customerNameMatches(state.customers, payload.name, payload.id);
     requireValue(
-      !dup || payload.confirm_duplicate,
+      !matches.length || payload.confirm_duplicate === true,
       "Posible cliente duplicado. Confirme explícitamente para continuar.",
+    );
+    requireValue(
+      !matches.length ||
+        payload.duplicate_review === customerDuplicateReview(state.customers, payload.name, payload.id),
+      "Las coincidencias de clientes cambiaron o no se revisaron. Revise los candidatos y confirme de nuevo.",
     );
   }
   if (table === "products") {

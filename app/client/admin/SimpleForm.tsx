@@ -1,3 +1,5 @@
+import { customerNameMatches, customerDuplicateReview } from "@/features/clientes/domain/name-matches.mjs";
+import CustomerNameWarning from "@/features/clientes/components/CustomerNameWarning";
 import CustomerFields from "@/features/clientes/components/CustomerFields";
 import ProductFields from "@/features/configuracion/components/ProductFields";
 import IngredientFields from "@/features/produccion/components/IngredientFields";
@@ -17,7 +19,21 @@ import { productPresentation } from "@/shared/domain/presentation.mjs";
 export default function SimpleForm({ s: state, record, kind, submit, close, busy }: FormProps) {
   const initial = simpleFormInitial({ s: state, record, kind });
   const [v, setV] = useState<SimpleFields>(initial);
-  const set = <K extends keyof SimpleFields>(k: K, x: SimpleFields[K]) => setV((a) => ({ ...a, [k]: x }));
+  const set = <K extends keyof SimpleFields>(k: K, x: SimpleFields[K]) =>
+    setV((a) => ({
+      ...a,
+      [k]: x,
+      ...(kind === "customer" && k === "name"
+        ? { confirm_duplicate: false, duplicate_review: undefined }
+        : {}),
+    }));
+  const matches = kind === "customer" ? customerNameMatches(state.customers, v.name ?? "", v.id) : [];
+  const review = customerDuplicateReview(state.customers, v.name ?? "", v.id);
+  if (v.duplicate_review && v.duplicate_review !== review) {
+    setV((a) => ({ ...a, confirm_duplicate: false, duplicate_review: undefined }));
+  }
+  const confirmed = v.confirm_duplicate === true && v.duplicate_review === review;
+  const blocked = kind === "customer" && matches.length > 0 && !confirmed;
   const input = (
     k: keyof SimpleFields,
     l: string,
@@ -26,6 +42,9 @@ export default function SimpleForm({ s: state, record, kind, submit, close, busy
   ) => (
     <Input
       label={l}
+      aria-describedby={
+        kind === "customer" && k === "name" && matches.length ? "customer-name-matches" : undefined
+      }
       type={type}
       required={required}
       min={type === "number" ? "0" : undefined}
@@ -56,6 +75,7 @@ export default function SimpleForm({ s: state, record, kind, submit, close, busy
       className={["expense", "adjust"].includes(kind ?? "") ? "operation-form" : undefined}
       onSubmit={async (e) => {
         e.preventDefault();
+        if (blocked || busy) return;
         await submit(operations[kind ?? ""] ?? record?._operation ?? "", {
           ...v,
           ...(kind === "adjust" &&
@@ -70,7 +90,25 @@ export default function SimpleForm({ s: state, record, kind, submit, close, busy
     >
       {["customer", "site", "product", "ingredient", "user"].includes(kind ?? "") && (
         <div className="form-grid">
-          {input("name", "Nombre")}
+          {kind === "customer" ? (
+            <div className="customer-name-field">
+              {input("name", "Nombre")}
+              <CustomerNameWarning
+                id="customer-name-matches"
+                matches={matches}
+                confirmed={confirmed}
+                onConfirm={(value) =>
+                  setV((a) => ({
+                    ...a,
+                    confirm_duplicate: value,
+                    duplicate_review: value ? review : undefined,
+                  }))
+                }
+              />
+            </div>
+          ) : (
+            input("name", "Nombre")
+          )}
           {kind === "customer" && <CustomerFields s={state} v={v} set={set} input={input} />}
           {kind === "product" && <ProductFields v={v} set={set} input={input} />}
           {kind === "ingredient" && <IngredientFields input={input} />}
@@ -90,7 +128,12 @@ export default function SimpleForm({ s: state, record, kind, submit, close, busy
         />
       )}
       {kind === "reason" && <AdministrativeReasonFields record={record} input={input} />}
-      <Footer busy={busy} close={close} label={kind === "reason" ? "Registrar operación" : "Guardar"} />
+      <Footer
+        disabled={blocked}
+        busy={busy}
+        close={close}
+        label={kind === "reason" ? "Registrar operación" : "Guardar"}
+      />
     </form>
   );
 }

@@ -1,5 +1,3 @@
-import { normalize } from "@/lib/domain-preview.mjs";
-import { Check } from "@/shared/ui";
 import { CustomerSiteFields } from "./CustomerSiteFields";
 import type { SimpleFieldProps } from "@/shared/types/simple-fields";
 export default function CustomerFields({
@@ -24,13 +22,6 @@ export default function CustomerFields({
           set("default_site_id", next.default_site_id);
         }}
       />
-      {state.customers.some((x) => x.id !== v.id && normalize(x.name) === normalize(v.name)) && (
-        <Check
-          label="Confirmo un cliente diferente con nombre similar"
-          value={v.confirm_duplicate}
-          onChange={(x) => set("confirm_duplicate", x)}
-        />
-      )}
     </>
   );
 }

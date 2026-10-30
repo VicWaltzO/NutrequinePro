@@ -10,6 +10,7 @@ const contracts = {
     ...contact,
     ...siteFields,
     "confirm_duplicate",
+    "duplicate_review",
     "code",
     ...immutable,
     "deleted_at",
@@ -163,6 +164,8 @@ export function validateMasterCommand(state, type, payload) {
     string(payload.name, "name", { required: true });
   if (payload.is_active !== undefined) boolean(payload.is_active, "is_active");
   if (type === "CUSTOMER_SAVE") {
+    if (payload.duplicate_review !== undefined)
+      string(payload.duplicate_review, "duplicate_review", { max: 1000000 });
     for (const field of contact) if (payload[field] !== undefined) string(payload[field], field);
     if (payload.confirm_duplicate !== undefined) boolean(payload.confirm_duplicate, "confirm_duplicate");
   }

@@ -1,6 +1,6 @@
 {
   "baseCommit": "54a4ef7",
-  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría. Núcleos decimales: solo los campos de cantidad de producción y rectificación admiten coma/punto con dos decimales. NQP26-03: última línea eliminable y bloqueo accesible sin productos; solo sale/sale:correct actualizados tras inspección visual sintética. NQP26-07: solo modal:sale y modal:sale-detail tras comparar DOM de main 2219f98 y capturas sintéticas 1440/390 claro/oscuro; fechas y rectificación intactas. Huellas en NQP26-07_REPORTE.md.",
+  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría. Núcleos decimales: solo los campos de cantidad de producción y rectificación admiten coma/punto con dos decimales. NQP26-03: última línea eliminable y bloqueo accesible sin productos; solo sale/sale:correct actualizados tras inspección visual sintética. NQP26-07: solo modal:sale y modal:sale-detail tras comparar DOM de main 2219f98 y capturas sintéticas 1440/390 claro/oscuro; fechas y rectificación intactas. Huellas en NQP26-07_REPORTE.md. NQP26-09: solo modal:customer tras inspección DOM (contenedor Nombre) y navegador 1440/390 claro/oscuro; aviso de candidatos cubierto por SSR y E2E propios. Resto de huellas conservadas.",
   "snapshots": {
     "ADMIN:dashboard": "f63f327371847be1f5670be60c4359bd1cec8628289a826a87a8ee394535deb7",
     "ADMIN:sales": "970f542136365c03e3878a6e286fafb7b86026bacb59d5085d6ee12a56e8fa2b",
@@ -54,7 +54,7 @@
     "modal:reconcile": "f395bce9cff55e027f4965336a5b44eed7f175a07bd69f8a516268b2287c74a9",
     "modal:production-quantities": "5122284eb79833b76cb665661d5fb5839f971bf9b753c803e3a4f2252e9426dd",
     "modal:formula": "c5b48827797d7c749d7b4882363ee967c858acad011f8d7a549447a9f0511025",
-    "modal:customer": "348b75d2a8f17136a0dcef58983776c6e2df2fcd4d6ea4eeb29b378e52d032cf",
+    "modal:customer": "2424c7047a09e3e5801d176a58d92d7db3d5e555c0051817207b94e599ff7c38",
     "modal:customer-delete": "ec205a7330f3656a83c3bfec2da115d46a0625b3454f9ee4bdbdd84b8d4c2a9c",
     "modal:site": "5504e3ea991586d0704795e403bc3f91f99b6f4615c91519f4da2839bf105f7d",
     "modal:product": "c657b8418a5d21ba471cd2bf09aecb0cd590360b7e67b11123e24c78bbfa3fce",

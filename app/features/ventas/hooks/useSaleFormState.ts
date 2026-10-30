@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { SaleFields, SaleLine, FormProps } from "@/shared/types/forms";
 import type { SaleItem } from "@/lib/domain-types";
 import { saleSummary } from "../domain/summary.mjs";
-import { normalize } from "@/shared/domain/core.mjs";
+import { customerNameMatches, customerDuplicateReview } from "@/features/clientes/domain/name-matches.mjs";
 import { saleFormPreview } from "./sale-form-preview";
 import { day } from "@/shared/lib/format";
 import { find } from "@/shared/lib/find";
@@ -42,8 +42,17 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
   );
   const [paidAmount, setPaidAmount] = useState<string | null>(null);
   const [quick, setQuick] = useState("");
-  const [newName, setNewName] = useState("");
-  const [duplicate, setDuplicate] = useState(false);
+  const [newName, setName] = useState("");
+  const [reviewed, setReviewed] = useState("");
+  const matches = customerNameMatches(state.customers, newName);
+  const review = customerDuplicateReview(state.customers, newName);
+  if (reviewed && reviewed !== review) setReviewed("");
+  const duplicate = reviewed === review;
+  const setNewName = (name: string) => {
+    setName(name);
+    setReviewed("");
+  };
+  const setDuplicate = (value: boolean) => setReviewed(value ? review : "");
   const update = (i: number, k: keyof SaleLine, x: string) =>
     setRows((a) =>
       a.map((r, j) => {
@@ -61,7 +70,7 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
     old,
     edit && record?.fulfillment_status === "DELIVERED",
   );
-  const dup = state.customers.some((x) => normalize(x.name) === normalize(newName));
+  const dup = matches.length > 0;
   const paid = paidAmount === null ? total : Math.round(Number(paidAmount || 0) * 100);
   return {
     edit,
@@ -81,6 +90,8 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
     missing,
     total,
     dup,
+    matches,
+    review,
     paid,
   };
 }

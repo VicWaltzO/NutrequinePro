@@ -1,3 +1,4 @@
+import CustomerNameWarning from "@/features/clientes/components/CustomerNameWarning";
 import { UserRound, CreditCard, Plus, X } from "lucide-react";
 import { useSaleFormState } from "../hooks/useSaleFormState";
 import { unitLabels } from "@/shared/domain/presentation.mjs";
@@ -26,6 +27,8 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
     missing,
     total,
     dup,
+    matches,
+    review,
     paid,
   } = useSaleFormState({ s: state, record, kind });
   const hasProducts = rows.length > 0 && rows.every((row) => !!row.product_id);
@@ -42,7 +45,9 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
     const result = await submit(quick === "customer" ? "CUSTOMER_SAVE" : "SITE_SAVE", {
       name: newName,
       is_active: true,
-      ...(quick === "customer" ? { confirm_duplicate: duplicate } : {}),
+      ...(quick === "customer"
+        ? { confirm_duplicate: duplicate, ...(duplicate ? { duplicate_review: review } : {}) }
+        : {}),
       _keep_open: true,
     });
     if (typeof result === "string") {
@@ -155,6 +160,7 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
                           <Input
                             label={customer ? "Nombre del nuevo cliente" : "Nombre de sede"}
                             value={newName}
+                            aria-describedby={customer && dup ? "quick-customer-name-matches" : undefined}
                             onChange={setNewName}
                             onKeyDown={(event) => {
                               if (event.key === "Enter") {
@@ -163,17 +169,13 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
                               }
                             }}
                           />
-                          {customer && dup && (
-                            <>
-                              <p className="warning">
-                                Posible duplicado: ya existe un cliente con ese nombre.
-                              </p>
-                              <Check
-                                label="Confirmo que es otro cliente"
-                                value={duplicate}
-                                onChange={setDuplicate}
-                              />
-                            </>
+                          {customer && (
+                            <CustomerNameWarning
+                              id="quick-customer-name-matches"
+                              matches={matches}
+                              confirmed={duplicate}
+                              onConfirm={setDuplicate}
+                            />
                           )}
                           <div className="sale-quick-actions">
                             <button
