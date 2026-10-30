@@ -1,6 +1,6 @@
 # NQP26-12 — Ordenamiento global tipado y accesible
 
-2026-10-30, America/Bogota. **CONFORME LOCAL**: 208/208 columnas SI implementadas en 42/42 superficies elegibles; 60 NO conservadas. Cierre de PR y CI aún pendiente de observación.
+2026-10-30, America/Bogota. **CONFORME TÉCNICO**: 208/208 columnas SI implementadas en 42/42 superficies elegibles; 60 NO conservadas. PR #24 abierto en borrador hacia main. CI del commit funcional observada completed/success; la cabeza documental final se coteja en el PR y cierre externo antes de entregar.
 
 ## Base y aislamiento
 
@@ -53,6 +53,6 @@ Medición complementaria de la utilidad pura: 10 000 filas sintéticas en 8.92 m
 - [Revisión independiente](NQP26-12_REVISION_INDEPENDIENTE.md).
 - [Diagnóstico previo y actualización de base](NQP26-12_DIAGNOSTICO.md).
 
-Las dos matrices de cobertura conservan 208 IMPLEMENTADO/60 EXCLUIDO_CONTRATO y 42 UI APROBADO/FORMULA-EDITOR excluido. La matriz de aceptación cierra los controles locales; PR/CI se completan solo al observarlos. El SHA funcional, SHA final y URLs de CI se registrarán en el PR y cierre externo para evitar autorreferencia del commit documental.
+Las dos matrices de cobertura conservan 208 IMPLEMENTADO/60 EXCLUIDO_CONTRATO y 42 UI APROBADO/FORMULA-EDITOR excluido. La matriz de aceptación cierra **36/36 APROBADO**. Commit funcional **7e6d909a961589322812e8a6b120d4e2bc99a048**, push/ls-remote cotejados. [PR #24](https://github.com/VicWaltzO/NutrequinePro/pull/24) abierto/draft hacia main; [CI funcional 41135756703](https://github.com/VicWaltzO/NutrequinePro/actions/runs/41135756703) observada **completed/success** para ese SHA. El cierre posterior solo actualiza documentos. SHA final, CI de su propia cabeza y confirmación remota se cotejan después del commit en el cuerpo del PR y `04_EVIDENCIAS/NQP26-12_CIERRE_GITHUB.json` externo, evitando autorreferencia. No se atribuye anticipadamente success a un commit aún no creado.
 
 Copias completas en `C:/Users/vicve/Documents/ChatGPT/NQP26-12-entrega/03_REPORTES/`; logs/capturas sintéticos externos en `04_EVIDENCIAS/` y bitácora en `05_BITACORA/`. No se versionan bases, credenciales, capturas, logs completos ni archivos de despliegue. Sin fusión ni despliegue.

@@ -1,6 +1,6 @@
 # NQP26-12 — Revisión independiente
 
-Estado: segunda inspección de código completada; cierre local favorable; cotejo de SHA funcional y CI del PR pendientes. Fecha: 2026-10-30.
+Estado: revisión de código y cierre funcional favorables; SHA funcional y CI verificados. Fecha: 2026-10-30.
 
 ## Base y método
 
@@ -53,3 +53,15 @@ Se releyeron el reporte principal y las matrices finales de aceptación, cobertu
 Como evidencia externa del autor se leyeron los logs `C:/Users/vicve/Documents/ChatGPT/NQP26-12-entrega/04_EVIDENCIAS/verify-03.log` y `e2e-03.log`. El primero registra 427 PASS, seis TODO conservados, cero fallos, tres comprobaciones TypeScript, lint, formato, build y distribución con 2080 archivos/69 paquetes/cero privados. El segundo registra 36/36 PASS, cero fallos/omitidas/canceladas/TODO y duración total 721301.143 ms; incluye el caso global de ordenamiento y los seis guardados sintéticos. Los procesos finalizaron con salida 0 según el registro del autor. No se suman las repeticiones dirigidas a los casos de la suite.
 
 La incidencia verify-02 queda explícita en el reporte del autor: tres timeouts durante una anomalía de reloj, sin causa definitiva demostrada ni relajación de controles. La repetición final completa aprobada aporta el resultado válido de cierre local. Este revisor no ejecutó esas suites ni atribuye a una inferencia la causa de los timeouts.
+
+## Cotejo del commit funcional
+
+SHA funcional evaluado: `7e6d909a961589322812e8a6b120d4e2bc99a048`, sobre base `6f5c7921825afebd9a8d5afd997a016ffb39e7cf`. Se verificaron HEAD, el listado completo del diff base→commit y la ausencia de diferencias de trabajo respecto al commit en este cotejo. Incluye los consumidores, utilidad, tabla reutilizable, pruebas y documentos previamente revisados; no se identificaron cambios adicionales de runtime fuera del alcance inspeccionado. `git diff --check` base→commit terminó sin errores. Se mantiene el dictamen favorable sin defectos P0–P2 confirmados.
+
+Según la publicación comunicada por el autor, corresponde al PR draft [24](https://github.com/VicWaltzO/NutrequinePro/pull/24), sin fusión ni despliegue. CI run `41135756703` estaba queued al solicitar este cotejo; no se declara aprobada. Pendiente observar su resultado y registrar el cierre documental posterior, sin atribuir a un commit documental cambios de código distintos del SHA funcional aquí evaluado.
+
+## Dictamen funcional definitivo
+
+Se consultó directamente el conector GitHub para los workflow runs del commit `7e6d909a961589322812e8a6b120d4e2bc99a048`. Se observó [Calidad de Nutrequine Pro, run 41135756703](https://github.com/VicWaltzO/NutrequinePro/actions/runs/41135756703), estado **completed**, conclusión **success**, ejecución 139. Es comprobación propia de metadatos remotos, distinta de la ejecución propia de pruebas y de los logs locales del autor.
+
+El dictamen definitivo sobre el código funcional, contrato y matrices evaluados es favorable, sin defectos P0–P2 confirmados. El commit funcional cotejado tiene regresión local documentada y CI observada aprobada. La publicación posterior de documentación tendrá SHA y CI propios: no se anticipa su resultado ni se le atribuye esta ejecución del commit funcional. Se conserva la prohibición de fusionar o desplegar en esta revisión.
