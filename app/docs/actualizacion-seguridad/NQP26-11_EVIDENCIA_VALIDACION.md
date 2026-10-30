@@ -37,3 +37,7 @@ La captura no verifica orden asc/desc porque no se implementa en 11. Las pruebas
 ## Registros y entrega
 
 Logs completos `verify.log`, `verify-02.log`, `e2e.log`, `visual.log`, `visual-02.log` y `visual.json`, matriz inicial y capturas sintéticas se conservan en `C:/Users/vicve/Documents/ChatGPT/NQP26-11-entrega/04_EVIDENCIAS/`. Solo este resumen seguro se versiona. El resultado E2E completo, estado del PR y CI final se incorporan al cierre documental y se cotejan en bitácora externa, sin sumar verificaciones estáticas a los totales de pruebas.
+
+## Regresión E2E final local
+
+`REGRESSION_BROWSER_CHANNEL=chrome; npm.cmd run test:e2e`, después del build y con TEMP/TMP exclusivos: salida 0; 35 pruebas, 35 aprobadas, cero fallos/canceladas/omitidas/TODO; duración 652917.8214 ms. Incluye flujos de negocio, roles, navegación/perfil, exportación, producción, fecha/entrega legacy, destinos, formularios e integración A/B existentes. No se suma el recorrido complementario de 94 estados a estas 35 pruebas.

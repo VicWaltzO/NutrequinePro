@@ -21,7 +21,7 @@ Familias repetidas por fórmula, snapshot de producto, devolución o rectificaci
 
 Se leyeron revisión técnica 10, ficha `Kit/02_TAREAS/NQP26-11.md`, UX-01 C.1–C.4 y fuente operativa B, plan maestro de 41 tareas, AGENTS raíz/app, matriz inicial 28 PENDIENTE, plantilla, mapa semilla, diagrama y orden de ejecución del paquete. Los adjuntos se trataron como especificación del encargo, contrastada con la petición; no autorizan ampliar alcance, fusionar o desplegar.
 
-`git fetch origin` y consulta viva del PR #22 confirmaron que ya estaba fusionado, a diferencia de la revisión adjunta. Base exacta de `origin/main`: **`e66f4deefd75ad938ba6b6acabe3de46ed0ddc3e`** (merge de #22); head 10 `7120e3a3127995cf0d86017af8227e0e7d8c6a1b`. El conector no devolvió workflow runs para el SHA merge base; no se le atribuye una CI inexistente. Contrato/matriz de invariantes NQP26-01 presentes en la base; seis TODO futuros I14–I19 permanecen intactos.
+`git fetch origin` y consulta viva del PR #22 confirmaron que ya estaba fusionado, a diferencia de la revisión adjunta. Base exacta de `origin/main`: **`e66f4deefd75ad938ba6b6acabe3de46ed0ddc3e`** (merge de #22); head 10 `7120e3a3127995cf0d86017af8227e0e7d8c6a1b`. El conector no devolvió workflow runs para el SHA merge base; no se atribuye al merge un resultado no observado; la herramienta filtra runs disparados por pull_request. Contrato/matriz de invariantes NQP26-01 presentes en la base; seis TODO futuros I14–I19 permanecen intactos.
 
 Worktree independiente `C:/Users/vicve/Documents/ChatGPT/NQP26-11-inventario`, rama `codex/nqp26-11-inventario-tablas`, creada desde origin/main. La herramienta administrada rechazó dos intentos por referencia; se completó mediante `git worktree add`. Checkout original y sus cambios ajenos preservados. Se volvió a contrastar `ls-remote main` antes de entrega; no se apiló sobre rama sin fusionar.
 
@@ -51,7 +51,7 @@ Instalación local `npm.cmd ci --ignore-scripts`: salida 0, 400 paquetes. Node v
 
 `verify-02`, salida **0**: 386 totales, **380 aprobadas, cero fallos, seis TODO**, tres TypeScript, lint sin advertencias, format:check, build completo y check:distribution. Distribución: 2080 archivos, 69 paquetes runtime, cero archivos privados y cero paquetes retirados. Los seis TODO no cuentan entre aprobadas. Las repeticiones y verificaciones estáticas no se suman a los 380.
 
-E2E y recorrido Chrome complementario se registran en [EVIDENCIA_VALIDACION](NQP26-11_EVIDENCIA_VALIDACION.md), junto con límites de montaje por estado/rol. La matriz distingue exhaustividad estática contrastada de recorrido visual parcial. No se afirma que cada familia histórica/condición vacía se haya montado visualmente para cada rol.
+E2E completo local después del build: **35/35 aprobadas**, salida 0, cero fallos/omitidas/canceladas/TODO. El recorrido Chrome complementario pasó 94 estados por tres roles. Resultados y límites se registran en [EVIDENCIA_VALIDACION](NQP26-11_EVIDENCIA_VALIDACION.md), junto con límites de montaje por estado/rol. La matriz distingue exhaustividad estática contrastada de recorrido visual parcial. No se afirma que cada familia histórica/condición vacía se haya montado visualmente para cada rol.
 
 ## Archivos y entrega
 
@@ -69,3 +69,11 @@ E2E y recorrido Chrome complementario se registran en [EVIDENCIA_VALIDACION](NQP
 10. `NQP26-11_REPORTE.md`
 
 Copias de entrega en `C:/Users/vicve/Documents/ChatGPT/NQP26-11-entrega/03_REPORTES/`, evidencias sintéticas externas en `04_EVIDENCIAS/` y bitácora `05_BITACORA/REGISTRO_TAREAS.csv`. No versionar capturas, bases, credenciales sintéticas, logs completos ni scripts temporales de autoría. El SHA documental funcional y el SHA final se registran en la bitácora externa y el cuerpo del PR para evitar autorreferencia del commit. PR independiente en borrador hacia main, sin fusión ni despliegue; estado vivo y CI del head final se cotejan al entregar. La aceptación de NQP26-12 sigue pendiente y exige implementar/probar el contrato propuesto.
+
+## Publicación inicial para revisión
+
+Commit documental funcional `987191a336b8e7347c6eb44200791f728f47bd88`, push y ls-remote cotejados. [PR #23](https://github.com/VicWaltzO/NutrequinePro/pull/23) abierto **en borrador** hacia main; base confirmada e66f4de, sin merge ni despliegue. Este cierre posterior solo completa resultados y trazabilidad documental; el runtime es idéntico al verificado localmente.
+
+## Cierre de matriz y CI
+
+Matriz final: **27 APROBADO y 1 PARCIAL (D11-25)**. D11-28 acredita trazabilidad de artefactos/PR/SHA/CI, sin sustituir aceptación empresarial. El run inicial [41081489171](https://github.com/VicWaltzO/NutrequinePro/actions/runs/41081489171), asociado a 987191a, pasó verify y ejecutaba E2E al redactar este cierre. El SHA del cierre documental no se incrusta en su propio contenido: SHA final, run y conclusión final se cotejan en GitHub antes de entregar y constan en cuerpo del PR, `04_EVIDENCIAS/NQP26-11_CIERRE_GITHUB.json` y `05_BITACORA/REGISTRO_TAREAS.csv` externos. No se atribuye anticipadamente success al head final.
