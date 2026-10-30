@@ -24,9 +24,20 @@ export function pendingStock(state) {
   const orderIds = new Set();
   /** @type {Map<string, PendingGroup>} */
   const groups = new Map();
+  /** @type {Map<string, import("../../../shared/types/domain.ts").AppState["saleItems"]>} */
+  const rowsBySale = new Map();
+  for (const row of state.saleItems) {
+    if (row.is_current === false || row.coverage?.version !== 1) continue;
+    const saleId = row.sale_id;
+    const rows = rowsBySale.get(saleId);
+    if (rows) rows.push(row);
+    else rowsBySale.set(saleId, [row]);
+  }
   for (const sale of sales) {
-    for (const row of state.saleItems) {
-      if (row.sale_id !== sale.id || row.is_current === false || row.coverage?.version !== 1) continue;
+    // One accumulator per group in this sale; insertion order is priority order.
+    /** @type {Map<string, PendingOrder>} */
+    const ordersByGroup = new Map();
+    for (const row of rowsBySale.get(sale.id) ?? []) {
       const missing = Math.max(0, row.quantity - row.coverage.quantity);
       if (!missing) continue;
       const product = products.get(row.product_id);
@@ -60,9 +71,13 @@ export function pendingStock(state) {
         groups.set(key, group);
       }
       group.missing += missing;
-      const order = group.orders.find((entry) => entry.id === sale.id);
+      const order = ordersByGroup.get(key);
       if (order) order.missing += missing;
-      else group.orders.push({ id: sale.id, code: sale.code, deliveryDate: sale.delivery_date, missing });
+      else {
+        const entry = { id: sale.id, code: sale.code, deliveryDate: sale.delivery_date, missing };
+        ordersByGroup.set(key, entry);
+        group.orders.push(entry);
+      }
       orderIds.add(sale.id);
     }
   }
