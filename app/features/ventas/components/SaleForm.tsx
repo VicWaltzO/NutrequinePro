@@ -11,6 +11,7 @@ import type { FormProps } from "@/shared/types/forms";
 export function SaleForm({ s: state, record, kind, submit, close, busy }: FormProps) {
   const {
     edit,
+    siteContext,
     v: values,
     set,
     rows,
@@ -60,9 +61,12 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
       className="sale-form"
       onSubmit={async (event) => {
         event.preventDefault();
-        if (!hasProducts) return;
+        if (!hasProducts || (!edit && values.site_link_mode === "LINK" && !values.confirm_site_link)) return;
         await submit(edit ? "SALE_CORRECT" : "SALE_SAVE", {
           ...values,
+          ...(!edit && (kind === "draft" || !siteContext.needsChoice)
+            ? { site_link_mode: "ONE_TIME", confirm_site_link: false }
+            : {}),
           paid_amount: paidAmount ?? total / 100,
           items: rows,
           confirm: kind !== "draft",
@@ -137,24 +141,84 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
                         aria-label={caption}
                         required
                         value={customer ? values.customer_id : values.site_id}
-                        onChange={(event) => {
-                          const value = event.target.value;
-                          set(customer ? "customer_id" : "site_id", value);
-                          if (customer) {
-                            const defaultSite = state.customerSites.find(
-                              (row) => row.customer_id === value && row.is_default && row.is_active !== false,
-                            );
-                            if (defaultSite) set("site_id", defaultSite.site_id);
-                          }
-                        }}
+                        aria-describedby={
+                          !customer && siteContext.needsChoice ? "sale-site-context" : undefined
+                        }
+                        onChange={(event) => set(customer ? "customer_id" : "site_id", event.target.value)}
                       >
                         <option value="">Seleccionar</option>
-                        {options.map((option) => (
-                          <option key={option.id} value={option.id}>
-                            {option.name}
-                          </option>
-                        ))}
+                        {customer
+                          ? options.map((option) => (
+                              <option key={option.id} value={option.id}>
+                                {option.name}
+                              </option>
+                            ))
+                          : [
+                              { label: "Sedes del cliente", sites: siteContext.linked },
+                              { label: "Otras sedes", sites: siteContext.other },
+                            ]
+                              .filter((group) => group.sites.length > 0)
+                              .map((group) => (
+                                <optgroup key={group.label} label={group.label}>
+                                  {group.sites.map((option) => (
+                                    <option key={option.id} value={option.id}>
+                                      {option.name}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              ))}
                       </select>
+                      {!customer && siteContext.needsChoice && (
+                        <div className="sale-site-choice">
+                          <p id="sale-site-context" className="warning" role="status">
+                            <strong>Sede no vinculada.</strong> El cliente «{siteContext.customer?.name}» no
+                            tiene un vínculo activo con «{siteContext.site?.name}».
+                          </p>
+                          {kind === "draft" ? (
+                            <p className="sale-section-help">
+                              El borrador guardará el destino sin vincularlo. Podrás elegir vincular la sede
+                              al confirmar la venta.
+                            </p>
+                          ) : (
+                            <fieldset aria-describedby="sale-site-context" disabled={busy}>
+                              <legend>Uso de esta sede</legend>
+                              <label className="check">
+                                <input
+                                  type="radio"
+                                  name="sale-site-use"
+                                  value="ONE_TIME"
+                                  checked={values.site_link_mode === "ONE_TIME"}
+                                  onChange={() => set("site_link_mode", "ONE_TIME")}
+                                />
+                                Solo esta venta
+                              </label>
+                              <p className="sale-section-help">
+                                Guarda este destino sin cambiar las sedes habituales del cliente.
+                              </p>
+                              <label className="check">
+                                <input
+                                  type="radio"
+                                  name="sale-site-use"
+                                  value="LINK"
+                                  checked={values.site_link_mode === "LINK"}
+                                  onChange={() => set("site_link_mode", "LINK")}
+                                />
+                                Vincular sede
+                              </label>
+                              <p className="sale-section-help">
+                                La sede quedará disponible para futuras ventas al confirmar esta venta.
+                              </p>
+                              {values.site_link_mode === "LINK" && (
+                                <Check
+                                  label="Confirmo vincular esta sede al cliente al confirmar la venta"
+                                  value={values.confirm_site_link}
+                                  onChange={(value) => set("confirm_site_link", value)}
+                                />
+                              )}
+                            </fieldset>
+                          )}
+                        </div>
+                      )}
                       {quick === field && (
                         <div className="sale-quick-create" id="sale-quick-create">
                           <Input
@@ -370,7 +434,9 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
       <Footer
         busy={busy}
         disabled={
-          !hasProducts || (!edit && kind !== "draft" && values.mode === "immediate" && missing.length > 0)
+          !hasProducts ||
+          (!edit && values.site_link_mode === "LINK" && !values.confirm_site_link) ||
+          (!edit && kind !== "draft" && values.mode === "immediate" && missing.length > 0)
         }
         close={close}
         label={submitLabel}
