@@ -30,6 +30,31 @@ test("D09-04/05/12/14/15: similares explicables, propios, múltiples e históric
     assert.equal(customerNameMatches(customers, name).length, 0);
   assert.equal(customerNameMatches([{ id: "n", name: "Cliente 10" }], "Cliente 11").length, 0);
 });
+test("las erratas se detectan aunque cambien el orden de los tokens", () => {
+  const pairs = [
+    ["María Marta", "Marya Marta"],
+    ["Marta Marza", "Marta Maarza"],
+    ["Marta Marza", "Marta Mazra"],
+    ["María María Marta", "Marya María Marta"],
+    ["María María", "María Marya"],
+  ];
+  for (const [name, candidate] of pairs) {
+    for (const [left, right] of [
+      [name, candidate],
+      [candidate, name],
+    ]) {
+      assert.equal(customerNameMatches([{ id: "a", name: left }], right)[0]?.kind, "similar");
+    }
+  }
+  for (const [name, candidate] of [
+    ["María María Marta", "Marya Marta Marta"],
+    ["María María", "Marya Marya"],
+    ["María Marta", "María María Marta"],
+  ]) {
+    assert.deepEqual(customerNameMatches([{ id: "a", name }], candidate), []);
+  }
+});
+
 test("D09-11: revisión distingue nombre original, candidato, estado e identidad", () => {
   const name = "Gonzalo Andrade";
   const review = customerDuplicateReview(customers, name);

@@ -26,12 +26,19 @@ function smallTypo(a, b) {
 
 function matchKind(name, candidate) {
   if (name === candidate) return "exact";
-  const a = name.split(" ").sort();
-  const b = candidate.split(" ").sort();
+  const a = name.split(" ");
+  const b = candidate.split(" ");
   if (a.length !== b.length || a.length < 2) return null;
-  const different = a.map((token, i) => [token, b[i]]).filter(([x, y]) => x !== y);
-  if (!different.length) return "similar";
-  return different.length === 1 && smallTypo(...different[0]) ? "similar" : null;
+  // Remove one matching occurrence at a time: a typo can change token order,
+  // and repeated tokens must retain their multiplicity.
+  const unmatched = [];
+  for (const token of a) {
+    const index = b.indexOf(token);
+    if (index === -1) unmatched.push(token);
+    else b.splice(index, 1);
+  }
+  if (!unmatched.length) return "similar";
+  return unmatched.length === 1 && smallTypo(unmatched[0], b[0]) ? "similar" : null;
 }
 
 /** @template {{ id: string, name: string }} T
