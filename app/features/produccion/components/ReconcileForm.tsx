@@ -3,7 +3,7 @@ import { recordId } from "@/lib/domain-types";
 import type { CostInput, NumericInput, ProductionCost } from "@/lib/domain-types";
 import type { ReconcileIngredient, FormProps } from "@/shared/types/forms";
 import { productionSummary } from "@/lib/domain-preview.mjs";
-import { Input, Check, Table, money, find } from "@/shared/ui";
+import { Input, Check, SortableTable, money, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import { CostRows } from "./CostRows";
 export function ReconcileForm({ s: state, record, submit, close, busy }: FormProps) {
@@ -31,8 +31,25 @@ export function ReconcileForm({ s: state, record, submit, close, busy }: FormPro
       <p className="notice">
         La conciliación conserva fórmula y precios históricos. Cada modificación se registra en auditoría.
       </p>
-      <Table heads={["Insumo", "Teórico bruto", "Descuento S/", "Cobro real S/", "Diferencia", "Pagado"]}>
-        {rows.map((x, i) => (
+      <SortableTable
+        heads={["Insumo", "Teórico bruto", "Descuento S/", "Cobro real S/", "Diferencia", "Pagado"]}
+        rows={rows}
+        values={[
+          (x) => find(state, "ingredients", x.ingredient_id)?.name,
+          (x) => x.theoretical_gross_cost,
+          null,
+          null,
+          (x) =>
+            x.actual_charge === ""
+              ? null
+              : Math.round(Number(x.actual_charge) * 100) -
+                x.theoretical_gross_cost +
+                Math.round(Number(x.discount_amount) * 100),
+          null,
+        ]}
+        tie={(x) => [find(state, "ingredients", x.ingredient_id)?.name, x.id]}
+      >
+        {(x, i) => (
           <tr key={x.id}>
             <td>{find(state, "ingredients", x.ingredient_id)?.name}</td>
             <td>{money(x.theoretical_gross_cost)}</td>
@@ -71,8 +88,8 @@ export function ReconcileForm({ s: state, record, submit, close, busy }: FormPro
               />
             </td>
           </tr>
-        ))}
-      </Table>
+        )}
+      </SortableTable>
       <h3>Costos adicionales existentes</h3>
       {costs.map((x, i) => (
         <div className="form-grid inset" key={x.id}>

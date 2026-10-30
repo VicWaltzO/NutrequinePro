@@ -2,7 +2,7 @@ import { useState } from "react";
 import { recordId } from "@/lib/domain-types";
 import type { ReturnValues, FormProps } from "@/shared/types/forms";
 import { saleSummary } from "@/lib/domain-preview.mjs";
-import { Input, Table, day, find } from "@/shared/ui";
+import { Input, SortableTable, day, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import { unitLabels } from "@/shared/domain/presentation.mjs";
 
@@ -40,8 +40,21 @@ export function ReturnForm({ s: state, record, submit, close, busy }: FormProps)
         value={v.return_date}
         onChange={(x) => set("return_date", x)}
       />
-      <Table heads={["Producto", "Entregado", "Ya devuelto", "Devolver cantidad"]}>
-        {a.items.map((x) => {
+      <SortableTable
+        heads={["Producto", "Entregado", "Ya devuelto", "Devolver cantidad"]}
+        rows={a.items}
+        values={[
+          (x) => find(state, "products", x.product_id)?.name,
+          (x) => [x.quantity, unitLabels(x).singular],
+          (x) => [
+            state.returnItems.filter((r) => r.sale_item_id === x.id).reduce((n, r) => n + r.quantity, 0),
+            unitLabels(x).singular,
+          ],
+          null,
+        ]}
+        tie={(x) => [find(state, "products", x.product_id)?.name, x.id]}
+      >
+        {(x) => {
           const returned = state.returnItems
             .filter((r) => r.sale_item_id === x.id)
             .reduce((n: number, r) => n + r.quantity, 0);
@@ -69,8 +82,8 @@ export function ReturnForm({ s: state, record, submit, close, busy }: FormProps)
               </td>
             </tr>
           );
-        })}
-      </Table>
+        }}
+      </SortableTable>
       <Input
         label="Reducción económica S/ (0 si no aplica)"
         type="number"

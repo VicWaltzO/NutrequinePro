@@ -2,7 +2,7 @@ import { Search } from "lucide-react";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { normalize, customerSummary } from "@/lib/domain-preview.mjs";
-import { Empty, Table, find, money } from "@/shared/ui";
+import { Empty, SortableTable, find, money } from "@/shared/ui";
 
 export default function CustomerDirectory({
   s: state,
@@ -52,8 +52,13 @@ export default function CustomerDirectory({
       <SubtabContent tab={tab} order={["all", "sites"]}>
         <section className="panel flush">
           {tab === "sites" ? (
-            <Table heads={["Sede", "Clientes asociados", "Estado", ""]}>
-              {siteRows.map((x) => (
+            <SortableTable
+              heads={["Sede", "Clientes asociados", "Estado", ""]}
+              rows={siteRows}
+              values={[(x) => x.name, (x) => linkedCustomers(x.id).length, (x) => x.is_active, null]}
+              tie={(x) => [x.name, x.id]}
+            >
+              {(x) => (
                 <tr key={x.id}>
                   <td>{x.name}</td>
                   <td>
@@ -70,11 +75,24 @@ export default function CustomerDirectory({
                   <td>{x.is_active ? "Activo" : "Inactivo"}</td>
                   <td>{write && <button onClick={() => open("site", x)}>Editar</button>}</td>
                 </tr>
-              ))}
-            </Table>
+              )}
+            </SortableTable>
           ) : (
-            <Table heads={["Cliente", "Contacto", "Sedes", "Deuda", "Saldo a favor", "Estado", ""]}>
-              {customerRows.map((x) => (
+            <SortableTable
+              heads={["Cliente", "Contacto", "Sedes", "Deuda", "Saldo a favor", "Estado", ""]}
+              rows={customerRows}
+              values={[
+                (x) => [x.name, x.code],
+                (x) => [x.contact_name, x.phone],
+                (x) => linkedSites(x.id).length,
+                (x) => customerSummary(state, x.id).debt,
+                (x) => customerSummary(state, x.id).credit,
+                (x) => x.is_active,
+                null,
+              ]}
+              tie={(x) => [x.name, x.id]}
+            >
+              {(x) => (
                 <tr key={x.id}>
                   <td>
                     <button className="row-link" onClick={() => open("customer-detail", x)}>
@@ -108,8 +126,8 @@ export default function CustomerDirectory({
                     )}
                   </td>
                 </tr>
-              ))}
-            </Table>
+              )}
+            </SortableTable>
           )}
           {!(tab === "sites" ? siteRows : customerRows).length && (
             <Empty

@@ -1,21 +1,43 @@
 import type { AppState, Sale, OpenModal } from "@/lib/domain-types";
 import { saleSummary } from "@/lib/domain-preview.mjs";
-import { Badge, Table, Empty, money, find } from "@/shared/ui";
+import { label, Badge, SortableTable, Empty, money, find } from "@/shared/ui";
 
 export default function SaleTable({
+  context = "",
   s: state,
   write,
   open,
   rows,
 }: {
+  context?: string;
   s: AppState;
   write: boolean;
   open: OpenModal;
   rows: Sale[];
 }) {
   return rows.length ? (
-    <Table heads={["Venta / fecha", "Cliente", "Sede", "Total", "Pagado", "Saldo", "Finanzas", "Entrega"]}>
-      {rows.map((x) => {
+    <SortableTable
+      heads={["Venta / fecha", "Cliente", "Sede", "Total", "Pagado", "Saldo", "Finanzas", "Entrega"]}
+      rows={rows}
+      values={[
+        (x) => [x.sale_date, x.code],
+        (x) => find(state, "customers", x.customer_id)?.name,
+        (x) => find(state, "sites", x.site_id)?.name,
+        (x) => saleSummary(state, x).total,
+        (x) => saleSummary(state, x).paid,
+        (x) => saleSummary(state, x).balance,
+        (x) =>
+          label(
+            ["DRAFT", "CANCELLED"].includes(x.commercial_status)
+              ? x.commercial_status
+              : saleSummary(state, x).financial_status,
+          ),
+        (x) => label(x.fulfillment_status),
+      ]}
+      tie={(x) => [x.sale_date, x.code, x.id]}
+      context={context}
+    >
+      {(x) => {
         const a = saleSummary(state, x);
         let status = a.financial_status;
         if (x.commercial_status === "CANCELLED") status = "CANCELLED";
@@ -41,8 +63,8 @@ export default function SaleTable({
             </td>
           </tr>
         );
-      })}
-    </Table>
+      }}
+    </SortableTable>
   ) : (
     <Empty
       text="No hay ventas en esta vista."

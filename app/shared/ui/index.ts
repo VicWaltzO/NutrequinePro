@@ -11,3 +11,4 @@ export { History } from "./History";
 export { PaymentFields } from "./PaymentFields";
 export * from "../lib/format";
 export { find } from "../lib/find";
+export { SortableTable } from "./SortableTable";

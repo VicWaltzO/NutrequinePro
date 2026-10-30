@@ -1,7 +1,8 @@
+import { instant } from "@/shared/lib/table-sort";
 import { Moon, Sun } from "lucide-react";
 import type { AppState, OpenModal, User } from "@/lib/domain-types";
 import { changeTheme } from "@/lib/browser-preferences.mjs";
-import { Table, kg, label, money, stamp } from "@/shared/ui";
+import { SortableTable, kg, label, money, stamp } from "@/shared/ui";
 import AuthenticatedId from "@/shared/ui/AuthenticatedId";
 import { unitLabels, productPresentation, isNucleusProduct } from "@/shared/domain/presentation.mjs";
 export default function Configuration({
@@ -24,7 +25,7 @@ export default function Configuration({
       <>
         <section className="settings-section">
           <h2>Parámetros comerciales</h2>
-          <Table
+          <SortableTable
             heads={[
               "Producto",
               "Precio base",
@@ -35,8 +36,24 @@ export default function Configuration({
               "Estado",
               "",
             ]}
+            rows={state.products}
+            values={[
+              (p) => p.name,
+              (p) => [p.default_sale_price, unitLabels(p).singular],
+              (p) => [
+                unitLabels(p).singular,
+                productPresentation(p).unit_weight_grams,
+                productPresentation(p).weight_policy,
+              ],
+              (p) => (isNucleusProduct(p) ? p.bags_per_nucleus : null),
+              (p) => (isNucleusProduct(p) ? (p.commercial_weight_per_nucleus_kg ?? 0) : null),
+              (p) => p.is_sellable,
+              (p) => p.is_active,
+              null,
+            ]}
+            tie={(p) => [p.name, p.id]}
           >
-            {state.products.map((p) => (
+            {(p) => (
               <tr key={p.id}>
                 <td>{p.name}</td>
                 <td>
@@ -54,8 +71,8 @@ export default function Configuration({
                 <td>{p.is_active ? "Activo" : "Inactivo"}</td>
                 <td>{admin && <button onClick={() => open("product", p)}>Editar</button>}</td>
               </tr>
-            ))}
-          </Table>
+            )}
+          </SortableTable>
         </section>
         <details className="settings-section">
           <summary>Presentación original de productos</summary>
@@ -78,8 +95,13 @@ export default function Configuration({
         </div>
         <p className="notice">El acceso requiere una identidad autenticada y permiso de acceso al sitio.</p>
         <AuthenticatedId id={actor.id} />
-        <Table heads={["Usuario", "ID autenticado", "Rol", "Estado", ""]}>
-          {state.users.map((x) => (
+        <SortableTable
+          heads={["Usuario", "ID autenticado", "Rol", "Estado", ""]}
+          rows={state.users}
+          values={[(x) => x.name, (x) => x.id, (x) => label(x.role), (x) => x.is_active, null]}
+          tie={(x) => [x.name, x.id]}
+        >
+          {(x) => (
             <tr key={x.id}>
               <td>{x.name}</td>
               <td>
@@ -89,32 +111,34 @@ export default function Configuration({
               <td>{x.is_active ? "Activo" : "Inactivo"}</td>
               <td>{admin && <button onClick={() => open("user", x)}>Editar</button>}</td>
             </tr>
-          ))}
-        </Table>
+          )}
+        </SortableTable>
       </section>
     );
   if (tab === "audit")
     return (
       <section className="settings-section">
         <h2>Historial de acciones</h2>
-        <Table heads={["Fecha", "Usuario", "Acción", "Detalle"]}>
-          {state.audit
-            .slice()
-            .reverse()
-            .map((x) => (
-              <tr key={x.id}>
-                <td>{stamp(x.created_at)}</td>
-                <td>{x.actor_name}</td>
-                <td>{x.action}</td>
-                <td>
-                  <details>
-                    <summary>Ver registro</summary>
-                    <pre>{JSON.stringify(x.payload, null, 2)}</pre>
-                  </details>
-                </td>
-              </tr>
-            ))}
-        </Table>
+        <SortableTable
+          heads={["Fecha", "Usuario", "Acción", "Detalle"]}
+          rows={state.audit.slice().reverse()}
+          values={[(x) => instant(x.created_at), (x) => x.actor_name, (x) => x.action, null]}
+          tie={(x) => [x.actor_name, x.id]}
+        >
+          {(x) => (
+            <tr key={x.id}>
+              <td>{stamp(x.created_at)}</td>
+              <td>{x.actor_name}</td>
+              <td>{x.action}</td>
+              <td>
+                <details>
+                  <summary>Ver registro</summary>
+                  <pre>{JSON.stringify(x.payload, null, 2)}</pre>
+                </details>
+              </td>
+            </tr>
+          )}
+        </SortableTable>
       </section>
     );
   if (tab === "appearance")

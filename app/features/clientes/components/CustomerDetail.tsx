@@ -10,7 +10,7 @@ import {
 } from "@/lib/domain-types";
 import { customerProfile } from "../domain/profile.mjs";
 import { saleSummary, paymentSummary } from "@/lib/domain-preview.mjs";
-import { money, Input, Select, Table, label, stamp } from "@/shared/ui";
+import { money, Input, Select, SortableTable, label, stamp } from "@/shared/ui";
 import { Tabs } from "@/shared/ui/Tabs";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
 import { CustomerSites } from "./CustomerSites";
@@ -243,8 +243,22 @@ export function CustomerDetail({
               Cobros recibidos vigentes del periodo: <strong>{money(periodReceived)}</strong>
             </p>
             {payments.length ? (
-              <Table heads={["Cobro / fecha", "Recibido", "Aplicado", "Disponible", "Estado / aplicaciones"]}>
-                {payments.map((payment) => {
+              <SortableTable
+                heads={["Cobro / fecha", "Recibido", "Aplicado", "Disponible", "Estado / aplicaciones"]}
+                rows={payments}
+                values={[
+                  (payment) => [payment.payment_date, payment.code],
+                  (payment) => [
+                    paymentSummary(state, payment).reversed ? 0 : payment.total_amount,
+                    payment.total_amount,
+                  ],
+                  (payment) => paymentSummary(state, payment).applied,
+                  (payment) => paymentSummary(state, payment).available,
+                  (payment) => paymentSummary(state, payment).reversed,
+                ]}
+                tie={(payment) => [payment.payment_date, payment.code, payment.id]}
+              >
+                {(payment) => {
                   const info = paymentSummary(state, payment);
                   return (
                     <tr key={payment.id}>
@@ -279,8 +293,8 @@ export function CustomerDetail({
                       </td>
                     </tr>
                   );
-                })}
-              </Table>
+                }}
+              </SortableTable>
             ) : (
               <p>No hay cobros en el periodo seleccionado.</p>
             )}

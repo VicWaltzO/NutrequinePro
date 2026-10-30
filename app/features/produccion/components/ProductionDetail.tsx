@@ -1,5 +1,5 @@
 import { productionSummary } from "@/lib/domain-preview.mjs";
-import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
+import { SortableTable, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
 import { ProductName } from "@/shared/ui/ProductMarker";
 import DownloadPdfButton from "@/features/documentos/components/DownloadPdfButton.tsx";
@@ -67,8 +67,20 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
       </div>
       <section className="panel">
         <h3>Productos y fórmula histórica</h3>
-        <Table heads={["Producto", "Versión", "Núcleos", "Sacos", "Kg comerciales", "Kg fórmula"]}>
-          {a.products.map((x) => (
+        <SortableTable
+          heads={["Producto", "Versión", "Núcleos", "Sacos", "Kg comerciales", "Kg fórmula"]}
+          rows={a.products}
+          values={[
+            (x) => find(state, "products", x.product_id)?.name,
+            (x) => find(state, "formulas", x.formula_id)?.version,
+            (x) => x.nuclei_count,
+            (x) => x.bags_produced,
+            (x) => x.commercial_weight_kg,
+            (x) => x.formula_weight_kg,
+          ]}
+          tie={(x) => [find(state, "products", x.product_id)?.name, x.id]}
+        >
+          {(x) => (
             <tr key={x.id}>
               <td>
                 <ProductName name={find(state, "products", x.product_id)?.name ?? ""} />
@@ -79,25 +91,30 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
               <td>{kg(x.commercial_weight_kg)}</td>
               <td>{kg(x.formula_weight_kg)}</td>
             </tr>
-          ))}
-        </Table>
+          )}
+        </SortableTable>
         {a.products.map((x) => (
           <details key={x.id}>
             <summary>Snapshot de fórmula · {find(state, "products", x.product_id)?.name}</summary>
-            <Table heads={["Insumo", "Kg por núcleo"]}>
-              {x.formula_snapshot?.map((f) => (
+            <SortableTable
+              heads={["Insumo", "Kg por núcleo"]}
+              rows={x.formula_snapshot}
+              values={[(f) => find(state, "ingredients", f.ingredient_id)?.name, (f) => f.kg_per_nucleus]}
+              tie={(f) => [find(state, "ingredients", f.ingredient_id)?.name, f.ingredient_id, f.id]}
+            >
+              {(f) => (
                 <tr key={f.id}>
                   <td>{find(state, "ingredients", f.ingredient_id)?.name}</td>
                   <td>{kg(f.kg_per_nucleus)}</td>
                 </tr>
-              ))}
-            </Table>
+              )}
+            </SortableTable>
           </details>
         ))}
       </section>
       <section className="panel">
         <h3>Costos de insumos y diferencias</h3>
-        <Table
+        <SortableTable
           heads={[
             "Insumo",
             "Kg",
@@ -109,8 +126,21 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
             "Diferencia",
             "Pagado",
           ]}
+          rows={a.ingredients}
+          values={[
+            (x) => find(state, "ingredients", x.ingredient_id)?.name,
+            (x) => x.total_kg,
+            (x) => x.historical_price_per_kg,
+            (x) => x.theoretical_gross_cost,
+            (x) => x.discount_amount,
+            (x) => x.theoretical_net_cost,
+            (x) => x.actual_charge,
+            (x) => x.difference,
+            (x) => x.is_paid,
+          ]}
+          tie={(x) => [find(state, "ingredients", x.ingredient_id)?.name, x.id]}
         >
-          {a.ingredients.map((x) => (
+          {(x) => (
             <tr key={x.id}>
               <td>{find(state, "ingredients", x.ingredient_id)?.name}</td>
               <td>{kg(x.total_kg)}</td>
@@ -122,13 +152,25 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
               <td>{x.difference === null ? "—" : money(x.difference)}</td>
               <td>{x.is_paid ? "Sí" : "No"}</td>
             </tr>
-          ))}
-        </Table>
+          )}
+        </SortableTable>
       </section>
       <section className="panel">
         <h3>Costos adicionales</h3>
-        <Table heads={["Categoría", "Descripción", "Cantidad", "Costo unitario", "Importe", "Pagado"]}>
-          {a.costs.map((x) => (
+        <SortableTable
+          heads={["Categoría", "Descripción", "Cantidad", "Costo unitario", "Importe", "Pagado"]}
+          rows={a.costs}
+          values={[
+            (x) => label(x.category),
+            (x) => [x.description, find(state, "ingredients", x.ingredient_id)?.name],
+            (x) => x.quantity,
+            (x) => x.unit_cost,
+            (x) => x.amount,
+            (x) => x.is_paid,
+          ]}
+          tie={(x) => [x.description, x.id]}
+        >
+          {(x) => (
             <tr key={x.id}>
               <td>{label(x.category)}</td>
               <td>
@@ -140,8 +182,8 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
               <td>{money(x.amount)}</td>
               <td>{x.is_paid ? "Sí" : "No"}</td>
             </tr>
-          ))}
-        </Table>
+          )}
+        </SortableTable>
       </section>
       {p.cancellation_reason && <p className="warning">Anulada: {p.cancellation_reason}</p>}
       <History s={state} type="PRODUCTION" id={id} />

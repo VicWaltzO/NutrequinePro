@@ -1,4 +1,4 @@
-import { Table, kg, money } from "@/shared/ui";
+import { SortableTable, kg, money } from "@/shared/ui";
 import { ProductionPriceCell } from "./ProductionPriceCell";
 import type { productionFormPreview } from "../hooks/production-form-preview";
 import type { ProductionIngredientDraft } from "../hooks/production-ingredient-input";
@@ -12,8 +12,13 @@ export function ProductionIngredients({
   update: (id: string, change: Partial<ProductionIngredientDraft>) => void;
 }) {
   return (
-    <Table heads={["Insumo", "Kg", "S/ por kg", "Teórico neto", "Descuento S/", "Cobro real S/", "Pagado"]}>
-      {rows.map((row) => {
+    <SortableTable
+      heads={["Insumo", "Kg", "S/ por kg", "Teórico neto", "Descuento S/", "Cobro real S/", "Pagado"]}
+      rows={rows}
+      values={[(row) => row.ing.name, (row) => row.w, null, (row) => row.net, null, null, null]}
+      tie={(row) => [row.ing.name, row.ing.id]}
+    >
+      {(row) => {
         const { ing, w, gross, net, a, price, discountEnabled, manual, discountError, chargeError } = row;
         return (
           <tr key={ing.id}>
@@ -117,7 +122,7 @@ export function ProductionIngredients({
             </td>
           </tr>
         );
-      })}
-    </Table>
+      }}
+    </SortableTable>
   );
 }

@@ -1054,3 +1054,33 @@ tbody tr:hover {
 .monthly-export .detail-actions {
   align-items: end;
 }
+
+/* Sorting belongs to the column header; keep the existing horizontal table scroll. */
+.table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.table-sort svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.table-sort:hover {
+  color: var(--accent);
+  background: transparent;
+}
+th[aria-sort] .table-sort {
+  color: var(--accent);
+}
+.table-sort:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
