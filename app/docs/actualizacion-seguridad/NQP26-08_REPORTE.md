@@ -65,3 +65,23 @@ Revisión visual independiente final: **ship** para esta extensión operativa, s
 [PR #19](https://github.com/VicWaltzO/NutrequinePro/pull/19) abierto en borrador, base codex/nqp26-07-entrega-ux, sin conflictos ni fusión, comprobado en GitHub. Commits 17e8836 (implementación) y af1d4f8 (reporte/matriz y captura fullPage) publicados y cotejados mediante ls-remote. Revisión estática independiente adicional del delta fijo 17e8836..af1d4f8: sin P0–P2; solo documentación y captura completa. El cierre documental posterior no cambia código y su SHA/CI se registra en la bitácora y el PR.
 
 Matriz completa: **20 controles técnicos aprobados y dos parciales (A08-15/16)**, con nivel de evidencia por escenario. No quedan controles sin resultado. La franja moderna sigue inerte en aplicación ordinaria: no se habilita el motor para obtener aprobación. E07-14 e I14–I19 conservan su estado. Conforme para Capa 1; sin aceptación empresarial, fusión ni despliegue.
+
+## Ajuste NQP08-R1 · 2026-10-29
+
+Estado remoto contrastado: PR #18 y #19 ya fusionados por acciones anteriores; main `fabe5c93e4f15899586f8db30a60939c8c95635a`. Se preserva la entrega original como antecedente; las afirmaciones anteriores sobre PR abiertos no describen el estado vigente. Parche independiente `codex/nqp26-08-indexacion` desde ese main, en el worktree existente de 08. No se retargetea un PR fusionado ni se realiza otra fusión/despliegue.
+
+Se reemplaza P×L por índice único de líneas vigentes con cobertura y acumulador por grupo dentro de cada venta. Orden original de líneas y prioridad de ventas intactos; contrato de salida sin campos nuevos. Costo O(S + P log P + L + G log G), incluyendo filtro de ventas y ordenamiento de grupos que ya existían. Memoria O(L + G + pares venta/grupo de salida). No se aborda el P3 opcional del resumen; no cambia UI, design.json, comandos ni persistencia.
+
+Oráculo congelado del selector anterior en tests/helpers/pending-stock-reference.mjs. Cuatro pruebas comparan salida completa e inmutabilidad a tamaños crecientes, con líneas múltiples, inactivas, 25/50 kg, frascos 2,2 kg, K=q, históricos sin cobertura y empates de fecha/antigüedad. Cuentan consultas de sale_id con getters; el nuevo índice inspecciona todos los registros una vez y omite claves de filas no vigentes/sin cobertura. No se fijan tiempos máximos frágiles.
+
+Medición dirigida: 100 pedidos/10.600 líneas: 1.060.000 consultas antiguas frente a 500 nuevas, 44,5 ms frente a 2,8 ms. 1.000 pedidos/106.000 líneas: 106.000.000 frente a 5.000, 3.646,8 ms frente a 34,9 ms. Los tiempos son observaciones de esta máquina, no SLA ni evidencia empresarial.
+
+A08-15/16 siguen PARCIALES; E07-14 e I14–I19 no cambian. Reservas empresariales siguen deshabilitadas. Revisión independiente del delta contra main: sin P0–P2 para AppState válido; el revisor ejecutó 4/4 nuevas pruebas y diff --check. No ejecutó verify ni E2E; esos resultados corresponden al agente principal.
+
+Validación del ajuste: verify-04 completo con salida 0, 359 aprobadas, seis todo I14–I19, cero fallidas/omitidas/canceladas. Tres TypeScript, lint, formato, build y auditoría correctos: 2078 archivos, 69 paquetes runtime, cero privados/retirados. Las cuatro nuevas pruebas están incluidas en el total.
+
+Intentos conservados: verify-01 terminó 358 aprobadas/1 fallida/6todo por timeout de 30 s al arrancar distribución aislada; no se amplió el timeout. verify-02 no inició porque Node prohíbe --test-concurrency en NODE_OPTIONS; no se cambió el comando ni el entorno persistente. verify-03 aprobó 359/6todo, tipos y lint, pero detectó formato del informe. Se formateó y repitió verify-04 con el comando normal, correcto. E2E completo tras ese build: 33/33 aprobadas, salida 0, cero fallidas/omitidas/canceladas/todo. No se suman dirigidas. Logs en 04_EVIDENCIAS/NQP26-08_ajuste-\*.
+
+Entrega del ajuste: commit funcional `f904c0f09960b3f9794ec17bbb79c1bbd8d0b593` publicado y cotejado con ls-remote. [PR correctivo #20](https://github.com/VicWaltzO/NutrequinePro/pull/20) abierto en borrador hacia main `fabe5c9`; no se altera PR19 fusionado. CI de ese SHA: [run 40997789002](https://github.com/VicWaltzO/NutrequinePro/actions/runs/40997789002), completed/success, pasos verify y E2E comprobados success en GitHub.
+
+Ajuste R1 conforme para integración preparatoria: equivalencia, complejidad indexada, regresiones y revisión independiente correctas. Matriz: 20 controles técnicos aprobados y A08-15/16 parciales. No hay aceptación empresarial ni activación de reservas. El cierre documental no cambia código; su SHA y CI final se cotejan en el PR y bitácora local para evitar atribuirle el run funcional.
