@@ -5,6 +5,7 @@ import { isNucleusProduct, presentationSnapshot } from "../../../shared/domain/p
 import { savedDeliveryFields } from "./delivery-date.mjs";
 import { coverSale, releaseCoverage } from "./coverage.mjs";
 import { correctReservedSale } from "./correct-coverage.mjs";
+import { validateSaleSiteLink, linkConfirmedSaleSite } from "./site-link.mjs";
 export function saleSave(context) {
   const {
     s: state,
@@ -20,9 +21,13 @@ export function saleSave(context) {
     productionRows,
   } = context;
   let result = null;
+  const siteLinkMode = validateSaleSiteLink(payload);
   const customer = pick(state, "customers", payload.customer_id);
   const site = pick(state, "sites", payload.site_id);
-  requireValue(customer.is_active && site.is_active, "Cliente y sede deben estar activos.");
+  requireValue(
+    customer.is_active && !customer.deleted_at && site.is_active,
+    "Cliente y sede deben estar activos.",
+  );
   requireValue(["CASH", "CREDIT"].includes(payload.payment_condition), "Condición inválida.");
   requireValue(
     !context.partialReservations || !payload.create_production,
@@ -72,13 +77,7 @@ export function saleSave(context) {
         );
     }
   }
-  if (!state.customerSites.some((x) => x.customer_id === customer.id && x.site_id === site.id))
-    add("customerSites", {
-      customer_id: customer.id,
-      site_id: site.id,
-      is_default: false,
-      is_active: true,
-    });
+  if (siteLinkMode === "LINK") linkConfirmedSaleSite(context, customer.id, site.id);
   if (payload.create_production) {
     const grouped = {};
     rows

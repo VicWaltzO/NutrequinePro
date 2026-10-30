@@ -29,6 +29,8 @@ export interface SaleFields extends PaymentFieldsValue {
   delivery_date_manual_override: boolean;
   customer_id: string;
   site_id: string;
+  site_link_mode: "ONE_TIME" | "LINK";
+  confirm_site_link: boolean;
   payment_condition: string;
   notes: string;
   mode: string;

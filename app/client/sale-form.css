@@ -85,6 +85,30 @@
 .sale-party-field {
   min-width: 0;
 }
+.sale-site-choice {
+  margin-top: 14px;
+  overflow-wrap: anywhere;
+}
+.sale-site-choice fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+}
+.sale-site-choice legend {
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+.sale-site-choice input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  flex: 0 0 18px;
+  padding: 0;
+  accent-color: var(--accent);
+}
+.sale-site-choice .sale-section-help {
+  margin-block: 4px 12px;
+}
 .sale-field-heading {
   display: flex;
   align-items: center;

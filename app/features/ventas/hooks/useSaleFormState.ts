@@ -1,4 +1,5 @@
 import { initialSaleDates, changeSaleDateFields } from "./sale-dates.mjs";
+import { saleSiteContext, changeSaleParty } from "./sale-sites.mjs";
 import { useState } from "react";
 import type { SaleFields, SaleLine, FormProps } from "@/shared/types/forms";
 import type { SaleItem } from "@/lib/domain-types";
@@ -16,6 +17,8 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
     ...initialSaleDates(record, day()),
     customer_id: record?.customer_id ?? "",
     site_id: record?.site_id ?? "",
+    site_link_mode: "ONE_TIME",
+    confirm_site_link: false,
     payment_condition: record?.payment_condition ?? state.config.default_payment_condition ?? "CREDIT",
     notes: record?.notes ?? "",
     mode: "immediate",
@@ -25,7 +28,20 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
     production_id: "",
     id: record?.id,
   });
-  const set = (k: string, x: string | boolean) => setValues((a) => changeSaleDateFields(a, k, x));
+  const siteContext = saleSiteContext(state, values.customer_id, values.site_id);
+  const [siteKey, setSiteKey] = useState(siteContext.key);
+  if (siteKey !== siteContext.key) {
+    setSiteKey(siteContext.key);
+    if (values.site_link_mode !== "ONE_TIME" || values.confirm_site_link)
+      setValues({ ...values, site_link_mode: "ONE_TIME", confirm_site_link: false });
+  }
+  const set = (k: string, x: string | boolean) =>
+    setValues((a) => {
+      if (k === "customer_id" || k === "site_id") return changeSaleParty(a, k, String(x), state);
+      if (k === "site_link_mode")
+        return { ...a, site_link_mode: x as SaleFields["site_link_mode"], confirm_site_link: false };
+      return changeSaleDateFields(a, k, x);
+    });
   const [rows, setRows] = useState<SaleLine[]>(
     old.length
       ? old.map((x) => ({
@@ -74,6 +90,7 @@ export function useSaleFormState({ s: state, record, kind }: Pick<FormProps, "s"
   const paid = paidAmount === null ? total : Math.round(Number(paidAmount || 0) * 100);
   return {
     edit,
+    siteContext,
     v: values,
     set,
     rows,
