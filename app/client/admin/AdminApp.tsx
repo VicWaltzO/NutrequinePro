@@ -14,7 +14,9 @@ export default function AdminApp() {
   const { view, go, menu, theme, setMenu, toggleTheme } = navigation;
   if (!state || !actor) return <LoadingScreen reload={reload} error={error} />;
   const write = actor.role !== "VIEWER";
-  const saleTable = (rows: Sale[]) => <SaleTable s={state} write={write} open={open} rows={rows} />;
+  const saleTable = (rows: Sale[]) => (
+    <SaleTable context={"customer:" + modal?.record?.id} s={state} write={write} open={open} rows={rows} />
+  );
   return (
     <div className="app-shell">
       <a

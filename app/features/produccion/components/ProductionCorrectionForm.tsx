@@ -3,7 +3,7 @@ import { recordId } from "@/lib/domain-types";
 import type { NumericInput } from "@/lib/domain-types";
 import type { EditableCost, FormProps } from "@/shared/types/forms";
 import { productionSummary } from "@/lib/domain-preview.mjs";
-import { Input, Table, find } from "@/shared/ui";
+import { Input, SortableTable, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 
 export function ProductionCorrectionForm({ s: state, record, submit, close, busy }: FormProps) {
@@ -28,8 +28,17 @@ export function ProductionCorrectionForm({ s: state, record, submit, close, busy
         compensatorios. Los cobros reales de insumos se conservan; los costos adicionales deben confirmarse
         explícitamente abajo.
       </p>
-      <Table heads={["Producto", "Núcleos originales", "Núcleos corregidos"]}>
-        {products.map((x, i) => (
+      <SortableTable
+        heads={["Producto", "Núcleos originales", "Núcleos corregidos"]}
+        rows={products}
+        values={[
+          (x) => find(state, "products", x.product_id)?.name,
+          (x, i) => a.products[i].nuclei_count,
+          null,
+        ]}
+        tie={(x) => [find(state, "products", x.product_id)?.name, x.product_id]}
+      >
+        {(x, i) => (
           <tr key={x.product_id}>
             <td>{find(state, "products", x.product_id)?.name}</td>
             <td>{a.products[i].nuclei_count}</td>
@@ -47,8 +56,8 @@ export function ProductionCorrectionForm({ s: state, record, submit, close, busy
               />
             </td>
           </tr>
-        ))}
-      </Table>
+        )}
+      </SortableTable>
       <h3>Importes de costos adicionales</h3>
       {costs.map((x, i) => (
         <Input

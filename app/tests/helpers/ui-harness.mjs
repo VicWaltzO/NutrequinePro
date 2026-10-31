@@ -230,12 +230,15 @@ export function createUiHarness(readSource = (file) => readFileSync(path.join(ap
     "products",
   ];
   return {
+    state: () => state,
+    actor,
+    run,
     renderComponent(file, name, props) {
       injectAdminState = false;
       hookIndex = 0;
       return renderToStaticMarkup(React.createElement(load(file)[name], props));
     },
-    snapshots() {
+    snapshots({ normalize = (html) => html } = {}) {
       const result = {};
       for (const role of ["ADMIN", "OPERATOR", "VIEWER"])
         for (const route of role === "ADMIN"
@@ -251,7 +254,9 @@ export function createUiHarness(readSource = (file) => readFileSync(path.join(ap
               "customers",
               "config",
             ]) {
-          result[`${role}:${route}`] = createHash("sha256").update(render(route, role)).digest("hex");
+          result[`${role}:${route}`] = createHash("sha256")
+            .update(normalize(render(route, role)))
+            .digest("hex");
         }
       const records = {
         sale: state.sales[0],
@@ -286,7 +291,7 @@ export function createUiHarness(readSource = (file) => readFileSync(path.join(ap
       ];
       for (const modal of modals)
         result["modal:" + modal.type + (modal.kind ? ":" + modal.kind : "")] = createHash("sha256")
-          .update(render("dashboard", "ADMIN", modal))
+          .update(normalize(render("dashboard", "ADMIN", modal)))
           .digest("hex");
       return result;
     },

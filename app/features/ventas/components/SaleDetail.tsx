@@ -1,5 +1,5 @@
 import { saleSummary, deliveryAvailability } from "@/lib/domain-preview.mjs";
-import { Table, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
+import { SortableTable, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
 import DownloadPdfButton from "@/features/documentos/components/DownloadPdfButton.tsx";
 import { unitLabels } from "@/shared/domain/presentation.mjs";
@@ -104,15 +104,23 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
                 entrega requiere una acción explícita.
               </p>
             )}
-            <Table
+            <SortableTable
               heads={[
                 "Producto",
                 "Venta (cantidad / kg)",
                 "Saldo según movimientos (cantidad / kg)",
                 "Faltan (cantidad / kg)",
               ]}
+              rows={availability}
+              values={[
+                (x) => find(state, "products", x.product_id)?.name,
+                (x) => [x.requested, x.weight],
+                (x) => [x.quantity, x.weight_kg],
+                (x) => [x.missing_quantity, x.missing_weight],
+              ]}
+              tie={(x) => [find(state, "products", x.product_id)?.name, x.product_id]}
             >
-              {availability.map((x) => (
+              {(x) => (
                 <tr key={x.product_id}>
                   <td>
                     {find(state, "products", x.product_id)?.name} ·{" "}
@@ -128,13 +136,13 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
                     {x.missing_quantity} / {kg(x.missing_weight)}
                   </td>
                 </tr>
-              ))}
-            </Table>
+              )}
+            </SortableTable>
           </section>
         )}
       <section className="panel">
         <h3>Detalle comercial</h3>
-        <Table
+        <SortableTable
           heads={[
             "Producto",
             "Cantidad",
@@ -144,8 +152,19 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
             "Precio aplicado",
             "Subtotal",
           ]}
+          rows={a.items}
+          values={[
+            (x) => find(state, "products", x.product_id)?.name,
+            (x) => [x.quantity, unitLabels(x).singular],
+            (x) => [x.unit_weight_kg, unitLabels(x).singular],
+            (x) => x.total_weight_kg,
+            (x) => x.reference_unit_price,
+            (x) => [x.unit_price, unitLabels(x).singular],
+            (x) => x.subtotal,
+          ]}
+          tie={(x) => [find(state, "products", x.product_id)?.name, x.id]}
         >
-          {a.items.map((x) => (
+          {(x) => (
             <tr key={x.id}>
               <td>{find(state, "products", x.product_id)?.name}</td>
               <td>
@@ -161,8 +180,8 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
               </td>
               <td>{money(x.subtotal)}</td>
             </tr>
-          ))}
-        </Table>
+          )}
+        </SortableTable>
         <p>
           {sale.payment_condition === "CASH" ? "Contado" : "Crédito"} · {sale.notes || "Sin notas"}
         </p>
@@ -170,8 +189,23 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
       </section>
       <section className="panel">
         <h3>Pagos aplicados</h3>
-        <Table heads={["Pago", "Fecha", "Método", "Aplicado", "Estado"]}>
-          {payments.map((x) => {
+        <SortableTable
+          heads={["Pago", "Fecha", "Método", "Aplicado", "Estado"]}
+          rows={payments}
+          values={[
+            (x) => find(state, "payments", x.payment_id)?.code,
+            (x) => find(state, "payments", x.payment_id)?.payment_date,
+            (x) => label(find(state, "payments", x.payment_id)?.payment_method ?? ""),
+            (x) => x.applied_amount,
+            (x) => state.paymentReversals.some((r) => r.payment_id === x.payment_id),
+          ]}
+          tie={(x) => [
+            find(state, "payments", x.payment_id)?.payment_date,
+            find(state, "payments", x.payment_id)?.code,
+            x.id,
+          ]}
+        >
+          {(x) => {
             const p = find(state, "payments", x.payment_id);
             if (!p) return null;
             const reversed = state.paymentReversals.some((r) => r.payment_id === p.id);
@@ -188,8 +222,8 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
                 <td>{reversed ? "Revertido" : "Registrado"}</td>
               </tr>
             );
-          })}
-        </Table>
+          }}
+        </SortableTable>
       </section>
       {state.saleProductionLinks.filter((x) => x.sale_id === id).length > 0 && (
         <section className="panel">
@@ -217,21 +251,31 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
             <p>
               {r.reason} · Reducción económica {money(r.economic_amount)}
             </p>
-            <Table heads={["Producto", "Cantidad", "Peso"]}>
-              {state.returnItems
-                .filter((x) => x.return_id === r.id)
-                .map((x) => (
-                  <tr key={x.id}>
-                    <td>
-                      {find(state, "products", find(state, "saleItems", x.sale_item_id)?.product_id)?.name}
-                    </td>
-                    <td>
-                      {x.quantity} {unitLabels(find(state, "saleItems", x.sale_item_id)).plural}
-                    </td>
-                    <td>{kg(x.weight_kg)} kg</td>
-                  </tr>
-                ))}
-            </Table>
+            <SortableTable
+              heads={["Producto", "Cantidad", "Peso"]}
+              rows={state.returnItems.filter((x) => x.return_id === r.id)}
+              values={[
+                (x) => find(state, "products", find(state, "saleItems", x.sale_item_id)?.product_id)?.name,
+                (x) => [x.quantity, unitLabels(find(state, "saleItems", x.sale_item_id)).singular],
+                (x) => x.weight_kg,
+              ]}
+              tie={(x) => [
+                find(state, "products", find(state, "saleItems", x.sale_item_id)?.product_id)?.name,
+                x.id,
+              ]}
+            >
+              {(x) => (
+                <tr key={x.id}>
+                  <td>
+                    {find(state, "products", find(state, "saleItems", x.sale_item_id)?.product_id)?.name}
+                  </td>
+                  <td>
+                    {x.quantity} {unitLabels(find(state, "saleItems", x.sale_item_id)).plural}
+                  </td>
+                  <td>{kg(x.weight_kg)} kg</td>
+                </tr>
+              )}
+            </SortableTable>
           </section>
         ))}
       <History s={state} type="SALE" id={id} />

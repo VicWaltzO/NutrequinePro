@@ -1,5 +1,5 @@
 import { paymentSummary } from "@/lib/domain-preview.mjs";
-import { Table, Metrics, money, find, stamp, label } from "@/shared/ui";
+import { SortableTable, Metrics, money, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
 export default function PaymentDetail({ s: state, actor, id, open }: DetailProps) {
   const admin = actor.role === "ADMIN";
@@ -45,23 +45,26 @@ export default function PaymentDetail({ s: state, actor, id, open }: DetailProps
           </button>
         )
       )}
-      <Table heads={["Venta", "Aplicación"]}>
-        {state.paymentApplications
-          .filter((x) => x.payment_id === id)
-          .map((x) => (
-            <tr key={x.id}>
-              <td>
-                <button
-                  className="text-button"
-                  onClick={() => open("sale-detail", find(state, "sales", x.sale_id))}
-                >
-                  {find(state, "sales", x.sale_id)?.code}
-                </button>
-              </td>
-              <td>{money(x.applied_amount)}</td>
-            </tr>
-          ))}
-      </Table>
+      <SortableTable
+        heads={["Venta", "Aplicación"]}
+        rows={state.paymentApplications.filter((x) => x.payment_id === id)}
+        values={[(x) => find(state, "sales", x.sale_id)?.code, (x) => x.applied_amount]}
+        tie={(x) => [find(state, "sales", x.sale_id)?.code, x.id]}
+      >
+        {(x) => (
+          <tr key={x.id}>
+            <td>
+              <button
+                className="text-button"
+                onClick={() => open("sale-detail", find(state, "sales", x.sale_id))}
+              >
+                {find(state, "sales", x.sale_id)?.code}
+              </button>
+            </td>
+            <td>{money(x.applied_amount)}</td>
+          </tr>
+        )}
+      </SortableTable>
       <p className="metadata">
         Registrado por {find(state, "users", p.created_by)?.name} · {stamp(p.created_at)}
       </p>

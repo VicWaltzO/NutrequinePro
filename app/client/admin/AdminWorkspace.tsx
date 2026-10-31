@@ -65,7 +65,9 @@ export default function AdminWorkspace({
   });
 
   const productCards = <ProductCards s={state} />;
-  const saleTable = (rows: Sale[]) => <SaleTable s={state} write={write} open={open} rows={rows} />;
+  const saleTable = (rows: Sale[]) => (
+    <SaleTable context={view + ":" + tab} s={state} write={write} open={open} rows={rows} />
+  );
   const tabs = (options: [string, string][]) => <Tabs options={options} view={view} tab={tab} />;
   const filters = (
     <RecordFilters
@@ -86,7 +88,15 @@ export default function AdminWorkspace({
     />
   );
 
-  const productionList = <ProductionList s={state} write={write} open={open} productions={productions} />;
+  const productionList = (
+    <ProductionList
+      context={view + ":" + tab}
+      s={state}
+      write={write}
+      open={open}
+      productions={productions}
+    />
+  );
 
   return (
     <main id="main-content" tabIndex={-1}>

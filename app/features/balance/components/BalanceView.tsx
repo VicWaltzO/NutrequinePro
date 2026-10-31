@@ -1,6 +1,6 @@
 import type { AppState, BalanceSummary } from "@/lib/domain-types";
 import { balanceSummary } from "@/lib/domain-preview.mjs";
-import { Table, Metrics, money } from "@/shared/ui";
+import { SortableTable, Metrics, money } from "@/shared/ui";
 import type { ReactNode } from "react";
 import MonthlyBalanceExport from "@/features/documentos/components/MonthlyBalanceExport.tsx";
 export default function BalanceView({
@@ -85,26 +85,33 @@ export default function BalanceView({
       </section>
       <section className="panel">
         <h2>Ventas y cobros por mes</h2>
-        <Table heads={["Mes", "Ventas registradas", "Cobros netos"]}>
-          {[
+        <SortableTable
+          heads={["Mes", "Ventas registradas", "Cobros netos"]}
+          rows={[
             ...new Set([
               ...state.sales.map((x) => x.sale_date.slice(0, 7)),
               ...state.payments.map((x) => x.payment_date.slice(0, 7)),
               ...state.paymentReversals.map((x) => x.date.slice(0, 7)),
             ]),
-          ]
-            .sort()
-            .map((m) => {
-              const z = balanceSummary(state, m + "-01", m + "-31");
-              return (
-                <tr key={m}>
-                  <td>{m}</td>
-                  <td>{money(z.sales)}</td>
-                  <td>{money(z.collections)}</td>
-                </tr>
-              );
-            })}
-        </Table>
+          ].sort()}
+          values={[
+            (m) => m,
+            (m) => balanceSummary(state, m + "-01", m + "-31").sales,
+            (m) => balanceSummary(state, m + "-01", m + "-31").collections,
+          ]}
+          tie={(m) => m}
+        >
+          {(m) => {
+            const z = balanceSummary(state, m + "-01", m + "-31");
+            return (
+              <tr key={m}>
+                <td>{m}</td>
+                <td>{money(z.sales)}</td>
+                <td>{money(z.collections)}</td>
+              </tr>
+            );
+          }}
+        </SortableTable>
       </section>
     </>
   );

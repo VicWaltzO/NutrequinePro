@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { PaymentValues, FormProps } from "@/shared/types/forms";
 import { saleSummary, paymentSummary, customerSummary } from "@/lib/domain-preview.mjs";
-import { Input, Select, Table, PaymentFields, money, day, find } from "@/shared/ui";
+import { Input, Select, SortableTable, PaymentFields, money, day, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import { CreditCard, ListChecks, UserRound } from "lucide-react";
 import { FormSection } from "@/shared/ui/FormSection";
@@ -100,8 +100,20 @@ export function PaymentForm({ s: state, record, kind, submit, close, busy }: For
         {sales.length ? (
           <div className="form-state-enter" key={v.customer_id}>
             <p className="form-table-hint">Desliza la tabla para consultar todas las columnas.</p>
-            <Table heads={["Venta", "Fecha", "Sede", "Saldo", "Aplicar S/"]}>
-              {sales.map((x) => {
+            <SortableTable
+              heads={["Venta", "Fecha", "Sede", "Saldo", "Aplicar S/"]}
+              rows={sales}
+              values={[
+                (x) => x.code,
+                (x) => x.sale_date,
+                (x) => find(state, "sites", x.site_id)?.name,
+                (x) => saleSummary(state, x).balance,
+                null,
+              ]}
+              tie={(x) => [x.sale_date, x.code, x.id]}
+              context={(usingCredit ? "credit:" : "payment:") + v.customer_id}
+            >
+              {(x) => {
                 const a = saleSummary(state, x);
                 return (
                   <tr key={x.id}>
@@ -122,8 +134,8 @@ export function PaymentForm({ s: state, record, kind, submit, close, busy }: For
                     </td>
                   </tr>
                 );
-              })}
-            </Table>
+              }}
+            </SortableTable>
           </div>
         ) : (
           <p className="form-empty" role="status">

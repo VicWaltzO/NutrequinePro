@@ -1,6 +1,6 @@
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
-import { Table, money, kg, find } from "@/shared/ui";
+import { SortableTable, money, kg, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";
 export default function ProductionsView({
@@ -36,16 +36,21 @@ export default function ProductionsView({
       <SubtabContent tab={tab} order={["all", "draft", "ingredients", "formulas"]}>
         <section className="panel flush">
           {tab === "ingredients" ? (
-            <Table heads={["Insumo", "Precio actual S/ por kg", "Estado", ""]}>
-              {state.ingredients.filter(match).map((x) => (
+            <SortableTable
+              heads={["Insumo", "Precio actual S/ por kg", "Estado", ""]}
+              rows={state.ingredients.filter(match)}
+              values={[(x) => x.name, (x) => x.current_price_per_kg, (x) => x.is_active, null]}
+              tie={(x) => [x.name, x.id]}
+            >
+              {(x) => (
                 <tr key={x.id}>
                   <td>{x.name}</td>
                   <td>{money(x.current_price_per_kg)}</td>
                   <td>{x.is_active ? "Activo" : "Inactivo"}</td>
                   <td>{admin && <button onClick={() => open("ingredient", x)}>Editar</button>}</td>
                 </tr>
-              ))}
-            </Table>
+              )}
+            </SortableTable>
           ) : tab === "formulas" ? (
             <div className="formula-list">
               {state.formulas
@@ -59,14 +64,22 @@ export default function ProductionsView({
                         {find(state, "products", f.product_id)?.name} · v{f.version} ·{" "}
                         {f.is_active ? "Activa" : "Histórica"} · desde {f.valid_from}
                       </summary>
-                      <Table heads={["Insumo", "Kg / núcleo"]}>
-                        {rows.map((x) => (
+                      <SortableTable
+                        heads={["Insumo", "Kg / núcleo"]}
+                        rows={rows}
+                        values={[
+                          (x) => find(state, "ingredients", x.ingredient_id)?.name,
+                          (x) => x.kg_per_nucleus,
+                        ]}
+                        tie={(x) => [find(state, "ingredients", x.ingredient_id)?.name, x.id]}
+                      >
+                        {(x) => (
                           <tr key={x.id}>
                             <td>{find(state, "ingredients", x.ingredient_id)?.name}</td>
                             <td>{kg(x.kg_per_nucleus)}</td>
                           </tr>
-                        ))}
-                      </Table>
+                        )}
+                      </SortableTable>
                       {write && f.is_active && (
                         <button className="formula-edit" onClick={() => open("formula", f)}>
                           Editar fórmula
