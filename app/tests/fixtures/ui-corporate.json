@@ -1,6 +1,6 @@
 {
   "baseCommit": "54a4ef7",
-  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría. Núcleos decimales: solo los campos de cantidad de producción y rectificación admiten coma/punto con dos decimales. NQP26-03: última línea eliminable y bloqueo accesible sin productos; solo sale/sale:correct actualizados tras inspección visual sintética. NQP26-07: solo modal:sale y modal:sale-detail tras comparar DOM de main 2219f98 y capturas sintéticas 1440/390 claro/oscuro; fechas y rectificación intactas. Huellas en NQP26-07_REPORTE.md. NQP26-09: solo modal:customer tras inspección DOM (contenedor Nombre) y navegador 1440/390 claro/oscuro; aviso de candidatos cubierto por SSR y E2E propios. Resto de huellas conservadas.",
+  "review": "Referencia corporativa con unidades comerciales por producto y snapshots históricos: inventario, configuración, venta y devolución. Comparación de claro/oscuro, escritorio/móvil y foto privada en E2E de presentaciones. T01: el fixture de cliente ya no envía date; cambia únicamente su payload mostrado en auditoría. Núcleos decimales: solo los campos de cantidad de producción y rectificación admiten coma/punto con dos decimales. NQP26-03: última línea eliminable y bloqueo accesible sin productos; solo sale/sale:correct actualizados tras inspección visual sintética. NQP26-07: solo modal:sale y modal:sale-detail tras comparar DOM de main 2219f98 y capturas sintéticas 1440/390 claro/oscuro; fechas y rectificación intactas. Huellas en NQP26-07_REPORTE.md. NQP26-09: solo modal:customer tras inspección DOM (contenedor Nombre) y navegador 1440/390 claro/oscuro; aviso de candidatos cubierto por SSR y E2E propios. Resto de huellas conservadas. NQP26-17: solo ADMIN:customers y OPERATOR:customers tras revisión individual del HTML contra origin/main 87008eb; únicamente disparador Eliminar por Trash2 accesible, resto del HTML normalizado idéntico. VIEWER, Sedes y modales intactos; capturas sintéticas 1440/390 claro/oscuro revisadas.",
   "snapshots": {
     "ADMIN:dashboard": "f63f327371847be1f5670be60c4359bd1cec8628289a826a87a8ee394535deb7",
     "ADMIN:sales": "58bdf45d292394e40720f2dde67bf490075ba37ef15d8c40ee3a67ce6cf975a6",
@@ -11,7 +11,7 @@
     "ADMIN:sales/cancelled": "1376bc7d7434f5edd935362978e46fe051248bea8c7db4b55b7719ec3e43329f",
     "ADMIN:collections": "5175ce1c52bf4d623b33dd105dbde6889f17454971cd0dd26703f0d3f7eea766",
     "ADMIN:collections/payments": "b6078fd9affb14a0b6a992b2fadb735fdcd025bfe7466828e3385e39a951ee4d",
-    "ADMIN:customers": "9f1c24e16931a3bf09c6bc9752fa3e9938c6053a65b962f1d60289b74d1abc37",
+    "ADMIN:customers": "2d7fb07e108ca882aadafd3cd4d4011cf3764eb48dd87df044f4e23de55ca90f",
     "ADMIN:customers/sites": "04806ef4b77652547aaf5ea771b6fba17fcb5f8478dd28641c8b65cd0556fb6b",
     "ADMIN:productions": "f9eb9440d80a12251737cb98035ecfbf5158fa77e7d3e0f286435a4b10144265",
     "ADMIN:productions/draft": "5011f8a6c01ce4e1f1470750b1c7451d7f1182106090eef0701485e9bf78d15c",
@@ -35,7 +35,7 @@
     "OPERATOR:inventory": "55c7d15a9f87bc8f0d9df4bf420750017685ab7aa75896c272cf0dd9385eedc1",
     "OPERATOR:expenses": "21ccaa1330723818ffcab0c43debcef90e82227563cc73dc31e8c7895365926c",
     "OPERATOR:balance": "48915d18e9811b09bbf6b5de4aaa9b519082b6ae1469c36a866b688ade355c5d",
-    "OPERATOR:customers": "4e61b25420969d3e26382ffc68c9356ff4b2caefc84bd07f407534b0a938c7ab",
+    "OPERATOR:customers": "4d2076d1dfe1c72c6c5bde6f3241b1b0580787a250b7f7f59b6c7db84950badc",
     "OPERATOR:config": "72615b48a0ac594f338c4a31e24f2f11e160621d62512e4e50db059c32e02d1f",
     "VIEWER:dashboard": "0e3ec60edff611d00b4ae85ef1c14021138124ac67a6aa12fe884a514767670e",
     "VIEWER:sales": "8b0642ccc64ca1409842be658af3e3532ad922c1f31d36e04cafbfe2cafe3883",

@@ -91,6 +91,9 @@ input[type="checkbox"] {
   width: 40px;
   min-height: 40px;
 }
+.customer-delete-button:hover {
+  background: var(--danger-soft);
+}
 .skip-link {
   position: fixed;
   z-index: 100;

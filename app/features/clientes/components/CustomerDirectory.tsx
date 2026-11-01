@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { normalize, customerSummary } from "@/lib/domain-preview.mjs";
@@ -119,8 +119,14 @@ export default function CustomerDirectory({
                     {write && (
                       <>
                         <button onClick={() => open("customer", x)}>Editar</button>
-                        <button className="text-button danger" onClick={() => open("customer-delete", x)}>
-                          Eliminar
+                        <button
+                          type="button"
+                          className="icon-button danger customer-delete-button"
+                          aria-label={"Eliminar cliente " + x.name}
+                          title="Eliminar cliente"
+                          onClick={() => open("customer-delete", x)}
+                        >
+                          <Trash2 size={18} aria-hidden="true" />
                         </button>
                       </>
                     )}
