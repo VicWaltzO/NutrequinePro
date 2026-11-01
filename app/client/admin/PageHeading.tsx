@@ -28,13 +28,13 @@ export default function PageHeading({
                 sales: "Ventas registradas, entregas e historial comercial.",
                 collections: "Saldos pendientes y dinero efectivamente recibido.",
                 productions: "Del lote planificado al producto terminado.",
-                inventory: "Stock físico y movimientos con origen trazable.",
+                inventory: "Stock físico, movimientos y catálogo de productos.",
                 balance: "Ventas, cobros y costos, consolidados desde la operación.",
                 products: "Parámetros comerciales y presentaciones reales.",
                 customers: "Clientes y sedes de entrega.",
                 sites: "Destinos de tus operaciones.",
                 expenses: "Egresos y sus operaciones relacionadas.",
-                config: "Empresa, valores predeterminados, productos y accesos.",
+                config: "Empresa, valores predeterminados y accesos.",
               } as Record<string, string>
             )[view]
           }

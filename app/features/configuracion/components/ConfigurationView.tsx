@@ -21,12 +21,11 @@ export default function ConfigurationView({
     <>
       {tabs([
         ["all", "Empresa y valores"],
-        ["products", "Productos"],
         ["users", "Usuarios"],
         ["audit", "Auditoría"],
         ["appearance", "Apariencia"],
       ])}
-      <SubtabContent tab={tab} order={["all", "products", "users", "audit", "appearance"]}>
+      <SubtabContent tab={tab} order={["all", "users", "audit", "appearance"]}>
         <Configuration s={state} actor={actor} tab={tab} open={open} theme={theme} />
       </SubtabContent>
     </>

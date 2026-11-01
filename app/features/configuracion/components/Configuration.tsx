@@ -2,9 +2,8 @@ import { instant } from "@/shared/lib/table-sort";
 import { Moon, Sun } from "lucide-react";
 import type { AppState, OpenModal, User } from "@/lib/domain-types";
 import { changeTheme } from "@/lib/browser-preferences.mjs";
-import { SortableTable, kg, label, money, stamp } from "@/shared/ui";
+import { SortableTable, label, money, stamp } from "@/shared/ui";
 import AuthenticatedId from "@/shared/ui/AuthenticatedId";
-import { unitLabels, productPresentation, isNucleusProduct } from "@/shared/domain/presentation.mjs";
 export default function Configuration({
   s: state,
   actor,
@@ -20,72 +19,6 @@ export default function Configuration({
 }) {
   const admin = actor.role === "ADMIN";
   const c = state.config;
-  if (tab === "products")
-    return (
-      <>
-        <section className="settings-section">
-          <h2>Parámetros comerciales</h2>
-          <SortableTable
-            heads={[
-              "Producto",
-              "Precio base",
-              "Presentación",
-              "Sacos / núcleo",
-              "Kg / núcleo",
-              "Venta",
-              "Estado",
-              "",
-            ]}
-            rows={state.products}
-            values={[
-              (p) => p.name,
-              (p) => [p.default_sale_price, unitLabels(p).singular],
-              (p) => [
-                unitLabels(p).singular,
-                productPresentation(p).unit_weight_grams,
-                productPresentation(p).weight_policy,
-              ],
-              (p) => (isNucleusProduct(p) ? p.bags_per_nucleus : null),
-              (p) => (isNucleusProduct(p) ? (p.commercial_weight_per_nucleus_kg ?? 0) : null),
-              (p) => p.is_sellable,
-              (p) => p.is_active,
-              null,
-            ]}
-            tie={(p) => [p.name, p.id]}
-          >
-            {(p) => (
-              <tr key={p.id}>
-                <td>{p.name}</td>
-                <td>
-                  {p.default_sale_price == null
-                    ? "Pendiente de configurar"
-                    : money(p.default_sale_price) + " / " + unitLabels(p).singular}
-                </td>
-                <td>
-                  {unitLabels(p).singular} · {kg(productPresentation(p).unit_weight_grams)} kg ·{" "}
-                  {productPresentation(p).weight_policy === "FIXED" ? "Fijo" : "Variable"}
-                </td>
-                <td>{isNucleusProduct(p) ? p.bags_per_nucleus : "Ingreso directo"}</td>
-                <td>{isNucleusProduct(p) ? kg(p.commercial_weight_per_nucleus_kg ?? 0) : "—"}</td>
-                <td>{p.is_sellable ? "Habilitada" : "Consumo interno"}</td>
-                <td>{p.is_active ? "Activo" : "Inactivo"}</td>
-                <td>{admin && <button onClick={() => open("product", p)}>Editar</button>}</td>
-              </tr>
-            )}
-          </SortableTable>
-        </section>
-        <details className="settings-section">
-          <summary>Presentación original de productos</summary>
-          <img
-            width={1440}
-            height={1728}
-            className="catalog-image"
-            src={frontendPath("/brand/productos.jpg")}
-            alt="Presentación real de Nutrelin, Hi-Performance y Potripregnant"
-          />
-        </details>
-      </>
-    );
   if (tab === "users")
     return (
       <section className="settings-section">
@@ -231,4 +164,3 @@ export default function Configuration({
     </>
   );
 }
-import { frontendPath } from "@/client/paths";

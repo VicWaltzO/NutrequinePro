@@ -116,7 +116,7 @@ test(
       await page.locator("nav").getByRole("button", { name, exact: true }).click();
       await page.getByRole("heading", { name, exact: true, level: 1 }).waitFor();
     };
-    await nav("Configuración");
+    await nav("Inventario");
     await page.getByRole("button", { name: "Productos", exact: true }).click();
     for (const product of catalog.products) {
       const row = page
@@ -124,12 +124,13 @@ test(
         .filter({ has: page.getByRole("cell", { name: product.name, exact: true }) });
       // Reading text contents does not wait for the hash navigation to render.
       await expect(row.getByRole("cell").nth(6)).toBeVisible();
-      await expect(row.locator("td:nth-child(-n+7)")).toHaveText([
+      await expect(row.locator("td:nth-child(-n+8)")).toHaveText([
         product.name,
         money(product.default_sale_price) + " / saco",
         "saco · " + kg(product.standard_bag_weight_kg) + " kg · Variable",
         String(product.bags_per_nucleus),
         kg(product.commercial_weight_per_nucleus_kg),
+        "Fabricación por núcleos",
         product.is_sellable ? "Habilitada" : "Consumo interno",
         "Activo",
       ]);
@@ -195,7 +196,7 @@ test(
       await button.click();
       assert.equal((await pending).status(), 200);
     };
-    await nav("Configuración");
+    await nav("Inventario");
     await page.getByRole("button", { name: "Productos", exact: true }).click();
     await page
       .getByRole("row")

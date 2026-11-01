@@ -64,7 +64,11 @@ const common = {
 };
 // Commands replace the fixture state; use its current immutable snapshot.
 common.s = common.state = ui.state();
-const fileFor = (id) => inventory.find((x) => x.ID_tabla === id).Archivo_componente.slice(4);
+// Keep the historical inventory untouched; NQP15 relocates this table and adds two columns.
+const fileFor = (id) =>
+  id === "CONFIG-PRODUCTOS"
+    ? "features/inventario/components/ProductCatalog.tsx"
+    : inventory.find((x) => x.ID_tabla === id).Archivo_componente.slice(4);
 const cases = {
   "BALANCE-MESES": { name: "default" },
   "PERFIL-COBROS": { name: "CustomerDetail", customer },
@@ -148,7 +152,11 @@ for (const [id, props] of Object.entries(cases))
   test("NQP12 cobertura " + id, () => {
     const before = structuredClone(common.s);
     const html = ui.renderComponent(fileFor(id), props.name, { ...common, ...props });
-    const expected = inventory.filter((x) => x.ID_tabla === id);
+    const expected = inventory.filter((x) => x.ID_tabla === id).map((x) => ({ ...x }));
+    if (id === "CONFIG-PRODUCTOS") {
+      expected.splice(5, 0, { Etiqueta_columna_real: "Ingreso al inventario", Ordenable_SI_NO: "SI" });
+      expected.splice(8, 0, { Etiqueta_columna_real: "Imagen", Ordenable_SI_NO: "NO" });
+    }
     if (id === "FORMULA-EDITOR") {
       assert.doesNotMatch(html, /table-sort/);
       return;

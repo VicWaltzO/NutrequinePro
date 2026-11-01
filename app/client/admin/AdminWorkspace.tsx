@@ -155,6 +155,7 @@ export default function AdminWorkspace({
       )}
       {view === "inventory" && (
         <InventoryView
+          admin={admin}
           s={state}
           tab={tab}
           open={open}
