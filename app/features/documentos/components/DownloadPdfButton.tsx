@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Download } from "lucide-react";
 import { adminFetch } from "@/client/session-api.ts";
 import type { DocumentKind } from "../domain/common.ts";
@@ -19,9 +19,17 @@ export default function DownloadPdfButton({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [failed, setFailed] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const restoreBalanceFocus = useRef(false);
+  useEffect(() => {
+    if (busy || !restoreBalanceFocus.current) return;
+    restoreBalanceFocus.current = false;
+    if (document.activeElement === document.body) buttonRef.current?.focus();
+  }, [busy]);
   const invalid = !!from && !!to && from > to;
   async function download() {
     if (busy) return;
+    restoreBalanceFocus.current = kind === "balance" && document.activeElement === buttonRef.current;
     setBusy(true);
     setMessage("");
     setFailed(false);
@@ -58,7 +66,7 @@ export default function DownloadPdfButton({
   }
   return (
     <span className="pdf-download">
-      <button type="button" disabled={busy || invalid} aria-busy={busy} onClick={download}>
+      <button ref={buttonRef} type="button" disabled={busy || invalid} aria-busy={busy} onClick={download}>
         <Download size={16} aria-hidden="true" />
         {busy ? "Generando PDF…" : children}
       </button>
