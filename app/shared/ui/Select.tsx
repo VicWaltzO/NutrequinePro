@@ -1,3 +1,4 @@
+import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import { label } from "@/shared/lib/format";
 import { Field } from "@/shared/ui/Field";
 type SelectProps = {
@@ -5,6 +6,8 @@ type SelectProps = {
   value?: string | null;
   onChange: (value: string) => void;
   options: (string | { id: string; name: string })[];
+  order?: "nominal" | "preserve";
+  fixedLast?: readonly string[];
   empty?: string | false;
   required?: boolean;
 };
@@ -13,9 +16,20 @@ export function Select({
   value,
   onChange,
   options,
+  order = "preserve",
+  fixedLast = [],
   empty = "Seleccionar",
   required = false,
 }: SelectProps) {
+  const visibleOptions =
+    order === "nominal"
+      ? orderNominal(
+          options,
+          (x) => (typeof x === "string" ? label(x) : x.name),
+          (x) => (typeof x === "string" ? x : x.id),
+          fixedLast,
+        )
+      : options;
   return (
     <Field label={caption}>
       <select
@@ -25,7 +39,7 @@ export function Select({
         required={required}
       >
         {empty !== false && <option value="">{empty}</option>}
-        {options.map((x) => {
+        {visibleOptions.map((x) => {
           const id = typeof x === "string" ? x : x.id;
           return (
             <option value={id} key={id}>

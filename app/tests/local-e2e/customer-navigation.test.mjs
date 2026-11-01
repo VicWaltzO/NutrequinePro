@@ -200,6 +200,27 @@ test(
     const dialog = page.getByRole("dialog");
     const profileTabs = dialog.locator(".tabs");
     current = await state();
+    // Rectifications use the server clock; a fixed cutoff eventually becomes today.
+    // Choose the next business day after every activity date in the synthetic fixture.
+    const activityDay = (value) =>
+      value.includes("T")
+        ? new Intl.DateTimeFormat("en-CA", { timeZone: current.config.timezone }).format(new Date(value))
+        : value;
+    const lastActivityDate = [
+      ...current.sales.flatMap((row) => [row.sale_date, row.cancelled_at]),
+      ...current.payments.map((row) => row.payment_date),
+      ...current.returns.map((row) => row.return_date),
+      ...current.corrections.map((row) => row.created_at),
+      ...current.paymentReversals.map((row) => row.date),
+    ]
+      .filter(Boolean)
+      .map(activityDay)
+      .sort()
+      .at(-1);
+    assert.ok(lastActivityDate);
+    const afterActivity = new Date(`${lastActivityDate}T12:00:00Z`);
+    afterActivity.setUTCDate(afterActivity.getUTCDate() + 1);
+    const emptyPeriodFrom = afterActivity.toISOString().slice(0, 10);
     const expected = customerProfile(current, scenario.customer);
     await expect(dialog.locator(".customer-metrics dd").nth(4)).toHaveText(String(expected.count));
     const periodTotal = dialog.locator(".customer-summary p strong").first();
@@ -220,7 +241,7 @@ test(
         dialog.getByText("No hay actividad en el periodo seleccionado.", { exact: true }),
       ).toHaveCount(0);
     }
-    await dialog.getByLabel("Desde", { exact: true }).fill("2026-11-01");
+    await dialog.getByLabel("Desde", { exact: true }).fill(emptyPeriodFrom);
     await expect(periodTotal).not.toHaveText(unfilteredTotal);
     await expect(
       dialog.getByText("No hay actividad en el periodo seleccionado.", { exact: true }),
@@ -232,7 +253,7 @@ test(
     assert.equal(await dialog.locator("tbody tr").count(), 1);
     await profileTabs.getByRole("button", { name: "Actividad", exact: true }).click();
     await expect(dialog.getByText("Devolución sintética de navegación", { exact: true })).toBeVisible();
-    await dialog.getByLabel("Desde", { exact: true }).fill("2026-11-01");
+    await dialog.getByLabel("Desde", { exact: true }).fill(emptyPeriodFrom);
     await expect(
       dialog.getByText("No hay actividad en el periodo seleccionado.", { exact: true }),
     ).toBeVisible();

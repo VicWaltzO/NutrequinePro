@@ -113,6 +113,14 @@ test(
     await page.keyboard.press("Escape");
     await expect(page.getByRole("button", { name: "Abrir navegación", exact: true })).toBeFocused();
     await openMenu();
+    await expect(drawer.getByRole("button", { name: "Cerrar navegación", exact: true })).toBeFocused();
+    // CDP coordinates do not auto-wait for an opening drawer to stop moving.
+    await expect.poll(() => drawer.evaluate((node) => getComputedStyle(node).transform)).toBe("none");
+    assert.equal(
+      await page.evaluate(() => document.elementFromPoint(240, 105)?.closest("#primary-navigation")?.id),
+      "primary-navigation",
+      "El gesto debe comenzar dentro del panel estable.",
+    );
     const cdp = await context.newCDPSession(page);
     await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: 240, y: 105 }] });
     await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: 105, y: 110 }] });

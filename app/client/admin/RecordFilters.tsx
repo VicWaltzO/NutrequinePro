@@ -62,13 +62,21 @@ export default function RecordFilters({
       {["sales", "collections"].includes(view) && (
         <>
           <Select
+            order="nominal"
             label="Cliente"
             value={client}
             onChange={setClient}
             options={state.customers}
             empty="Todos"
           />
-          <Select label="Sede" value={site} onChange={setSite} options={state.sites} empty="Todas" />
+          <Select
+            order="nominal"
+            label="Sede"
+            value={site}
+            onChange={setSite}
+            options={state.sites}
+            empty="Todas"
+          />
         </>
       )}
       {["sales", "collections", "productions"].includes(view) && (

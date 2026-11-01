@@ -1,3 +1,4 @@
+import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import { useState } from "react";
 import type { NumericInput } from "@/lib/domain-types";
 import { Input, Select, Table, day } from "@/shared/ui";
@@ -25,6 +26,7 @@ export function FormulaForm({ s: state, record, submit, close, busy }: FormProps
       </p>
       <div className="form-grid">
         <Select
+          order="nominal"
           label="Producto"
           required
           empty={false}
@@ -47,13 +49,18 @@ export function FormulaForm({ s: state, record, submit, close, busy }: FormProps
           <tr key={i}>
             <td>
               <select
+                aria-label={`Insumo ${i + 1}`}
                 required
                 value={x.ingredient_id}
                 onChange={(e) =>
                   setRows((a) => a.map((r, j) => (i === j ? { ...r, ingredient_id: e.target.value } : r)))
                 }
               >
-                {state.ingredients.map((ing) => (
+                {orderNominal(
+                  state.ingredients,
+                  (x) => x.name,
+                  (x) => x.id,
+                ).map((ing) => (
                   <option key={ing.id} value={ing.id}>
                     {ing.name}
                   </option>

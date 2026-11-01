@@ -14,6 +14,7 @@ export default function ExpenseFields({
         <div className="form-grid">
           {input("date", "Fecha", "date")}
           <Select
+            order="nominal"
             label="Categoría"
             required
             value={v.category}
@@ -27,6 +28,7 @@ export default function ExpenseFields({
       <FormSection title="Vinculación" icon={Link2} meta="Opcional" accent>
         <div className="form-grid">
           <Select
+            order="nominal"
             label="Producción (opcional)"
             value={v.production_id}
             onChange={(x) => set("production_id", x)}
@@ -35,18 +37,21 @@ export default function ExpenseFields({
               .map((x) => ({ id: x.id, name: x.code }))}
           />
           <Select
+            order="nominal"
             label="Venta (opcional)"
             value={v.sale_id}
             onChange={(x) => set("sale_id", x)}
             options={state.sales.map((x) => ({ id: x.id, name: x.code }))}
           />
           <Select
+            order="nominal"
             label="Sede (opcional)"
             value={v.site_id}
             onChange={(x) => set("site_id", x)}
             options={state.sites}
           />
           <Select
+            order="nominal"
             label="Insumo (opcional)"
             value={v.ingredient_id}
             onChange={(x) => set("ingredient_id", x)}

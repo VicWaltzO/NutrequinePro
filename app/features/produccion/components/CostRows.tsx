@@ -21,6 +21,8 @@ export function CostRows({
           <div className="inset production-extra-cost form-state-enter" key={i}>
             <div className="form-grid">
               <Select
+                order="nominal"
+                fixedLast={["OTHER"]}
                 label="Concepto"
                 required
                 value={c.category}
@@ -44,6 +46,7 @@ export function CostRows({
               />
               {c.category === "INGREDIENT_EXTRA" && (
                 <Select
+                  order="nominal"
                   label="Insumo"
                   required
                   value={c.ingredient_id}

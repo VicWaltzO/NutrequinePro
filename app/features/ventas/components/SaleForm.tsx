@@ -1,3 +1,4 @@
+import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import CustomerNameWarning from "@/features/clientes/components/CustomerNameWarning";
 import { UserRound, CreditCard, Plus, X } from "lucide-react";
 import { useSaleFormState } from "../hooks/useSaleFormState";
@@ -148,7 +149,11 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
                       >
                         <option value="">Seleccionar</option>
                         {customer
-                          ? options.map((option) => (
+                          ? orderNominal(
+                              options,
+                              (x) => x.name,
+                              (x) => x.id,
+                            ).map((option) => (
                               <option key={option.id} value={option.id}>
                                 {option.name}
                               </option>
@@ -335,6 +340,7 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
             {values.mode !== "immediate" && (
               <section className="sale-lot" aria-label="Vínculo a lote">
                 <Select
+                  order="nominal"
                   label="Asociar a un lote existente (opcional)"
                   value={values.production_id}
                   onChange={(value) => set("production_id", value)}

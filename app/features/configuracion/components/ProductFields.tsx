@@ -10,6 +10,7 @@ export default function ProductFields({ v, set, input }: Pick<SimpleFieldProps, 
     <>
       {input("category", "Categoría")}
       <Select
+        order="nominal"
         label="Unidad de venta e inventario"
         value={v.presentation_unit}
         empty={false}

@@ -1,9 +1,13 @@
-const collator = new Intl.Collator("es-PE", { sensitivity: "base", numeric: true });
+import { orderNominal } from "../../../shared/lib/nominal-order.mjs";
 
 export function saleSiteContext(state, customerId, siteId) {
   const links = state.customerSites.filter((row) => row.customer_id === customerId);
   const active = new Set(links.filter((row) => row.is_active !== false).map((row) => row.site_id));
-  const sites = state.sites.filter((row) => row.is_active).sort((a, b) => collator.compare(a.name, b.name));
+  const sites = orderNominal(
+    state.sites.filter((row) => row.is_active),
+    (row) => row.name,
+    (row) => row.id,
+  );
   const linked = sites.filter((row) => active.has(row.id));
   const other = sites.filter((row) => !active.has(row.id));
   const principal = links.find(
