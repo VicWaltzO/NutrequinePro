@@ -1,3 +1,4 @@
+import ProductCatalog from "./ProductCatalog";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
 import { stock } from "@/lib/domain-preview.mjs";
@@ -8,6 +9,7 @@ import { unitLabels } from "@/shared/domain/presentation.mjs";
 export default function InventoryView({
   s: state,
   tab,
+  admin,
   open,
   match,
   filters,
@@ -16,6 +18,7 @@ export default function InventoryView({
 }: {
   s: AppState;
   tab: string;
+  admin: boolean;
   open: OpenModal;
   match: (record: Searchable) => boolean;
   filters: ReactNode;
@@ -27,10 +30,13 @@ export default function InventoryView({
       {tabs([
         ["all", "Stock actual"],
         ["movements", "Movimientos"],
+        ["products", "Productos"],
       ])}
-      <div hidden={tab === "all"}>{filters}</div>
-      <SubtabContent tab={tab} order={["all", "movements"]}>
-        {tab === "all" ? (
+      <div hidden={tab !== "movements"}>{filters}</div>
+      <SubtabContent tab={tab} order={["all", "movements", "products"]}>
+        {tab === "products" ? (
+          <ProductCatalog s={state} admin={admin} open={open} />
+        ) : tab === "all" ? (
           <>
             {productCards}
             <section className="panel">

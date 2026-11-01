@@ -79,9 +79,8 @@ export function adminSelectors(
     sales: ["sale", "Nueva venta"],
     collections: ["payment", "Registrar pago"],
     customers: tab === "sites" ? ["site", "Nueva sede"] : ["customer", "Nuevo cliente"],
-    ...(tab === "products" ? { config: ["product", "Nuevo producto"] as [string, string] } : {}),
     productions: productionAction,
-    inventory: ["adjust", "Ajustar inventario"],
+    inventory: tab === "products" ? ["product", "Nuevo producto"] : ["adjust", "Ajustar inventario"],
     expenses: ["expense", "Registrar gasto"],
   };
   return { match, sales, pending, productions, primary };

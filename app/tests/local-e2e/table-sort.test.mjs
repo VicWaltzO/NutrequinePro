@@ -268,7 +268,7 @@ test(
       "collections",
       "collections/payments",
       "expenses",
-      "config/products",
+      "inventory/products",
       "config/users",
       "config/audit",
       "balance",
