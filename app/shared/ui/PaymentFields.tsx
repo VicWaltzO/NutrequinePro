@@ -10,6 +10,8 @@ export function PaymentFields({
   return (
     <>
       <Select
+        order="nominal"
+        fixedLast={["OTHER"]}
         label="Método de pago"
         required
         value={v.payment_method}

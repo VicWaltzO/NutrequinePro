@@ -31,6 +31,7 @@ export default function CompanyFields({
           ]}
         />
         <Select
+          order="nominal"
           label="Método de pago predeterminado"
           empty="Elegir en cada operación"
           value={v.default_payment_method}
@@ -44,6 +45,7 @@ export default function CompanyFields({
       <div className="form-grid">
         {input("categories_text", "Categorías de gastos (separadas por coma)")}
         <Select
+          order="nominal"
           label="Categoría predeterminada"
           required
           empty={false}

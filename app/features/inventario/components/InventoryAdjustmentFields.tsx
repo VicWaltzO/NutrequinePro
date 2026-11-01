@@ -18,6 +18,7 @@ export default function InventoryAdjustmentFields({
         <div className="form-grid">
           {input("date", "Fecha", "date")}
           <Select
+            order="nominal"
             label="Producto"
             required
             value={v.product_id}

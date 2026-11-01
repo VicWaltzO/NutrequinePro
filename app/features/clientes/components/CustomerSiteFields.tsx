@@ -1,3 +1,4 @@
+import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { normalize } from "@/lib/domain-preview.mjs";
@@ -22,8 +23,12 @@ export function CustomerSiteFields({
   const ids = value.site_ids ?? [];
   const names = value.new_sites ?? [];
   const choices = [
-    ...ids.map((id) => ({ id, name: state.sites.find((site) => site.id === id)?.name ?? id })),
-    ...names.map((name, index) => ({ id: `new:${index}`, name: `${name} (nueva)` })),
+    ...ids.map((id) => ({
+      id,
+      name: state.sites.find((site) => site.id === id)?.name ?? id,
+      sortName: state.sites.find((site) => site.id === id)?.name ?? id,
+    })),
+    ...names.map((name, index) => ({ id: `new:${index}`, name: `${name} (nueva)`, sortName: name })),
   ];
   const principal = value.default_site_id ?? choices[0]?.id ?? "";
   const duplicate = state.sites.find((site) => normalize(site.name) === normalize(name));
@@ -81,7 +86,11 @@ export function CustomerSiteFields({
       {choices.length > 0 && (
         <Select
           label="Sede principal"
-          options={choices}
+          options={orderNominal(
+            choices,
+            (site) => site.sortName,
+            (site) => site.id,
+          )}
           empty={false}
           value={principal}
           onChange={(id) => onChange({ ...value, default_site_id: id })}
@@ -106,16 +115,18 @@ export function CustomerSiteFields({
       {mode === "link" && (
         <div className="customer-site-options">
           <Input label="Buscar sede existente" value={query} onChange={setQuery} />
-          {state.sites
-            .filter((site) => site.is_active && normalize(site.name).includes(normalize(query)))
-            .map((site) => (
-              <Check
-                key={site.id}
-                label={site.name}
-                value={ids.includes(site.id)}
-                onChange={(yes) => link(site.id, yes)}
-              />
-            ))}
+          {orderNominal(
+            state.sites.filter((site) => site.is_active && normalize(site.name).includes(normalize(query))),
+            (site) => site.name,
+            (site) => site.id,
+          ).map((site) => (
+            <Check
+              key={site.id}
+              label={site.name}
+              value={ids.includes(site.id)}
+              onChange={(yes) => link(site.id, yes)}
+            />
+          ))}
           {!state.sites.some((site) => site.is_active && normalize(site.name).includes(normalize(query))) && (
             <p>No hay sedes activas que coincidan.</p>
           )}

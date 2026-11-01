@@ -47,6 +47,7 @@ export function PaymentForm({ s: state, record, kind, submit, close, busy }: For
           <p className="form-record-value">{find(state, "customers", v.customer_id)?.name}</p>
         ) : (
           <Select
+            order="nominal"
             label="Cliente"
             required
             value={v.customer_id}

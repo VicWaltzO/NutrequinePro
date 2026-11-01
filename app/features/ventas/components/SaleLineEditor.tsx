@@ -1,3 +1,4 @@
+import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import { useRef, useState } from "react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { Check, Plus, ShoppingBag, Trash2 } from "lucide-react";
@@ -191,7 +192,11 @@ export function SaleLineEditor({
                       onChange={(event) => editLine(index, "product_id", event.target.value)}
                     >
                       <option value="">Seleccionar producto</option>
-                      {products.map((option) => (
+                      {orderNominal(
+                        products,
+                        (x) => x.name,
+                        (x) => x.id,
+                      ).map((option) => (
                         <option key={option.id} value={option.id}>
                           {option.name}
                         </option>
