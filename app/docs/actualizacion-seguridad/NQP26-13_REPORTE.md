@@ -1,0 +1,19 @@
+# NQP26-13 · Inventario de selectores y orden semántico
+
+Se congelan 64 contextos en un CSV de 23 campos, cubriendo las 31 declaraciones consumidoras de select (28 Select compartidos y tres select directos), listas filtrables de Check, mes y radios de uso de sede. La correspondencia declaración → consumidores → contexto → ID está en CONCILIACION_FUENTES. Se separan alta, edición, reapertura y proveedores que cambian; alias de rutas y repetición por entidad no inflan el inventario.
+
+La base comprobada es main fa6a7eadb95aca1d7fc6cd434c24854a76821ec0, después de la fusión externa del PR24. Se trabajó en worktree independiente y rama codex/nqp26-13-inventario-selectores. Solo se propone documentación: no hay cambios de UI, hooks, servidor, API, dependencias, esquemas, selección ni ordenamiento A–Z. NQP26-14 implementará ese cambio mediante una orden nueva.
+
+Select conserva el orden del proveedor; strings muestran label(code) y objetos name. El inventario registra filtros y ausencia de ellos, grupos y placeholders, defaults, identidad y cargas dinámicas. Se preservan agrupación de sedes cliente/otras, IDs new:index, selección explícita y snapshots. Roles, estados, entrega, condición y modos son secuencias de negocio; el mes es cronológico. Tablas, tarjetas de acción, listas de advertencias por relevancia y disclosures quedan razonados en EXCLUSIONES.
+
+La revisión independiente empezó por código sin historial de implementación, cotejó 64 filas/23 campos/IDs únicos/cero vacíos y las 31 declaraciones. Los hallazgos de orden en sede principal alta/ficha y clasificación de radios quedaron corregidos. Su dictamen documental no es una aprobación formal de GitHub ni prueba de interacción.
+
+El recorrido adicional SSR del responsable principal cubre 107 casos sintéticos: 78 rutas/roles, 22 modales y siete variantes directas; estado idéntico antes/después. Usa hooks inertes, y sustitución en memoria para abrir lista de sedes. No demuestra autorización de un modal montado directamente ni inspección visual total. Las suites verify/E2E y el resultado real de la CI del head se registran al publicar en el PR y en el cierre local; no se anticipa aquí su éxito.
+
+Entregables completos y matriz final se centralizan en la carpeta oficial Actualizacion_2026-10-24_Codex, exclusivamente 03_REPORTES, 04_EVIDENCIAS y 05_BITACORA. La evidencia histórica NQP26-12 se concilió por SHA256 sin borrar originales; el cierre anterior draft/no merged se conserva como histórico y se distingue de la consulta actual. Los scripts auxiliares, logs, capturas y fixtures sintéticos son locales, externos a Git; este directorio contiene la copia documental segura del inventario para revisión.
+
+La matriz local distingue comprobación de fuentes, límites visuales, verificación de suites y cierre remoto. El enlace y SHA final reales se obtienen del PR de esta rama; la CI debe corresponder a ese SHA exacto para declarar cierre. Sin merge, despliegue, datos empresariales reales ni activación de reservas. Se mantienen I14–I19 como TODO históricos.
+
+Archivos de esta propuesta: este reporte, inventario, conciliación de fuentes, exclusiones, contrato futuro y revisión independiente. No equivale a aceptación empresarial ni a ejecución de NQP26-14.
+
+Validación local final: verify-01 salida 0, 427 PASS y seis TODO I14–I19, cero fallos; tres TypeScript, lint, formato, build y auditoría de distribución correctos (2080 archivos/69 paquetes/cero privados). E2E-01 secuencial sobre ese build, Chrome: 36/36 PASS, cero fallos/omitidos/cancelados/TODO. No se alteraron pruebas, timeouts ni huellas. Las únicas ediciones posteriores son documentales; se revisan diff y formato antes de publicar. La CI del SHA final y el PR borrador se registran en el cierre remoto real, sin atribuirles por anticipado un resultado.

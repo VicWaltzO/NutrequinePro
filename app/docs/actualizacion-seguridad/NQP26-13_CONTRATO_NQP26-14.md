@@ -1,0 +1,14 @@
+# NQP26-13 · Contrato pendiente para NQP26-14
+
+NQP26-13 solo congela inventario y excepciones. No incorpora comparador ni ordenamiento nuevo. Implementación A–Z, aceptación funcional de UX-07 y aprobación empresarial siguen pendientes en NQP26-14.
+
+1. Ordenar una copia de opciones nominales por etiqueta realmente visible: objetos name y strings label(code). Propuesta Intl.Collator("es-PE", {sensitivity:"base", numeric:true}), estable ante empate; nombres originales e IDs intactos. Muestras sintéticas: Árbol 2/arbol 10/Zeta; Producto 2 antes Producto 10. No usar datos reales.
+2. Mantener placeholder Todos/Todas/Seleccionar/Sin asignar si aparece, value vacío y opción Otro de cierre en su posición funcional. No ordenar el placeholder con el catálogo; Company default method no incluye OTHER. CostRows Concepto mantiene OTHER fijo final.
+3. Sedes de venta: Sedes del cliente antes Otras sedes; orden interno por name; no modificar sugerencia principal, ONE_TIME/LINK o aceptación. Ya existe comparación lingüística en sale-sites.mjs, no duplicar comparadores sin justificar.
+4. IDs new:index se generan sobre new_sites original. Solo ordenar proyección choices, jamás arrays originales, índices, principal ni payload. FormulaForm usa primer producto/ingrediente de fuente como default: ordenar opciones no altera ese default ni carga fórmula distinta.
+5. Conservar selección explícita tras carga, alta rápida, edición o refresco: igualdad de IDs, no índice de opción. Si valor deja de estar en filtro, documentar comportamiento actual (no inventar opción o reemplazar silenciosamente). Mantener query, checks, foco, teclado y móvil.
+6. Conservar secuencias de estados, roles, condición, entrega, política de peso, stock y confirmación. Unidad BAG/BOTTLE/UNIT es nominal por etiqueta, pero orden visual no cambia gramos ni equivalencias: saco 25/50kg y frasco 2.2kg no son intercambiables. Mantener dependencias BOTTLE/FIXED/DIRECT_STOCK.
+7. Mes/fecha son cronológicos; selección de línea es numérica; advertencias duplicados priorizan relevancia; navegación, disclosures, tablas y tarjetas de acción quedan fuera del cambio automático según exclusiones.
+8. Añadir en 14 pruebas de refresco, alta rápida y empates/tildes/números, placeholders y selección; comprobar agrupación, new:index y contextos con/sin catálogos. Incluir deriva contra declaración → CSV al agregar selectores en 14–40. Este documento no habilita reservas, APIs, compras ni maestros nuevos.
+
+Límites detectados a conservar en el diagnóstico, no corregidos aquí: select Insumo de FormulaForm carece de nombre accesible propio; fallback product usa primer catálogo antes de filtro fabricable; filtros de estados globales mezclan dimensiones; algunas opciones históricas/inactivas no están visibles en listas activas. No atribuir corrección ni validación visual total a este inventario.
