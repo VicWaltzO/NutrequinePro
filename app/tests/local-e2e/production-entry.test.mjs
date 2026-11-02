@@ -56,6 +56,7 @@ test(
     const dialog = page.locator("dialog.modal");
     const field = (name) => dialog.getByLabel(name, { exact: true });
     const rows = dialog.getByRole("region", { name: "Insumos consolidados", exact: true });
+    await expect(rows.locator('input[type="checkbox"]')).toHaveCount(0);
     const soyName = "Torta soya HiPro";
     const soy = () =>
       rows.getByRole("row").filter({ has: page.getByRole("cell", { name: soyName, exact: true }) });
@@ -81,6 +82,25 @@ test(
     assert.equal(await rows.locator('input[type="checkbox"]').count(), 20);
     await expect(field("Pagado " + soyName)).toBeChecked();
     await expect(field("Aplicar descuento a " + soyName)).not.toBeChecked();
+    await expect(field("Descuento " + soyName)).toHaveCount(0);
+    await expect(rows.getByText("Aplicar descuento", { exact: true })).toHaveCount(0);
+    const discountToggle = field("Aplicar descuento a " + soyName);
+    await discountToggle.focus();
+    await discountToggle.press("Space");
+    await expect(discountToggle).toBeChecked();
+    await expect(field("Descuento " + soyName)).toHaveValue("0");
+    await discountToggle.press("Tab");
+    await expect(field("Descuento " + soyName)).toBeFocused();
+    await field("Descuento " + soyName).fill("");
+    await expect(field("Descuento " + soyName)).toHaveAttribute("aria-invalid", "true");
+    const errorId = await field("Descuento " + soyName).getAttribute("aria-describedby");
+    assert.ok(errorId);
+    await expect(dialog.locator('[id="' + errorId + '"]')).toHaveAttribute("role", "alert");
+    await field("Descuento " + soyName).fill("0");
+    await expect(field("Descuento " + soyName)).toHaveAttribute("aria-invalid", "false");
+    await field("Descuento " + soyName).press("Shift+Tab");
+    await expect(discountToggle).toBeFocused();
+    await discountToggle.press("Space");
     await expect(field("Descuento " + soyName)).toHaveCount(0);
     for (const name of ["Núcleos pagados", "Envases pagados"]) await expect(field(name)).not.toBeChecked();
     const pencil = dialog.getByRole("button", { name: "Editar precio por kg de " + soyName, exact: true });
@@ -186,6 +206,11 @@ test(
     await expect(field("Cobro real " + soyName)).toHaveValue("7.03");
     await expect(field("Pagado " + soyName)).not.toBeChecked();
     await expect(soy().getByText("S/ 2.20", { exact: true })).toBeVisible();
+    await expect(field("Aplicar descuento a " + soyName)).not.toBeChecked();
+    await expect(field("Descuento " + soyName)).toHaveCount(0);
+    await expect(field("Aplicar descuento a " + secondName)).toBeChecked();
+    await expect(field("Descuento " + secondName)).toHaveValue("0.05");
+    await expect(rows.getByText("Aplicar descuento", { exact: true })).toHaveCount(0);
     await expect(
       rows
         .getByRole("row")

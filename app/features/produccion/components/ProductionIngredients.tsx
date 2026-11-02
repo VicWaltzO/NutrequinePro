@@ -49,7 +49,6 @@ export function ProductionIngredients({
                   checked={discountEnabled}
                   onChange={(event) => update(ing.id, { discount_enabled: event.target.checked })}
                 />
-                <span>Aplicar descuento</span>
               </label>
               {discountEnabled && (
                 <input
