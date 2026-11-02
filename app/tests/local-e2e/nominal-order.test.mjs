@@ -137,7 +137,7 @@ test(
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
       }
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await dialog.getByRole("button", { name: "Crear cliente", exact: true }).click();
+    await dialog.getByRole("button", { name: "Crear nuevo cliente", exact: true }).click();
     await dialog.getByLabel("Nombre del nuevo cliente", { exact: true }).fill("A cliente rápido 14");
     const quick = await submit("Guardar cliente", "CUSTOMER_SAVE");
     await ordered(customer);

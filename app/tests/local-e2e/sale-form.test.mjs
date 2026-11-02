@@ -61,7 +61,7 @@ test(
       await expect(dialog.getByLabel(field, { exact: true })).toHaveCount(0);
     };
     await runQuick(
-      "Crear cliente",
+      "Crear nuevo cliente",
       "Nombre del nuevo cliente",
       "Cliente sintético del flujo visual",
       "CUSTOMER_SAVE",
