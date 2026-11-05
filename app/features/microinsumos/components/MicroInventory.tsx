@@ -1,3 +1,4 @@
+import HistoricalPurchases from "./HistoricalPurchases";
 import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import { useEffect, useRef, useState } from "react";
 import type { AppState, Submit, MicroIngredient, MicroOpening } from "@/lib/domain-types";
@@ -302,6 +303,7 @@ export default function MicroInventory({
           }}
         </SortableTable>
       )}
+      <HistoricalPurchases s={s} admin={admin} run={run} busy={busy} />
     </section>
   );
 }

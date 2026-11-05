@@ -1,3 +1,4 @@
+import { historicalSave, historicalCancel } from "../features/microinsumos/domain/historical-purchases.mjs";
 import { microSave, microOpen, microCorrect } from "../features/microinsumos/domain/commands.mjs";
 import { fail, safe, scaled } from "../shared/domain/core.mjs";
 import { nucleusHundredths } from "../shared/domain/production-quantities.mjs";
@@ -39,6 +40,8 @@ import {
 import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-delivery-date.mjs";
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 const handlers = {
+  MICRO_PURCHASE_SAVE: historicalSave,
+  MICRO_PURCHASE_CANCEL: historicalCancel,
   MICRO_SAVE: microSave,
   MICRO_OPEN: microOpen,
   MICRO_CORRECT: microCorrect,
@@ -111,7 +114,7 @@ export function executeCommand(original, command, actor, clock = new Date().toIS
           scaled(value);
         else safe(value);
       }
-  if (!["MICRO_SAVE", "MICRO_OPEN", "MICRO_CORRECT"].includes(type)) refresh();
+  if (!type.startsWith("MICRO_")) refresh();
   add("audit", {
     action: type,
     entity_id: result,
