@@ -61,6 +61,7 @@ test(
         "Stock actual",
         "Movimientos",
         "Productos",
+        "Microinsumos",
       ]);
       await expect(
         target.getByRole("heading", { name: "Parámetros comerciales", exact: true }),
