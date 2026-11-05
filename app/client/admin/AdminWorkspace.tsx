@@ -1,7 +1,7 @@
 import { adminSelectors } from "./selectors";
 import PendingStockBanner from "@/features/ventas/components/PendingStockBanner";
 import { Tabs } from "@/shared/ui/Tabs";
-import type { AppState, User, OpenModal, Sale } from "@/lib/domain-types";
+import type { AppState, User, OpenModal, Sale, Submit } from "@/lib/domain-types";
 import { balanceSummary } from "@/lib/domain-preview.mjs";
 import ProductCards from "@/features/inventario/components/ProductCards";
 import RecordFilters from "@/client/admin/RecordFilters";
@@ -25,12 +25,16 @@ export default function AdminWorkspace({
   navigation,
   open,
   error,
+  run,
+  busy,
 }: {
   state: AppState;
   actor: User;
   navigation: ReturnType<typeof useAdminNavigation>;
   open: OpenModal;
   error: string;
+  run: Submit;
+  busy: boolean;
 }) {
   const {
     q,
@@ -155,6 +159,8 @@ export default function AdminWorkspace({
       )}
       {view === "inventory" && (
         <InventoryView
+          run={run}
+          busy={busy}
           admin={admin}
           s={state}
           tab={tab}

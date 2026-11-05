@@ -1,0 +1,45 @@
+.micro-inventory > .field {
+  max-width: 32rem;
+  margin-block: 1rem;
+}
+.micro-inventory form {
+  border-block: 1px solid var(--border);
+  margin-block: 1.5rem;
+  padding-block: 1.5rem;
+}
+.micro-inventory fieldset {
+  border: 0;
+  padding: 0;
+  margin: 1rem 0 0;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.micro-inventory fieldset > small,
+.micro-inventory .form-actions {
+  grid-column: 1 / -1;
+}
+.micro-inventory .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.micro-inventory details {
+  margin-block-start: 0.5rem;
+  max-width: 26rem;
+  white-space: normal;
+}
+.micro-inventory summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+.micro-inventory td > button + button {
+  margin-inline-start: 0.5rem;
+}
+@media (max-width: 760px) {
+  .micro-inventory fieldset {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

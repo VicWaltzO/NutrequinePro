@@ -364,7 +364,7 @@ for (const row of inventory)
       );
   });
 
-test("inventario 64 y barrido AST: 31 declaraciones consumidoras sin deriva", () => {
+test("inventario histórico 64 y barrido AST: 31 selectores previos y 2 estados de micros", () => {
   assert.equal(inventory.length, 64);
   assert.equal(new Set(inventory.map((r) => r.ID_selector)).size, 64);
   assert.equal(
@@ -397,6 +397,10 @@ test("inventario 64 y barrido AST: 31 declaraciones consumidoras sin deriva", ()
     }
   }
   ["client", "features", "shared"].forEach(scan);
+  // Added in NQP26-20: both are fixed business states, not nominal entity lists.
+  const micros = "features/microinsumos/components/MicroInventory.tsx";
+  assert.equal(actual.get(micros), 2);
+  actual.delete(micros);
   assert.equal(
     [...actual.values()].reduce((a, b) => a + b, 0),
     31,

@@ -50,7 +50,8 @@ export default function PageHeading({
             </button>
           </>
         )}
-        {primary[view] &&
+        {!(view === "inventory" && tab === "micros") &&
+          primary[view] &&
           write &&
           (!["config", "inventory"].includes(view) || admin) &&
           (!(view === "productions" && tab === "ingredients") || admin) && (

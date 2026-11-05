@@ -28,6 +28,21 @@ export const customerSites = sqliteTable("customer_sites", {
 });
 export const products = sqliteTable("products", base());
 export const ingredients = sqliteTable("ingredients", base());
+export const microIngredients = sqliteTable(
+  "micro_ingredients",
+  {
+    ...base(),
+    operational_id: integer("operational_id").notNull().unique(),
+  },
+  (t) => [check("micro_operational_allowed", sql`${t.operational_id} > 0 AND ${t.operational_id} != 14`)],
+);
+export const microOpenings = sqliteTable("micro_openings", {
+  ...base(),
+  micro_ingredient_id: text("micro_ingredient_id")
+    .notNull()
+    .unique()
+    .references(() => microIngredients.id),
+});
 export const formulas = sqliteTable("formulas", {
   ...base(),
   product_id: text("product_id")

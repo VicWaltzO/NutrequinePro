@@ -1,3 +1,4 @@
+import { migrationCatalog } from "../../lib/sqlite/schema.mjs";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { test } from "node:test";
 import { DatabaseSync } from "node:sqlite";
@@ -46,8 +47,8 @@ export function diskFixture(t) {
       if (database.isOpen) database.close();
     },
   });
-  // Only a new, exclusively reserved synthetic file receives the unchanged historical SQL.
-  database.exec(historicalSchema);
+  // Only a new, exclusively reserved synthetic file receives the complete migration catalog.
+  for (const migration of migrationCatalog().migrations) database.exec(migration.sql);
   return { binding, database, filename, close };
 }
 
