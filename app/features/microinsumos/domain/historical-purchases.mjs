@@ -208,10 +208,10 @@ export function historicalSave({ s, p, add, correction, clock }) {
     correction(
       "MICRO_PURCHASE",
       current.id,
-      {
+      structuredClone({
         ...current,
         lines: s.microPurchaseLines.filter((line) => line.purchase_id === current.id && line.is_current),
-      },
+      }),
       { ...current, ...values, lines },
       why,
     );

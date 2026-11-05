@@ -183,6 +183,38 @@ test("histórico: borrador sin valores inventados, confirmación, corrección y 
   for (const table of unchangedTables) assert.deepEqual(s[table], before[table], table);
 });
 
+test("histórico: rectificaciones conservan la instantánea anterior y su detalle de auditoría", () => {
+  let s = apply(fixture(), payload());
+  const id = s.microPurchases[0].id;
+  const expenseId = s.microPurchases[0].expense_id;
+  for (const version of [1, 2]) {
+    const previousLines = structuredClone(s.microPurchaseLines.filter((line) => line.is_current));
+    s = apply(
+      s,
+      payload({
+        id,
+        expected_version: version,
+        existing_expense_id: expenseId,
+        reason: "Cantidad documental comprobada",
+        lines: [{ micro_ingredient_id: "m1", quantity_kg: String(25 + version), amount: "50" }],
+      }),
+    );
+    const correction = s.corrections.filter((row) => row.entity_type === "MICRO_PURCHASE").at(-1);
+    const detail = s.correctionFields.find(
+      (row) => row.correction_id === correction.id && row.field_name === "lines",
+    );
+    assert.deepEqual(correction.old_snapshot.lines, previousLines);
+    assert.deepEqual(correction.old_snapshot.lines, JSON.parse(detail.old_value));
+    assert.equal(s.microPurchaseLines.find((line) => line.id === previousLines[0].id).is_current, false);
+    assert.equal(s.microPurchaseLines.filter((line) => line.is_current).length, 1);
+    assert.equal(s.microPurchaseLines.find((line) => line.is_current).version, version + 1);
+  }
+  assert.equal(s.corrections[0].old_snapshot.lines[0].is_current, true);
+  assert.equal(s.expenses.length, 1);
+  assert.equal(s.expenses[0].amount, 5000);
+  assert.equal(s.microOpenings[0].quantity_grams, 5000);
+});
+
 test("histórico: validación estricta de fechas/cortes, identidades, datos, roles y duplicados", () => {
   const s = fixture();
   for (const extra of [
