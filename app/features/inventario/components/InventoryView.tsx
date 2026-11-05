@@ -1,5 +1,6 @@
+import MicroInventory from "@/features/microinsumos/components/MicroInventory";
 import ProductCatalog from "./ProductCatalog";
-import type { AppState, OpenModal } from "@/lib/domain-types";
+import type { AppState, OpenModal, Submit } from "@/lib/domain-types";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
 import { stock } from "@/lib/domain-preview.mjs";
 import { SortableTable, kg, num, label, find } from "@/shared/ui";
@@ -10,6 +11,8 @@ export default function InventoryView({
   s: state,
   tab,
   admin,
+  run,
+  busy,
   open,
   match,
   filters,
@@ -19,6 +22,8 @@ export default function InventoryView({
   s: AppState;
   tab: string;
   admin: boolean;
+  run: Submit;
+  busy: boolean;
   open: OpenModal;
   match: (record: Searchable) => boolean;
   filters: ReactNode;
@@ -31,10 +36,13 @@ export default function InventoryView({
         ["all", "Stock actual"],
         ["movements", "Movimientos"],
         ["products", "Productos"],
+        ["micros", "Microinsumos"],
       ])}
       <div hidden={tab !== "movements"}>{filters}</div>
-      <SubtabContent tab={tab} order={["all", "movements", "products"]}>
-        {tab === "products" ? (
+      <SubtabContent tab={tab} order={["all", "movements", "products", "micros"]}>
+        {tab === "micros" ? (
+          <MicroInventory s={state} admin={admin} run={run} busy={busy} />
+        ) : tab === "products" ? (
           <ProductCatalog s={state} admin={admin} open={open} />
         ) : tab === "all" ? (
           <>

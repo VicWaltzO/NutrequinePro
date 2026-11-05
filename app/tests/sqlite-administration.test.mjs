@@ -17,7 +17,7 @@ import { backupDatabase, restoreDatabase, verifyBackup } from "../lib/sqlite/rec
 import { ledgerSql, migrationCatalog, sha256 } from "../lib/sqlite/schema.mjs";
 import { openSqliteDatabase } from "../lib/adapters/node-sqlite.mjs";
 import { createStore } from "../lib/application-store.mjs";
-import { executeCommand } from "../lib/domain.mjs";
+import { executeCommand, TABLES } from "../lib/domain.mjs";
 import { writePlan } from "../lib/persistence.mjs";
 import { adminIdentity, cashCreditScenario, scenarioSession } from "./helpers/regression-scenarios.mjs";
 
@@ -58,7 +58,29 @@ function fixture(t, { historical = false, empty = false } = {}) {
 async function commercialState(filename) {
   const connection = openSqliteDatabase(filename);
   try {
-    const store = createStore(() => connection);
+    const historical = inspectDatabase(filename).version === 1;
+    const port = historical
+      ? {
+          prepare: (sql) => connection.prepare(sql),
+          batch: (statements) =>
+            connection
+              .batch(
+                statements.filter((statement) => !/micro_ingredients|micro_openings/.test(statement.sql)),
+              )
+              .then((results) => {
+                if (statements.length === TABLES.length + 1) {
+                  let index = 0;
+                  return statements.map((statement) =>
+                    /micro_ingredients|micro_openings/.test(statement.sql)
+                      ? { results: [] }
+                      : results[index++],
+                  );
+                }
+                return results;
+              }),
+        }
+      : connection;
+    const store = createStore(() => port);
     await store.ensureState(adminIdentity);
     const session = scenarioSession(store);
     const ids = await cashCreditScenario(session);
@@ -95,15 +117,15 @@ async function commercialState(filename) {
 function futureCatalog(f, sql = "CREATE INDEX idx_synthetic_future ON audit(id);") {
   const directory = join(f.root, "catalog");
   mkdirSync(join(directory, "meta"), { recursive: true });
-  writeFileSync(join(directory, "0000_nervous_silver_fox.sql"), historicalSql);
-  writeFileSync(join(directory, "0001_synthetic.sql"), sql);
+  for (const migration of catalog.migrations) writeFileSync(join(directory, migration.name), migration.sql);
+  writeFileSync(join(directory, "0002_synthetic.sql"), sql);
   writeFileSync(
     join(directory, "meta/_journal.json"),
     JSON.stringify({
       dialect: "sqlite",
       entries: [
-        { idx: 0, tag: "0000_nervous_silver_fox" },
-        { idx: 1, tag: "0001_synthetic" },
+        ...catalog.migrations.map((migration, idx) => ({ idx, tag: migration.name.slice(0, -4) })),
+        { idx: catalog.migrations.length, tag: "0002_synthetic" },
       ],
     }),
   );
@@ -152,8 +174,8 @@ test("SQLite administración: inicialización explícita y vacía, sin bootstrap
   const f = fixture(t);
   const initial = inspectDatabase(f.filename, { catalog });
   assert.equal(initial.status, "managed");
-  assert.equal(initial.version, 1);
-  assert.equal(initial.tables.length, 28);
+  assert.equal(initial.version, catalog.migrations.length);
+  assert.equal(initial.tables.length, 30);
   assert.equal(initial.tables.find((table) => table.name === "users").count, 0);
   assert.equal(initial.tables.find((table) => table.name === "settings").count, 0);
   const bytes = readFileSync(f.filename);
@@ -170,7 +192,10 @@ test("SQLite administración: un archivo vacío existente requiere selección ex
   assert.equal(inspectDatabase(f.filename, { catalog }).status, "empty");
   assert.throws(() => verifyDatabase(f.filename), /vacía/);
   assert.throws(() => migrateDatabase(f.filename, { catalog }), /initialize-empty/);
-  assert.equal(migrateDatabase(f.filename, { catalog, initializeEmpty: true }).version, 1);
+  assert.equal(
+    migrateDatabase(f.filename, { catalog, initializeEmpty: true }).version,
+    catalog.migrations.length,
+  );
 });
 
 test("SQLite administración: adopta historia comercial sin repetir CREATE ni regenerar IDs", async (t) => {
@@ -182,7 +207,7 @@ test("SQLite administración: adopta historia comercial sin repetir CREATE ni re
   const adopted = migrateDatabase(f.filename, { catalog, adopt: true });
   assert.equal(adopted.applied[0].origin, "adopted");
   assert.deepEqual(
-    adopted.tables.filter((table) => table.name !== "nutrequine_migrations"),
+    adopted.tables.filter((table) => before.tables.some((old) => old.name === table.name)),
     before.tables,
   );
   assert.deepEqual(migrateDatabase(f.filename, { catalog }), adopted);
@@ -215,7 +240,7 @@ test("SQLite administración: bloquea esquemas parciales, objetos extras e histo
     "CREATE TABLE parcial(id TEXT)",
     "CREATE VIEW vista_ajena AS SELECT 1",
     "DROP INDEX idx_sales_customer",
-    "UPDATE nutrequine_migrations SET name='unknown.sql'",
+    "UPDATE nutrequine_migrations SET name='unknown.sql' WHERE position=0",
     "UPDATE nutrequine_migrations SET sha256='modified'",
   ]) {
     const f = fixture(t);
@@ -246,9 +271,9 @@ test("SQLite administración: ejecuta solo pendientes y detecta SQL aplicado mod
   const f = fixture(t);
   const state = await commercialState(f.filename);
   const future = futureCatalog(f);
-  assert.deepEqual(inspectDatabase(f.filename, { catalog: future.catalog }).pending, ["0001_synthetic.sql"]);
+  assert.deepEqual(inspectDatabase(f.filename, { catalog: future.catalog }).pending, ["0002_synthetic.sql"]);
   const migrated = migrateDatabase(f.filename, { catalog: future.catalog });
-  assert.equal(migrated.applied.length, 2);
+  assert.equal(migrated.applied.length, catalog.migrations.length + 1);
   assert.deepEqual(migrateDatabase(f.filename, { catalog: future.catalog }), migrated);
   const connection = openSqliteDatabase(f.filename);
   try {
@@ -257,8 +282,8 @@ test("SQLite administración: ejecuta solo pendientes y detecta SQL aplicado mod
     connection.close();
   }
   writeFileSync(
-    join(future.directory, "0001_synthetic.sql"),
-    future.catalog.migrations[1].sql + "\n-- modificación posterior\n",
+    join(future.directory, "0002_synthetic.sql"),
+    future.catalog.migrations.at(-1).sql + "\n-- modificación posterior\n",
   );
   assert.throws(
     () => inspectDatabase(f.filename, { catalog: migrationCatalog(future.directory) }),
@@ -344,8 +369,8 @@ test("SQLite recuperación: respaldo verificable y restauración exacta de opera
   const olderRestore = join(f.directory, "older-version.sqlite");
   await restoreDatabase(backup, olderRestore, { catalog: newer.catalog });
   const older = inspectDatabase(olderRestore, { catalog: newer.catalog });
-  assert.equal(older.version, 1);
-  assert.deepEqual(older.pending, ["0001_synthetic.sql"]);
+  assert.equal(older.version, catalog.migrations.length);
+  assert.deepEqual(older.pending, ["0002_synthetic.sql"]);
 });
 
 test("SQLite recuperación: no sobrescribe destinos y rechaza hashes o manifiestos alterados", async (t) => {
@@ -455,15 +480,15 @@ test("SQLite CLI: adopción concurrente y creación exclusiva entre procesos", a
     [0, 0],
   );
   const after = inspectDatabase(f.filename, { catalog });
-  assert.equal(after.applied.length, 1);
+  assert.equal(after.applied.length, catalog.migrations.length);
   assert.deepEqual(
-    after.tables.filter((table) => table.name !== "nutrequine_migrations"),
+    after.tables.filter((table) => before.tables.some((old) => old.name === table.name)),
     before.tables,
   );
   const target = join(f.directory, "concurrent.sqlite");
   const created = await Promise.all([0, 1].map(() => concurrentCli(["init", "--database", target])));
   assert.equal(created.filter((result) => result.code === 0).length, 1);
-  assert.equal(inspectDatabase(target, { catalog }).applied.length, 1);
+  assert.equal(inspectDatabase(target, { catalog }).applied.length, catalog.migrations.length);
 });
 
 test("SQLite CLI: funciona aislada sin node_modules, Wrangler, Miniflare ni Sites", async (t) => {
@@ -514,7 +539,10 @@ test("SQLite administración: bloqueo de preparación conserva datos y permite r
     lock.exec("ROLLBACK");
   }
   assert.deepEqual(inspectDatabase(f.filename, { catalog }), before);
-  assert.equal(migrateDatabase(f.filename, { catalog, adopt: true }).applied.length, 1);
+  assert.equal(
+    migrateDatabase(f.filename, { catalog, adopt: true }).applied.length,
+    catalog.migrations.length,
+  );
 });
 
 test("SQLite administración: rechaza permisos amplios de directorio y archivo", (t) => {

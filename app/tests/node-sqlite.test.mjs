@@ -65,14 +65,14 @@ test("SQLite exige apertura explícita, reserva exclusiva y datos fuera de insta
   }
 });
 
-test("SQLite conserva las 27 tablas, índices y relaciones del SQL histórico", async (t) => {
+test("SQLite conserva tablas históricas y añade dos tablas de micros con sus restricciones", async (t) => {
   const f = diskFixture(t);
   const tables = f.database.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
   assert.deepEqual(
     tables.map((row) => row.name).sort(),
     [...Object.values(SQL_NAMES), "settings", "transaction_guards"].sort(),
   );
-  assert.equal(tables.length, 27);
+  assert.equal(tables.length, 29);
   assert.equal(f.database.prepare("PRAGMA foreign_keys").get().foreign_keys, 1);
   assert.equal(f.database.prepare("PRAGMA foreign_key_check").all().length, 0);
   assert.equal(f.database.prepare("PRAGMA integrity_check").get().integrity_check, "ok");

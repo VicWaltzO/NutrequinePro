@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { readFileSync } from "node:fs";
+import { migrationCatalog } from "../lib/sqlite/schema.mjs";
 import {
   seedState,
   executeCommand,
@@ -15,7 +15,7 @@ import { writePlan } from "../lib/persistence.mjs";
 function fixture() {
   const db = new DatabaseSync(":memory:");
   db.exec("PRAGMA foreign_keys=ON");
-  db.exec(readFileSync(new URL("../drizzle/0000_nervous_silver_fox.sql", import.meta.url), "utf8"));
+  for (const migration of migrationCatalog().migrations) db.exec(migration.sql);
   const persist = (before, after) => {
     db.exec("BEGIN");
     try {

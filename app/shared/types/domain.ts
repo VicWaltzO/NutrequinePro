@@ -53,6 +53,23 @@ export interface Product extends Site {
 export interface Ingredient extends Site {
   current_price_per_kg: number;
 }
+export interface MicroIngredient extends Site {
+  operational_id: number;
+  unit: "KG";
+  known_price_per_kg: number | null;
+}
+export interface MicroOpening extends Entity {
+  version: number;
+  micro_ingredient_id: string;
+  warehouse: "MICROS";
+  quantity_grams: number;
+  unit_cost_cents: number | null;
+  valuation_cents: number | null;
+  cutoff_date: string;
+  measurement: "REAL" | "ESTIMATED";
+  source: string;
+  notes: string;
+}
 export interface Formula extends Entity {
   product_id: string;
   version: number;
@@ -261,6 +278,8 @@ export interface Tables {
   customerSites: CustomerSite[];
   products: Product[];
   ingredients: Ingredient[];
+  microIngredients: MicroIngredient[];
+  microOpenings: MicroOpening[];
   formulas: Formula[];
   formulaIngredients: FormulaIngredient[];
   productions: Production[];

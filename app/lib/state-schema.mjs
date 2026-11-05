@@ -5,6 +5,8 @@ export const TABLES = [
   "customerSites",
   "products",
   "ingredients",
+  "microIngredients",
+  "microOpenings",
   "formulas",
   "formulaIngredients",
   "productions",
@@ -29,6 +31,8 @@ export const SQL_NAMES = Object.fromEntries(
   TABLES.map((t) => [t, t.replace(/[A-Z]/g, (c) => "_" + c.toLowerCase())]),
 );
 export const RELATIONS = {
+  microIngredients: ["operational_id"],
+  microOpenings: ["micro_ingredient_id"],
   customerSites: ["customer_id", "site_id"],
   formulas: ["product_id"],
   formulaIngredients: ["formula_id", "ingredient_id"],

@@ -40,6 +40,8 @@ export default function AdminApp() {
           toggleTheme={toggleTheme}
         />
         <AdminWorkspace
+          run={run}
+          busy={busy}
           state={state}
           actor={actor}
           navigation={navigation}

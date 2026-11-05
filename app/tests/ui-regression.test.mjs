@@ -10,6 +10,8 @@ test("vistas por rol, rutas antiguas y formularios conservan la referencia del r
     // form control and surrounding screen; new headers are checked separately.
     normalize: (html) =>
       html
+        // The only new navigation control; micros has its own interactive E2E.
+        .replace('<button type="button" class="">Microinsumos</button>', "")
         .replace(
           /<th scope="col"><button type="button" class="table-sort"[^>]*><span>([^<]*)<\/span><svg[\s\S]*?<\/svg><\/button><\/th>/g,
           "<th>$1</th>",
