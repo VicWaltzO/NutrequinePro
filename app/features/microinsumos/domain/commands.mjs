@@ -78,6 +78,20 @@ export function microCorrect({ s, p, correction, clock }) {
   const current = pick(s, "microOpenings", p.id);
   requireValue(p.expected_version === current.version, "El saldo cambió. Recargue antes de corregir.");
   const values = openingValues(p);
+  requireValue(
+    !s.microPurchaseLines.some(
+      (line) =>
+        line.is_current &&
+        line.micro_ingredient_id === current.micro_ingredient_id &&
+        s.microPurchases.some(
+          (purchase) =>
+            purchase.id === line.purchase_id &&
+            purchase.status === "CONFIRMED" &&
+            purchase.document_date > values.cutoff_date,
+        ),
+    ),
+    "El corte dejaría compras históricas fuera de período. Revise sus vínculos primero.",
+  );
   const reason = literal(p.reason, "Motivo de corrección");
   correction(
     "MICRO_OPENING",

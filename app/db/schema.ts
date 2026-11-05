@@ -170,3 +170,20 @@ export const expenses = sqliteTable("expenses", {
 });
 export const inventoryMovements = sqliteTable("inventory_movements", base());
 export const audit = sqliteTable("audit", base());
+
+export const microPurchases = sqliteTable("micro_purchases", {
+  ...base(),
+  document_key: text("document_key").notNull().unique(),
+  expense_id: text("expense_id")
+    .unique()
+    .references(() => expenses.id),
+});
+export const microPurchaseLines = sqliteTable("micro_purchase_lines", {
+  ...base(),
+  purchase_id: text("purchase_id")
+    .notNull()
+    .references(() => microPurchases.id),
+  micro_ingredient_id: text("micro_ingredient_id")
+    .notNull()
+    .references(() => microIngredients.id),
+});

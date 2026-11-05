@@ -15,6 +15,13 @@
       "when": 1793837740175,
       "tag": "0001_spotty_thunderbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793888442213,
+      "tag": "0002_cheerful_trish_tilby",
+      "breakpoints": true
     }
   ]
 }

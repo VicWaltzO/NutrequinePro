@@ -70,6 +70,31 @@ export interface MicroOpening extends Entity {
   source: string;
   notes: string;
 }
+export interface MicroPurchase extends Entity {
+  document_kind: "DOCUMENT" | "MANUAL";
+  document_key: string;
+  supplier: string | null;
+  reference: string;
+  source: string | null;
+  document_date: string | null;
+  total_cents: number | null;
+  discount_cents: number;
+  payment_method: "CASH";
+  status: "DRAFT" | "CONFIRMED" | "CANCELLED";
+  expense_id: string | null;
+  owns_expense: boolean;
+  version: number;
+}
+export interface MicroPurchaseLine extends Entity {
+  purchase_id: string;
+  micro_ingredient_id: string;
+  quantity_grams: number | null;
+  unit_price_cents: number | null;
+  amount_cents: number | null;
+  cutoff_date_snapshot: string | null;
+  is_current: boolean;
+  version: number;
+}
 export interface Formula extends Entity {
   product_id: string;
   version: number;
@@ -280,6 +305,8 @@ export interface Tables {
   ingredients: Ingredient[];
   microIngredients: MicroIngredient[];
   microOpenings: MicroOpening[];
+  microPurchases: MicroPurchase[];
+  microPurchaseLines: MicroPurchaseLine[];
   formulas: Formula[];
   formulaIngredients: FormulaIngredient[];
   productions: Production[];
