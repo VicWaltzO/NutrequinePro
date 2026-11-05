@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import CustomerNameWarning from "@/features/clientes/components/CustomerNameWarning";
 import { UserRound, CreditCard, Plus, X } from "lucide-react";
@@ -33,6 +34,8 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
     review,
     paid,
   } = useSaleFormState({ s: state, record, kind });
+  const customerTrigger = useRef<HTMLButtonElement>(null);
+  const customerSelect = useRef<HTMLSelectElement>(null);
   const hasProducts = rows.length > 0 && rows.every((row) => !!row.product_id);
   let submitLabel = "Confirmar venta";
   if (edit) submitLabel = "Registrar rectificación";
@@ -55,6 +58,7 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
     if (typeof result === "string") {
       set(quick === "customer" ? "customer_id" : "site_id", result);
       setQuick("");
+      if (quick === "customer") customerSelect.current?.focus();
     }
   };
   return (
@@ -127,18 +131,21 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
                         <label htmlFor={"sale-" + field}>{caption}</label>
                         <button
                           type="button"
-                          className="text-button"
+                          className={customer ? "text-button sale-new-customer" : "text-button"}
+                          aria-label={customer ? "Crear nuevo cliente" : undefined}
+                          ref={customer ? customerTrigger : undefined}
                           aria-expanded={quick === field}
                           aria-controls={quick === field ? "sale-quick-create" : undefined}
                           disabled={busy}
                           onClick={() => toggleQuick(field)}
                         >
                           <Plus size={14} aria-hidden="true" />
-                          Crear {customer ? "cliente" : "sede"}
+                          {customer ? "Nuevo" : "Crear sede"}
                         </button>
                       </div>
                       <select
                         id={"sale-" + field}
+                        ref={customer ? customerSelect : undefined}
                         aria-label={caption}
                         required
                         value={customer ? values.customer_id : values.site_id}
@@ -258,7 +265,10 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
                               type="button"
                               className="icon-button"
                               aria-label="Cancelar creación"
-                              onClick={() => setQuick("")}
+                              onClick={() => {
+                                setQuick("");
+                                if (customer) customerTrigger.current?.focus();
+                              }}
                               disabled={busy}
                             >
                               <X size={17} />

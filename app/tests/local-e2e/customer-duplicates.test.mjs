@@ -111,7 +111,7 @@ test(
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(server.baseURL + "/#sales");
     await page.getByRole("button", { name: "Nueva venta", exact: true }).click();
-    await dialog.getByRole("button", { name: "Crear cliente", exact: true }).click();
+    await dialog.getByRole("button", { name: "Crear nuevo cliente", exact: true }).click();
     const quick = dialog.getByLabel("Nombre del nuevo cliente", { exact: true });
     await quick.fill("Gonzalo Andrdae");
     const quickSave = dialog.getByRole("button", { name: "Guardar cliente", exact: true });
@@ -133,7 +133,7 @@ test(
     await expect(dialog.getByLabel("Cliente", { exact: true })).not.toHaveValue("");
     // The server commits, but the browser loses the response. The next click must
     // replay the identical body/request_id, rather than acknowledging its own new row.
-    await dialog.getByRole("button", { name: "Crear cliente", exact: true }).click();
+    await dialog.getByRole("button", { name: "Crear nuevo cliente", exact: true }).click();
     await dialog.getByLabel("Nombre del nuevo cliente", { exact: true }).fill("Gonzalo Andrade");
     await dialog.getByLabel(confirmation, { exact: true }).check();
     const beforeLost = await state();

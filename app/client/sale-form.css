@@ -126,6 +126,16 @@
   gap: 4px;
   padding: 4px 0;
 }
+.sale-field-heading .sale-new-customer {
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.sale-field-heading .sale-new-customer:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+  text-decoration: none;
+}
 .sale-quick-create {
   margin-top: 14px;
   padding-top: 14px;
