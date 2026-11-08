@@ -65,13 +65,20 @@ async function commercialState(filename) {
           batch: (statements) =>
             connection
               .batch(
-                statements.filter((statement) => !/micro_ingredients|micro_openings/.test(statement.sql)),
+                statements.filter(
+                  (statement) =>
+                    !/micro_ingredients|micro_openings|micro_purchases|micro_purchase_lines/.test(
+                      statement.sql,
+                    ),
+                ),
               )
               .then((results) => {
                 if (statements.length === TABLES.length + 1) {
                   let index = 0;
                   return statements.map((statement) =>
-                    /micro_ingredients|micro_openings/.test(statement.sql)
+                    /micro_ingredients|micro_openings|micro_purchases|micro_purchase_lines/.test(
+                      statement.sql,
+                    )
                       ? { results: [] }
                       : results[index++],
                   );
@@ -118,14 +125,14 @@ function futureCatalog(f, sql = "CREATE INDEX idx_synthetic_future ON audit(id);
   const directory = join(f.root, "catalog");
   mkdirSync(join(directory, "meta"), { recursive: true });
   for (const migration of catalog.migrations) writeFileSync(join(directory, migration.name), migration.sql);
-  writeFileSync(join(directory, "0002_synthetic.sql"), sql);
+  writeFileSync(join(directory, "0003_synthetic.sql"), sql);
   writeFileSync(
     join(directory, "meta/_journal.json"),
     JSON.stringify({
       dialect: "sqlite",
       entries: [
         ...catalog.migrations.map((migration, idx) => ({ idx, tag: migration.name.slice(0, -4) })),
-        { idx: catalog.migrations.length, tag: "0002_synthetic" },
+        { idx: catalog.migrations.length, tag: "0003_synthetic" },
       ],
     }),
   );
@@ -175,7 +182,7 @@ test("SQLite administración: inicialización explícita y vacía, sin bootstrap
   const initial = inspectDatabase(f.filename, { catalog });
   assert.equal(initial.status, "managed");
   assert.equal(initial.version, catalog.migrations.length);
-  assert.equal(initial.tables.length, 30);
+  assert.equal(initial.tables.length, 32);
   assert.equal(initial.tables.find((table) => table.name === "users").count, 0);
   assert.equal(initial.tables.find((table) => table.name === "settings").count, 0);
   const bytes = readFileSync(f.filename);
@@ -271,7 +278,7 @@ test("SQLite administración: ejecuta solo pendientes y detecta SQL aplicado mod
   const f = fixture(t);
   const state = await commercialState(f.filename);
   const future = futureCatalog(f);
-  assert.deepEqual(inspectDatabase(f.filename, { catalog: future.catalog }).pending, ["0002_synthetic.sql"]);
+  assert.deepEqual(inspectDatabase(f.filename, { catalog: future.catalog }).pending, ["0003_synthetic.sql"]);
   const migrated = migrateDatabase(f.filename, { catalog: future.catalog });
   assert.equal(migrated.applied.length, catalog.migrations.length + 1);
   assert.deepEqual(migrateDatabase(f.filename, { catalog: future.catalog }), migrated);
@@ -282,7 +289,7 @@ test("SQLite administración: ejecuta solo pendientes y detecta SQL aplicado mod
     connection.close();
   }
   writeFileSync(
-    join(future.directory, "0002_synthetic.sql"),
+    join(future.directory, "0003_synthetic.sql"),
     future.catalog.migrations.at(-1).sql + "\n-- modificación posterior\n",
   );
   assert.throws(
@@ -370,7 +377,7 @@ test("SQLite recuperación: respaldo verificable y restauración exacta de opera
   await restoreDatabase(backup, olderRestore, { catalog: newer.catalog });
   const older = inspectDatabase(olderRestore, { catalog: newer.catalog });
   assert.equal(older.version, catalog.migrations.length);
-  assert.deepEqual(older.pending, ["0002_synthetic.sql"]);
+  assert.deepEqual(older.pending, ["0003_synthetic.sql"]);
 });
 
 test("SQLite recuperación: no sobrescribe destinos y rechaza hashes o manifiestos alterados", async (t) => {

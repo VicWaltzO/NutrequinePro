@@ -45,6 +45,10 @@ export function expenseCancel(context) {
   const { s: state, p: payload, actor, clock, reason } = context;
   let result = null;
   const e = pick(state, "expenses", payload.id);
+  requireValue(
+    !state.microPurchases.some((p) => p.expense_id === e.id && p.status === "CONFIRMED"),
+    "Anule primero el registro histórico vinculado.",
+  );
   requireValue(e.status !== "CANCELLED", "Gasto ya anulado.");
   const why = reason();
   if (e.production_cost_id) {

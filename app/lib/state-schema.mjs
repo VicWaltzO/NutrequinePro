@@ -24,6 +24,8 @@ export const TABLES = [
   "corrections",
   "correctionFields",
   "expenses",
+  "microPurchases",
+  "microPurchaseLines",
   "inventoryMovements",
   "audit",
 ];
@@ -48,5 +50,7 @@ export const RELATIONS = {
   returns: ["sale_id"],
   returnItems: ["return_id", "sale_item_id"],
   correctionFields: ["correction_id"],
+  microPurchases: ["document_key", "expense_id"],
+  microPurchaseLines: ["purchase_id", "micro_ingredient_id"],
   expenses: ["production_id", "sale_id", "site_id", "ingredient_id"],
 };
