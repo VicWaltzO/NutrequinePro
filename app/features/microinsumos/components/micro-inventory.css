@@ -43,3 +43,28 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.operational-purchases {
+  margin-block: 2rem;
+  padding-block: 1.5rem;
+  border-block: 1px solid var(--border);
+}
+.operational-purchases > p {
+  max-width: 72ch;
+}
+.operational-purchases .receipt-line {
+  margin-block: 1.5rem;
+  padding-block: 1rem;
+  border-block-start: 1px solid var(--border);
+}
+.operational-purchases .receipt-confirmation {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-block: 1rem;
+}
+.operational-purchases .receipt-record {
+  max-width: none;
+  padding-block: 1rem;
+  border-block-end: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}

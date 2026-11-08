@@ -49,6 +49,10 @@ export function expenseCancel(context) {
     !state.microPurchases.some((p) => p.expense_id === e.id && p.status === "CONFIRMED"),
     "Anule primero el registro histórico vinculado.",
   );
+  requireValue(
+    !state.microReceipts.some((p) => p.expense_id === e.id),
+    "Gasto de recepción protegido. Correcciones pendientes de NQP26-35.",
+  );
   requireValue(e.status !== "CANCELLED", "Gasto ya anulado.");
   const why = reason();
   if (e.production_cost_id) {

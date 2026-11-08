@@ -405,6 +405,10 @@ test("inventario histórico 64 y barrido AST: 31 selectores previos y 2 estados 
   const purchases = "features/microinsumos/components/HistoricalPurchases.tsx";
   assert.equal(actual.get(purchases), 3);
   actual.delete(purchases);
+  // NQP26-22: nominal micro selector, verified A–Z in the purchase E2E.
+  const receipts = "features/microinsumos/components/OperationalPurchases.tsx";
+  assert.equal(actual.get(receipts), 1);
+  actual.delete(receipts);
   assert.equal(
     [...actual.values()].reduce((a, b) => a + b, 0),
     31,

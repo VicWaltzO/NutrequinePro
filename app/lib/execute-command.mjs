@@ -39,7 +39,9 @@ import {
 } from "../features/ventas/domain/coverage.mjs";
 import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-delivery-date.mjs";
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
+import { operationalSave } from "../features/microinsumos/domain/operational-purchases.mjs";
 const handlers = {
+  MICRO_RECEIPT_SAVE: operationalSave,
   MICRO_PURCHASE_SAVE: historicalSave,
   MICRO_PURCHASE_CANCEL: historicalCancel,
   MICRO_SAVE: microSave,

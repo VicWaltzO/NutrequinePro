@@ -77,6 +77,15 @@ export function createStore(getDatabase, options = {}) {
       throw new DomainError("Datos de operación inválidos.");
     const command = input;
     assertCommandPermission(actor, command.type);
+    if (
+      before.audit.some(
+        (entry) =>
+          entry.request_id === command.request_id &&
+          entry.created_by !== actor.id &&
+          (command.type === "MICRO_RECEIPT_SAVE" || entry.action === "MICRO_RECEIPT_SAVE"),
+      )
+    )
+      throw new DomainError("Identificador global de operación ya utilizado.");
     const duplicate = before.audit.find(
       (entry) => entry.request_id === command.request_id && entry.created_by === actor.id,
     );

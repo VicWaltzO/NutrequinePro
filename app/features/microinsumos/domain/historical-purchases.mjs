@@ -75,6 +75,10 @@ export function historicalSave({ s, p, add, correction, clock }) {
     !s.microPurchases.some((row) => row.id !== current?.id && row.document_key === documentKey),
     "Comprobante o referencia ya registrado, incluso si fue anulado.",
   );
+  requireValue(
+    !s.microReceipts.some((row) => row.document_key === documentKey),
+    "Comprobante ya registrado como compra operativa.",
+  );
   const documentDate =
     p.document_date == null || p.document_date === "" ? null : date(literal(p.document_date, "Fecha"));
   const source = literal(p.source, "Fuente documental", !confirmed);
@@ -160,7 +164,8 @@ export function historicalSave({ s, p, add, correction, clock }) {
       "No vincule gastos imputados a otras operaciones.",
     );
     requireValue(
-      !s.microPurchases.some((row) => row.id !== current?.id && row.expense_id === expense.id),
+      !s.microPurchases.some((row) => row.id !== current?.id && row.expense_id === expense.id) &&
+        !s.microReceipts.some((row) => row.expense_id === expense.id),
       "Gasto ya vinculado a otro comprobante.",
     );
   }
