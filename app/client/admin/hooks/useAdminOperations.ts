@@ -60,11 +60,16 @@ export function useAdminOperations() {
       requests.reset();
     }
   };
-  const run = async (type: string, operationPayload: object): Promise<string | true | null> => {
+  const run = async (
+    type: string,
+    operationPayload: object,
+    stableRequestId?: string,
+  ): Promise<string | true | null> => {
     if (busy) return null;
     const { _keep_open, ...payload } = operationPayload as { _keep_open?: boolean };
     const fingerprint = JSON.stringify({ type, payload });
-    const requestId = requests.begin(fingerprint);
+    const generatedId = requests.begin(fingerprint);
+    const requestId = generatedId ? (stableRequestId ?? generatedId) : null;
     if (!requestId) return null;
     setBusy(true);
     setError("");

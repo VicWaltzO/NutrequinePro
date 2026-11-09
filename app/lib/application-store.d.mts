@@ -12,5 +12,6 @@ export interface ApplicationStore {
 }
 export interface StoreOptions {
   partialReservations?: boolean;
+  microPreparationPolicies?: import("../shared/types/domain").MicroPreparationPolicy[];
 }
 export function createStore(binding: () => PersistenceDatabase, options?: StoreOptions): ApplicationStore;

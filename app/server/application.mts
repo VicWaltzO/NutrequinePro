@@ -1,3 +1,4 @@
+import { preparationOverview } from "../features/microinsumos/domain/preparations.mjs";
 import Fastify from "fastify";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { readFileSync } from "node:fs";
@@ -61,6 +62,7 @@ export async function createLocalServer(
     };
     const store = createStore(() => existingOnly, {
       partialReservations: dependencies.partialReservations === true,
+      microPreparationPolicies: config.micro_preparation_policies ?? [],
     });
     const initial = await store.loadState();
     if (dependencies.partialReservations === true && config.frontend_directory)
@@ -177,6 +179,19 @@ export async function createLocalServer(
         authentication.logout(session);
         reply.header("Set-Cookie", sessionCookie(cookieName, "", request.protocol === "https", true));
         return { ok: true };
+      }),
+    );
+    server.get("/api/micro-preparations", (request) =>
+      serialized(async () => {
+        const { state, session } = await authorized(request);
+        return {
+          ...preparationOverview(
+            state,
+            config.micro_preparation_policies ?? [],
+            new Date(dependencies.clock?.() ?? Date.now()).toISOString(),
+          ),
+          can_create: session.actor.role !== "VIEWER",
+        };
       }),
     );
     server.get("/api/state", (request) =>

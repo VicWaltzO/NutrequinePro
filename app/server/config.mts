@@ -1,7 +1,10 @@
 import { readFileSync } from "node:fs";
+import { validatePreparationPolicies } from "../features/microinsumos/domain/preparations.mjs";
+import type { MicroPreparationPolicy } from "../shared/types/domain.ts";
 import { selectedFile } from "../lib/sqlite/files.mjs";
 
 export interface ServerConfig {
+  micro_preparation_policies?: MicroPreparationPolicy[];
   database: string;
   auth_database: string;
   port: number;
@@ -15,6 +18,7 @@ export function validateConfig(input: unknown, allowEphemeralPort = false): Serv
   const value = input as Record<string, unknown>;
   const allowed = new Set([
     "database",
+    "micro_preparation_policies",
     "auth_database",
     "port",
     "tls_certificate",
@@ -41,6 +45,8 @@ export function validateConfig(input: unknown, allowEphemeralPort = false): Serv
   for (const key of ["tls_certificate", "tls_key"])
     if (value[key] !== undefined && (typeof value[key] !== "string" || !value[key]))
       throw new Error("Ruta TLS inválida.");
+  if (value.micro_preparation_policies !== undefined)
+    value.micro_preparation_policies = validatePreparationPolicies(value.micro_preparation_policies);
   return value as unknown as ServerConfig;
 }
 

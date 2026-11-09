@@ -1,3 +1,4 @@
+import MicroPreparations from "./MicroPreparations";
 import MicroFormulas from "./MicroFormulas";
 import OperationalPurchases from "./OperationalPurchases";
 import HistoricalPurchases from "./HistoricalPurchases";
@@ -318,6 +319,7 @@ export default function MicroInventory({
         </SortableTable>
       )}
       <MicroFormulas s={s} admin={admin} run={run} busy={busy} />
+      <MicroPreparations s={s} run={run} busy={busy} />
       <OperationalPurchases s={s} admin={admin} run={run} busy={busy} />
       <HistoricalPurchases s={s} admin={admin} run={run} busy={busy} />
     </section>
