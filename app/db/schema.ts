@@ -284,3 +284,23 @@ export const microFormulaHeads = sqliteTable(
     check("micro_head_version", sql`typeof(${t.version}) = 'integer' AND ${t.version} > 0`),
   ],
 );
+
+export const microPreparations = sqliteTable(
+  "micro_preparations",
+  {
+    ...base(),
+    formula_id: text("formula_id")
+      .notNull()
+      .references(() => microFormulas.id),
+    request_id: text("request_id").notNull().unique(),
+    family: text("family").notNull(),
+    nuclei_hundredths: integer("nuclei_hundredths").notNull(),
+  },
+  (t) => [
+    check("micro_preparation_family", sql`${t.family} IN ('ROSADO','VERDE_AMARILLO')`),
+    check(
+      "micro_preparation_quantity",
+      sql`typeof(${t.nuclei_hundredths}) = 'integer' AND ${t.nuclei_hundredths} > 0 AND ${t.nuclei_hundredths} <= 1000000000`,
+    ),
+  ],
+);

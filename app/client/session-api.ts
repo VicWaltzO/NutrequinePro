@@ -83,7 +83,10 @@ export async function adminFetch(input: RequestInfo | URL, init: RequestInit = {
     typeof input === "string" &&
     /^\/api\/documents\/(production|sale|customer|balance)\/[^/?#]+\.pdf(?:\?[^#]*)?$/.test(input) &&
     (!init.method || init.method === "GET");
-  if (typeof input !== "string" || (!documentRead && !["/api/state", "/api/command"].includes(input)))
+  if (
+    typeof input !== "string" ||
+    (!documentRead && !["/api/state", "/api/command", "/api/micro-preparations"].includes(input))
+  )
     throw new ApiError(400, "Ruta comercial inválida.");
   const headers = new Headers(init.headers);
   if (init.method === "POST") headers.set("X-CSRF-Token", csrf);

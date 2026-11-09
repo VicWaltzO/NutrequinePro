@@ -413,6 +413,10 @@ test("inventario histórico 64 y barrido AST: 31 selectores previos y 2 estados 
   const microFormulas = "features/microinsumos/components/MicroFormulas.tsx";
   assert.equal(actual.get(microFormulas), 1);
   actual.delete(microFormulas);
+  // NQP26-26: fixed recipe family, not a nominal entity list.
+  const preparations = "features/microinsumos/components/MicroPreparations.tsx";
+  assert.equal(actual.get(preparations), 1);
+  actual.delete(preparations);
   assert.equal(
     [...actual.values()].reduce((a, b) => a + b, 0),
     31,

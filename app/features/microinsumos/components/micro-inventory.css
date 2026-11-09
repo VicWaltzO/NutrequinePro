@@ -95,3 +95,29 @@
 .micro-formulas button {
   align-self: start;
 }
+
+.micro-preparations {
+  margin-block: 2rem;
+  padding-block: 1.5rem;
+  border-block: 1px solid var(--border);
+}
+.micro-preparations > p {
+  max-width: 72ch;
+}
+.micro-preparations .preparation-warning {
+  color: var(--warning);
+  background: var(--warning-soft);
+  padding: 0.75rem;
+}
+.micro-preparations .preparation-record {
+  padding-block: 1.5rem;
+  border-block-end: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+.micro-preparations .preparation-record details {
+  max-width: none;
+}
+.preparation-item {
+  padding-block: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,3 +1,4 @@
+import { microPreparationCreate } from "../features/microinsumos/domain/preparations.mjs";
 import { microFormulaSave, microFormulaActivate } from "../features/microinsumos/domain/formulas.mjs";
 import { historicalSave, historicalCancel } from "../features/microinsumos/domain/historical-purchases.mjs";
 import { microSave, microOpen, microCorrect } from "../features/microinsumos/domain/commands.mjs";
@@ -42,6 +43,7 @@ import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-deliver
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 import { operationalSave } from "../features/microinsumos/domain/operational-purchases.mjs";
 const handlers = {
+  MICRO_PREPARATION_CREATE: microPreparationCreate,
   MICRO_FORMULA_SAVE: microFormulaSave,
   MICRO_FORMULA_ACTIVATE: microFormulaActivate,
   MICRO_RECEIPT_SAVE: operationalSave,

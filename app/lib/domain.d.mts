@@ -22,7 +22,7 @@ export function executeCommand(
   command: Command,
   actor: User,
   clock?: string,
-  options?: { partialReservations?: boolean },
+  options?: import("./application-store.mjs").StoreOptions,
 ): CommandResult;
 export function saleSummary(state: AppState, sale: { id: string }): SaleSummary;
 export function productionSummary(state: AppState, production: { id: string }): ProductionSummary;

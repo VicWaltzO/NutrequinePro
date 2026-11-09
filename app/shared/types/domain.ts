@@ -360,7 +360,23 @@ export interface CompanyConfig {
   default_payment_method?: "" | "CASH" | "TRANSFER" | "CHECK";
   default_expense_category?: string;
 }
+export interface MicroPreparationPolicy {
+  formula_id: string;
+  family: MicroFamily;
+  reference: string;
+  lines: { micro_ingredient_id: string; dose_grams: number }[];
+}
+export interface MicroPreparation extends Entity {
+  family: MicroFamily;
+  formula_id: string;
+  nuclei_hundredths: number;
+  date: string;
+  status: "PENDING";
+  authorization_reference: string;
+  request_id: string;
+}
 export interface Tables {
+  microPreparations: MicroPreparation[];
   users: User[];
   customers: Customer[];
   sites: Site[];
@@ -445,7 +461,7 @@ export type EditorRecord = Omit<
   sale_id?: string | null;
   ingredient_id?: string | null;
 };
-export type Submit = (type: string, payload: object) => Promise<string | true | null>;
+export type Submit = (type: string, payload: object, requestId?: string) => Promise<string | true | null>;
 export type OpenModal = (type: string, record?: EditorRecord, kind?: string) => void;
 export interface Command {
   type: string;
