@@ -68,3 +68,30 @@
   border-block-end: 1px solid var(--border);
   overflow-wrap: anywhere;
 }
+
+.micro-formulas {
+  margin-block: 2rem;
+  padding-block: 1.5rem;
+  border-block: 1px solid var(--border);
+}
+.micro-formula-family {
+  padding-block: 1.25rem;
+  border-block-end: 1px solid var(--border);
+}
+.micro-formulas .micro-formula-family > details {
+  max-width: none;
+  margin-block-start: 1rem;
+}
+.micro-formula-detail {
+  overflow-wrap: anywhere;
+  margin-block: 1rem;
+}
+.micro-formula-detail ul {
+  padding-inline-start: 1.25rem;
+}
+.micro-formula-detail li {
+  margin-block: 0.5rem;
+}
+.micro-formulas button {
+  align-self: start;
+}

@@ -138,6 +138,27 @@ export interface MicroValuationEvent extends Entity {
   revision: number;
   event: unknown;
 }
+export type MicroFamily = "ROSADO" | "VERDE_AMARILLO";
+export interface MicroFormula extends Entity {
+  family: MicroFamily;
+  version: number;
+  notes: string;
+  published_at: string | null;
+  published_by: string | null;
+  total_grams: number;
+}
+export interface MicroFormulaLine extends Entity {
+  formula_id: string;
+  micro_ingredient_id: string;
+  operational_id_snapshot: number;
+  name_snapshot: string;
+  dose_grams: number;
+}
+export interface MicroFormulaHead extends Entity {
+  family: MicroFamily;
+  active_formula_id: string | null;
+  version: number;
+}
 export interface Formula extends Entity {
   product_id: string;
   version: number;
@@ -347,6 +368,9 @@ export interface Tables {
   products: Product[];
   ingredients: Ingredient[];
   microIngredients: MicroIngredient[];
+  microFormulas: MicroFormula[];
+  microFormulaLines: MicroFormulaLine[];
+  microFormulaHeads: MicroFormulaHead[];
   microOpenings: MicroOpening[];
   microReceipts: MicroReceipt[];
   microReceiptLines: MicroReceiptLine[];

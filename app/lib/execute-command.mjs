@@ -1,3 +1,4 @@
+import { microFormulaSave, microFormulaActivate } from "../features/microinsumos/domain/formulas.mjs";
 import { historicalSave, historicalCancel } from "../features/microinsumos/domain/historical-purchases.mjs";
 import { microSave, microOpen, microCorrect } from "../features/microinsumos/domain/commands.mjs";
 import { fail, safe, scaled } from "../shared/domain/core.mjs";
@@ -41,6 +42,8 @@ import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-deliver
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 import { operationalSave } from "../features/microinsumos/domain/operational-purchases.mjs";
 const handlers = {
+  MICRO_FORMULA_SAVE: microFormulaSave,
+  MICRO_FORMULA_ACTIVATE: microFormulaActivate,
   MICRO_RECEIPT_SAVE: operationalSave,
   MICRO_PURCHASE_SAVE: historicalSave,
   MICRO_PURCHASE_CANCEL: historicalCancel,
