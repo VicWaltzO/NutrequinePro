@@ -61,6 +61,7 @@ export function createCommandContext(state, type, payload, actor, clock, options
     movement,
     movementBatch,
     correction,
+    request_id: options.request_id,
     partialReservations: options.partialReservations === true,
   };
 }

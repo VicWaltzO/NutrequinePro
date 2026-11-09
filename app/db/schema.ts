@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index, check } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, index, uniqueIndex, check } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 // Amounts inside data are integer céntimos; weights are integer grams.
@@ -187,3 +187,51 @@ export const microPurchaseLines = sqliteTable("micro_purchase_lines", {
     .notNull()
     .references(() => microIngredients.id),
 });
+
+export const microReceipts = sqliteTable("micro_receipts", {
+  ...base(),
+  document_key: text("document_key").notNull().unique(),
+  expense_id: text("expense_id")
+    .unique()
+    .references(() => expenses.id),
+  request_id: text("request_id").notNull().unique(),
+});
+export const microReceiptLines = sqliteTable("micro_receipt_lines", {
+  ...base(),
+  receipt_id: text("receipt_id")
+    .notNull()
+    .references(() => microReceipts.id),
+  micro_ingredient_id: text("micro_ingredient_id")
+    .notNull()
+    .references(() => microIngredients.id),
+});
+export const microLedgers = sqliteTable("micro_ledgers", {
+  ...base(),
+  micro_ingredient_id: text("micro_ingredient_id")
+    .notNull()
+    .unique()
+    .references(() => microIngredients.id),
+  opening_id: text("opening_id")
+    .notNull()
+    .unique()
+    .references(() => microOpenings.id),
+});
+export const microValuationEvents = sqliteTable(
+  "micro_valuation_events",
+  {
+    ...base(),
+    ledger_id: text("ledger_id")
+      .notNull()
+      .references(() => microLedgers.id),
+    receipt_line_id: text("receipt_line_id")
+      .notNull()
+      .unique()
+      .references(() => microReceiptLines.id),
+    request_id: text("request_id").notNull(),
+    revision: integer("revision").notNull(),
+  },
+  (t) => [
+    uniqueIndex("micro_event_ledger_revision").on(t.ledger_id, t.revision),
+    uniqueIndex("micro_event_ledger_request").on(t.ledger_id, t.request_id),
+  ],
+);

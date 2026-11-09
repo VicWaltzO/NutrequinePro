@@ -280,7 +280,9 @@ test("histórico SQLite: upgrade 0001, atomicidad de gasto/cabecera/líneas, rep
   delete legacy.microPurchaseLines;
   // An old writer does not query the two future tables.
   const { writePlan } = await import("../lib/persistence.mjs");
-  const statements = writePlan(null, initial).filter((row) => !/micro_purchase/.test(row.sql));
+  const statements = writePlan(null, initial).filter(
+    (row) => !/micro_purchase|micro_receipt|micro_ledger|micro_valuation/.test(row.sql),
+  );
   await connection.batch(statements.map((row) => connection.prepare(row.sql).bind(...row.args)));
   connection.close();
   const prior = inspectDatabase(filename, { catalog: oldCatalog });

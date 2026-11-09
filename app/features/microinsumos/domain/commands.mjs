@@ -77,6 +77,12 @@ export function microOpen({ s, p, add }) {
 export function microCorrect({ s, p, correction, clock }) {
   const current = pick(s, "microOpenings", p.id);
   requireValue(p.expected_version === current.version, "El saldo cambió. Recargue antes de corregir.");
+  requireValue(
+    !s.microLedgers.some(
+      (row) => row.micro_ingredient_id === current.micro_ingredient_id && row.ledger.events.length > 0,
+    ),
+    "Apertura bloqueada por movimientos aceptados. La corrección requiere NQP26-35.",
+  );
   const values = openingValues(p);
   requireValue(
     !s.microPurchaseLines.some(

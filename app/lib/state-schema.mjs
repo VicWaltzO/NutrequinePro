@@ -26,6 +26,10 @@ export const TABLES = [
   "expenses",
   "microPurchases",
   "microPurchaseLines",
+  "microReceipts",
+  "microReceiptLines",
+  "microLedgers",
+  "microValuationEvents",
   "inventoryMovements",
   "audit",
 ];
@@ -52,5 +56,9 @@ export const RELATIONS = {
   correctionFields: ["correction_id"],
   microPurchases: ["document_key", "expense_id"],
   microPurchaseLines: ["purchase_id", "micro_ingredient_id"],
+  microReceipts: ["document_key", "expense_id", "request_id"],
+  microReceiptLines: ["receipt_id", "micro_ingredient_id"],
+  microLedgers: ["micro_ingredient_id", "opening_id"],
+  microValuationEvents: ["ledger_id", "receipt_line_id", "request_id", "revision"],
   expenses: ["production_id", "sale_id", "site_id", "ingredient_id"],
 };

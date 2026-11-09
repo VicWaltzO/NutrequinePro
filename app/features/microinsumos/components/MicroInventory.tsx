@@ -1,3 +1,4 @@
+import OperationalPurchases from "./OperationalPurchases";
 import HistoricalPurchases from "./HistoricalPurchases";
 import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import { useEffect, useRef, useState } from "react";
@@ -289,7 +290,19 @@ export default function MicroInventory({
                       {(micro.is_active || row) && (
                         <button
                           aria-label={`${row ? "Corregir saldo" : "Registrar saldo"} de ${micro.name}`}
-                          disabled={busy}
+                          disabled={
+                            busy ||
+                            s.microLedgers.some(
+                              (l) => l.micro_ingredient_id === micro.id && l.ledger.events.length > 0,
+                            )
+                          }
+                          title={
+                            s.microLedgers.some(
+                              (l) => l.micro_ingredient_id === micro.id && l.ledger.events.length > 0,
+                            )
+                              ? "Apertura bloqueada por movimientos aceptados"
+                              : undefined
+                          }
                           onClick={(e) => startOpening(micro, e.currentTarget)}
                         >
                           {row ? "Corregir saldo" : "Registrar saldo"}
@@ -303,6 +316,7 @@ export default function MicroInventory({
           }}
         </SortableTable>
       )}
+      <OperationalPurchases s={s} admin={admin} run={run} busy={busy} />
       <HistoricalPurchases s={s} admin={admin} run={run} busy={busy} />
     </section>
   );

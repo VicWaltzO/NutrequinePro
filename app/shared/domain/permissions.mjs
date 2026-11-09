@@ -4,6 +4,7 @@ export function assertCommandPermission(actor, type) {
   requireValue(["ADMIN", "OPERATOR", "VIEWER"].includes(actor.role), "Rol inválido.");
   requireValue(actor.role !== "VIEWER", "Este usuario solo puede consultar.");
   const adminTypes = [
+    "MICRO_RECEIPT_SAVE",
     "MICRO_PURCHASE_SAVE",
     "MICRO_PURCHASE_CANCEL",
     "MICRO_SAVE",
