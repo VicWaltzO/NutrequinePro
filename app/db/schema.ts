@@ -235,3 +235,52 @@ export const microValuationEvents = sqliteTable(
     uniqueIndex("micro_event_ledger_request").on(t.ledger_id, t.request_id),
   ],
 );
+
+export const microFormulas = sqliteTable(
+  "micro_formulas",
+  {
+    ...base(),
+    family: text("family").notNull(),
+    version: integer("version").notNull(),
+  },
+  (t) => [
+    uniqueIndex("micro_formula_family_version").on(t.family, t.version),
+    check("micro_formula_family", sql`${t.family} IN ('ROSADO','VERDE_AMARILLO')`),
+    check("micro_formula_version", sql`typeof(${t.version}) = 'integer' AND ${t.version} > 0`),
+  ],
+);
+export const microFormulaLines = sqliteTable(
+  "micro_formula_lines",
+  {
+    ...base(),
+    formula_id: text("formula_id")
+      .notNull()
+      .references(() => microFormulas.id),
+    micro_ingredient_id: text("micro_ingredient_id")
+      .notNull()
+      .references(() => microIngredients.id),
+    dose_grams: integer("dose_grams").notNull(),
+  },
+  (t) => [
+    uniqueIndex("micro_formula_line_identity").on(t.formula_id, t.micro_ingredient_id),
+    check(
+      "micro_formula_positive_dose",
+      sql`typeof(${t.dose_grams}) = 'integer' AND ${t.dose_grams} > 0 AND ${t.dose_grams} <= 1000000000000`,
+    ),
+  ],
+);
+export const microFormulaHeads = sqliteTable(
+  "micro_formula_heads",
+  {
+    ...base(),
+    family: text("family").notNull().unique(),
+    active_formula_id: text("active_formula_id")
+      .unique()
+      .references(() => microFormulas.id),
+    version: integer("version").notNull(),
+  },
+  (t) => [
+    check("micro_head_family", sql`${t.family} IN ('ROSADO','VERDE_AMARILLO')`),
+    check("micro_head_version", sql`typeof(${t.version}) = 'integer' AND ${t.version} > 0`),
+  ],
+);

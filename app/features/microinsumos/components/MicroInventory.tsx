@@ -1,3 +1,4 @@
+import MicroFormulas from "./MicroFormulas";
 import OperationalPurchases from "./OperationalPurchases";
 import HistoricalPurchases from "./HistoricalPurchases";
 import { orderNominal } from "@/shared/lib/nominal-order.mjs";
@@ -316,6 +317,7 @@ export default function MicroInventory({
           }}
         </SortableTable>
       )}
+      <MicroFormulas s={s} admin={admin} run={run} busy={busy} />
       <OperationalPurchases s={s} admin={admin} run={run} busy={busy} />
       <HistoricalPurchases s={s} admin={admin} run={run} busy={busy} />
     </section>

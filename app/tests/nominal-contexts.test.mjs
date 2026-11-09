@@ -409,6 +409,10 @@ test("inventario histórico 64 y barrido AST: 31 selectores previos y 2 estados 
   const receipts = "features/microinsumos/components/OperationalPurchases.tsx";
   assert.equal(actual.get(receipts), 1);
   actual.delete(receipts);
+  // NQP26-24: nominal micro selector, synthetic E2E verifies order.
+  const microFormulas = "features/microinsumos/components/MicroFormulas.tsx";
+  assert.equal(actual.get(microFormulas), 1);
+  actual.delete(microFormulas);
   assert.equal(
     [...actual.values()].reduce((a, b) => a + b, 0),
     31,
