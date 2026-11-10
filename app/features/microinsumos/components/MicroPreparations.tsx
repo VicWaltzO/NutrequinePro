@@ -1,32 +1,17 @@
+import { exactKg, type Evaluation } from "./preparation-view";
+import AssignmentActions from "./AssignmentActions";
 import { adminFetch } from "@/client/session-api";
 import { createCommandRequest } from "@/lib/command-request.mjs";
 import { useEffect, useRef, useState } from "react";
 import type { AppState, Submit } from "@/lib/domain-types";
 import { Input, Field } from "@/shared/ui";
 
-interface Evaluation {
-  id: string;
-  sufficiency: "MISSING" | "POTENTIALLY_RESUMABLE";
-  items: {
-    micro_ingredient_id: string;
-    name: string;
-    operational_id: number;
-    required_hundredths: number;
-    available_hundredths: number;
-    missing_hundredths: number;
-    stock_source: string;
-  }[];
-}
 interface Overview {
   can_create: boolean;
   revision: number;
   evaluated_at: string;
   authorizations: { formula_id: string; family: string }[];
   orders: Evaluation[];
-}
-// Exact decimal kg: one hundredth of a gram = 0.00001 kg.
-export function exactKg(value: number) {
-  return `${Math.floor(value / 100000)}.${String(value % 100000).padStart(5, "0")}`;
 }
 export default function MicroPreparations({ s, run, busy }: { s: AppState; run: Submit; busy: boolean }) {
   const [data, setData] = useState<Overview | null>(null);
@@ -85,8 +70,8 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
       <h3 id="micro-preparations-title">Preparaciones pendientes</h3>
       <p>Registre la intención de preparar núcleos. Ningún núcleo se ha preparado ni consumido al guardar.</p>
       <p className="preparation-warning">
-        El saldo es compartido entre órdenes. La suficiencia es informativa: no garantiza atención simultánea,
-        no asigna ni reserva ingredientes.
+        El saldo libre es compartido entre órdenes. La suficiencia es informativa: no garantiza atención
+        simultánea. Elija una orden para asignarle todos sus ingredientes; asignar no consume material.
       </p>
       <button type="button" disabled={busy} onClick={() => setRefresh((value) => value + 1)}>
         Reevaluar materiales
@@ -218,11 +203,13 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
               </h4>
               <p className="preparation-warning">
                 Pendiente
-                {evaluation
-                  ? evaluation.sufficiency === "MISSING"
-                    ? " por faltantes"
-                    : " · Potencialmente reanudable: puede solicitar asignación"
-                  : " · Evaluación pendiente"}
+                {evaluation?.assignment_status === "ASSIGNED"
+                  ? " · Ingredientes asignados, sin consumir"
+                  : evaluation
+                    ? evaluation.sufficiency === "MISSING"
+                      ? " por faltantes"
+                      : " · Potencialmente reanudable: puede solicitar asignación"
+                    : " · Evaluación pendiente"}
               </p>
               <p>
                 Fecha prevista: {order.date} · Fórmula versión {recipe?.version} · {order.formula_id}
@@ -231,6 +218,38 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                 Registrado por {s.users.find((u) => u.id === order.created_by)?.name ?? order.created_by} ·{" "}
                 {order.created_at}
               </p>
+              {data?.can_create && evaluation && (
+                <AssignmentActions
+                  orderId={order.id}
+                  evaluation={evaluation}
+                  revision={data.revision}
+                  run={run}
+                  busy={busy}
+                  onRefresh={() => setRefresh((v) => v + 1)}
+                />
+              )}
+              {s.microAssignments
+                .filter((a) => a.preparation_id === order.id)
+                .map((a) => {
+                  const reversed = s.microAssignmentReversals.find((r) => r.assignment_id === a.id);
+                  return (
+                    <details key={a.id}>
+                      <summary>Historial de asignación · {reversed ? "Revertida" : "Vigente"}</summary>
+                      <p>
+                        Referencia: {a.id} · {a.created_at} ·{" "}
+                        {s.users.find((u) => u.id === a.created_by)?.name ?? a.created_by}
+                      </p>
+                      <p>Motivo: {a.reason}</p>
+                      {reversed && (
+                        <p>
+                          Reversión: {reversed.id} · {reversed.created_at} ·{" "}
+                          {s.users.find((u) => u.id === reversed.created_by)?.name ?? reversed.created_by} ·{" "}
+                          {reversed.reason}
+                        </p>
+                      )}
+                    </details>
+                  );
+                })}
               <details>
                 <summary>Necesidades y faltantes por microinsumo</summary>
                 {evaluation?.items.map((item) => (
@@ -239,7 +258,9 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                       ID {item.operational_id} · {item.name}
                     </strong>
                     <p>
-                      Requerido: {exactKg(item.required_hundredths)} kg · Disponible:{" "}
+                      Requerido: {exactKg(item.required_hundredths)} kg · Asignado a esta orden:{" "}
+                      {exactKg(item.own_assigned_hundredths)} kg · Físico: {exactKg(item.physical_hundredths)}{" "}
+                      kg · Asignado total: {exactKg(item.assigned_hundredths)} kg · Libre:{" "}
                       {exactKg(item.available_hundredths)} kg · Faltante: {exactKg(item.missing_hundredths)}{" "}
                       kg
                     </p>

@@ -1,4 +1,5 @@
 import MicroPreparations from "./MicroPreparations";
+import { exactKg } from "./preparation-view";
 import MicroFormulas from "./MicroFormulas";
 import OperationalPurchases from "./OperationalPurchases";
 import HistoricalPurchases from "./HistoricalPurchases";
@@ -66,6 +67,19 @@ export default function MicroInventory({
     setSource(row?.source ?? "");
     setNotes(row?.notes ?? "");
     setReason("");
+  };
+  const balances = (id: string) => {
+    const ledger = s.microLedgers.find((l) => l.micro_ingredient_id === id && l.ledger.events.length > 0);
+    const opening = s.microOpenings.find((o) => o.micro_ingredient_id === id);
+    const physical = (ledger?.ledger.quantity_grams ?? opening?.quantity_grams ?? 0) * 100;
+    const assigned = s.microAssignmentLines
+      .filter(
+        (l) =>
+          l.micro_ingredient_id === id &&
+          !s.microAssignmentReversals.some((r) => r.assignment_id === l.assignment_id),
+      )
+      .reduce((sum, l) => sum + l.quantity_hundredths, 0);
+    return { physical, assigned, free: physical - assigned };
   };
   const rows = orderNominal(
     s.microIngredients.filter((x) =>
@@ -222,6 +236,7 @@ export default function MicroInventory({
             "ID operativo",
             "Estado",
             "Saldo inicial (kg)",
+            "Físico / asignado / libre (kg)",
             "Medición",
             "Fecha de corte",
             "Valor inicial",
@@ -233,6 +248,7 @@ export default function MicroInventory({
             (x) => x.operational_id,
             (x) => (x.is_active ? "Activo" : "Inactivo"),
             (x) => s.microOpenings.find((o) => o.micro_ingredient_id === x.id)?.quantity_grams ?? null,
+            (x) => balances(x.id).free,
             null,
             (x) => s.microOpenings.find((o) => o.micro_ingredient_id === x.id)?.cutoff_date ?? null,
             (x) => s.microOpenings.find((o) => o.micro_ingredient_id === x.id)?.valuation_cents ?? null,
@@ -276,6 +292,11 @@ export default function MicroInventory({
                 <td>{micro.operational_id}</td>
                 <td>{micro.is_active ? "Activo" : "Inactivo"}</td>
                 <td>{row ? kg(row.quantity_grams) : "Sin registrar"}</td>
+                <td>
+                  <p>Físico: {exactKg(balances(micro.id).physical)}</p>
+                  <p>Asignado: {exactKg(balances(micro.id).assigned)}</p>
+                  <p>Libre: {exactKg(balances(micro.id).free)}</p>
+                </td>
                 <td>{row ? (row.measurement === "REAL" ? "Real" : "Estimada") : "—"}</td>
                 <td>{row?.cutoff_date ?? "—"}</td>
                 <td>{row?.valuation_cents == null ? "Desconocido" : money(row.valuation_cents)}</td>
