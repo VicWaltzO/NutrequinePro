@@ -375,7 +375,27 @@ export interface MicroPreparation extends Entity {
   authorization_reference: string;
   request_id: string;
 }
+export interface MicroAssignment extends Entity {
+  preparation_id: string;
+  request_id: string;
+  reason: string;
+  authorization_reference: string;
+}
+export interface MicroAssignmentLine extends Entity {
+  assignment_id: string;
+  formula_line_id: string;
+  micro_ingredient_id: string;
+  quantity_hundredths: number;
+}
+export interface MicroAssignmentReversal extends Entity {
+  assignment_id: string;
+  request_id: string;
+  reason: string;
+}
 export interface Tables {
+  microAssignments: MicroAssignment[];
+  microAssignmentLines: MicroAssignmentLine[];
+  microAssignmentReversals: MicroAssignmentReversal[];
   microPreparations: MicroPreparation[];
   users: User[];
   customers: Customer[];

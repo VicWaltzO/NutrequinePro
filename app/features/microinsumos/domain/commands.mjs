@@ -1,3 +1,4 @@
+import { assignedHundredths } from "./assignment-balances.mjs";
 import { requireValue, text, pick, scaled, date, roundedProduct } from "../../../shared/domain/core.mjs";
 
 function decimal(value, digits) {
@@ -97,6 +98,10 @@ export function microCorrect({ s, p, correction, clock }) {
         ),
     ),
     "El corte dejaría compras históricas fuera de período. Revise sus vínculos primero.",
+  );
+  requireValue(
+    values.quantity_grams * 100 >= assignedHundredths(s, current.micro_ingredient_id),
+    "La apertura no puede reducirse por debajo del stock asignado. Revierta la asignación primero.",
   );
   const reason = literal(p.reason, "Motivo de corrección");
   correction(

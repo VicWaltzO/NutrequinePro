@@ -68,7 +68,7 @@ async function commercialState(filename) {
               .batch(
                 statements.filter(
                   (statement) =>
-                    !/micro_preparations|micro_formulas|micro_formula_lines|micro_formula_heads|micro_ingredients|micro_openings|micro_purchases|micro_purchase_lines|micro_receipts|micro_receipt_lines|micro_ledgers|micro_valuation_events/.test(
+                    !/micro_assignments|micro_assignment_lines|micro_assignment_reversals|micro_preparations|micro_formulas|micro_formula_lines|micro_formula_heads|micro_ingredients|micro_openings|micro_purchases|micro_purchase_lines|micro_receipts|micro_receipt_lines|micro_ledgers|micro_valuation_events/.test(
                       statement.sql,
                     ),
                 ),
@@ -77,7 +77,7 @@ async function commercialState(filename) {
                 if (statements.length === TABLES.length + 1) {
                   let index = 0;
                   return statements.map((statement) =>
-                    /micro_preparations|micro_formulas|micro_formula_lines|micro_formula_heads|micro_ingredients|micro_openings|micro_purchases|micro_purchase_lines|micro_receipts|micro_receipt_lines|micro_ledgers|micro_valuation_events/.test(
+                    /micro_assignments|micro_assignment_lines|micro_assignment_reversals|micro_preparations|micro_formulas|micro_formula_lines|micro_formula_heads|micro_ingredients|micro_openings|micro_purchases|micro_purchase_lines|micro_receipts|micro_receipt_lines|micro_ledgers|micro_valuation_events/.test(
                       statement.sql,
                     )
                       ? { results: [] }
@@ -183,7 +183,7 @@ test("SQLite administración: inicialización explícita y vacía, sin bootstrap
   const initial = inspectDatabase(f.filename, { catalog });
   assert.equal(initial.status, "managed");
   assert.equal(initial.version, catalog.migrations.length);
-  assert.equal(initial.tables.length, 40);
+  assert.equal(initial.tables.length, 43);
   assert.equal(initial.tables.find((table) => table.name === "users").count, 0);
   assert.equal(initial.tables.find((table) => table.name === "settings").count, 0);
   const bytes = readFileSync(f.filename);

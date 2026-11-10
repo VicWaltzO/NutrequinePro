@@ -82,7 +82,11 @@ export function createStore(getDatabase, options = {}) {
         (entry) =>
           entry.request_id === command.request_id &&
           entry.created_by !== actor.id &&
-          (command.type === "MICRO_RECEIPT_SAVE" ||
+          (command.type === "MICRO_ASSIGN" ||
+            entry.action === "MICRO_ASSIGN" ||
+            command.type === "MICRO_ASSIGNMENT_REVERSE" ||
+            entry.action === "MICRO_ASSIGNMENT_REVERSE" ||
+            command.type === "MICRO_RECEIPT_SAVE" ||
             entry.action === "MICRO_RECEIPT_SAVE" ||
             command.type === "MICRO_PREPARATION_CREATE" ||
             entry.action === "MICRO_PREPARATION_CREATE"),

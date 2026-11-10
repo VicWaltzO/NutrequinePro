@@ -1,3 +1,4 @@
+import { activeAssignment, assignedHundredths } from "./assignment-balances.mjs";
 import { date, pick, requireValue, text } from "../../../shared/domain/core.mjs";
 import { nucleusHundredths } from "../../../shared/domain/production-quantities.mjs";
 import { MICRO_FAMILIES, microFormulaRequirement } from "./formulas.mjs";
@@ -111,6 +112,7 @@ export function microPreparationCreate({ s, p, add, request_id, microPreparation
 export function evaluatePreparation(s, order, evaluated_at) {
   const lines = s.microFormulaLines.filter((line) => line.formula_id === order.formula_id);
   const requirements = microFormulaRequirement(lines, String(order.nuclei_hundredths / 100));
+  const assignment = activeAssignment(s, order.id);
   const items = requirements.map((requirement, i) => {
     const id = requirement.micro_ingredient_id;
     const ledger = s.microLedgers.find(
@@ -120,6 +122,12 @@ export function evaluatePreparation(s, order, evaluated_at) {
     const grams = ledger?.ledger.quantity_grams ?? opening?.quantity_grams ?? 0;
     requireValue(Number.isSafeInteger(grams) && grams >= 0 && grams <= 1e12, "Saldo físico inválido.");
     const available = grams * 100; // Up to 1e14: still an exact safe integer.
+    const committed = assignedHundredths(s, id);
+    const own = assignment
+      ? (s.microAssignmentLines.find((l) => l.assignment_id === assignment.id && l.micro_ingredient_id === id)
+          ?.quantity_hundredths ?? 0)
+      : 0;
+    const free = Math.max(0, available - committed);
     let stock_source = "UNRECORDED";
     if (ledger) stock_source = "LEDGER";
     else if (opening) stock_source = "OPENING";
@@ -128,13 +136,18 @@ export function evaluatePreparation(s, order, evaluated_at) {
       name: lines[i].name_snapshot,
       operational_id: lines[i].operational_id_snapshot,
       required_hundredths: requirement.grams_hundredths,
-      available_hundredths: available,
-      missing_hundredths: Math.max(0, requirement.grams_hundredths - available),
+      physical_hundredths: available,
+      assigned_hundredths: committed,
+      own_assigned_hundredths: own,
+      available_hundredths: free,
+      missing_hundredths: Math.max(0, requirement.grams_hundredths - own - free),
       stock_source,
     };
   });
   return {
     id: order.id,
+    assignment_id: assignment?.id ?? null,
+    assignment_status: assignment ? "ASSIGNED" : "UNASSIGNED",
     evaluated_at,
     revision: s.revision,
     sufficiency:

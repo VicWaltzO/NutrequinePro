@@ -137,11 +137,14 @@ test(
       area
         .locator(".preparation-record")
         .first()
-        .getByText("Requerido: 0.02000 kg · Disponible: 0.00500 kg · Faltante: 0.01500 kg", {
-          exact: true,
-        }),
+        .getByText(
+          "Requerido: 0.02000 kg · Asignado a esta orden: 0.00000 kg · Físico: 0.00500 kg · Asignado total: 0.00000 kg · Libre: 0.00500 kg · Faltante: 0.01500 kg",
+          {
+            exact: true,
+          },
+        ),
     ).toBeVisible();
-    await expect(area.getByText("El saldo es compartido", { exact: false })).toBeVisible();
+    await expect(area.getByText("El saldo libre es compartido", { exact: false })).toBeVisible();
     await page.getByText("Operación registrada.", { exact: true }).waitFor({ state: "hidden" });
     for (const width of [1440, 390])
       for (const theme of ["light", "dark"]) {

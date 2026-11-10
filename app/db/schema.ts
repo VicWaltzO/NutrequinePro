@@ -304,3 +304,42 @@ export const microPreparations = sqliteTable(
     ),
   ],
 );
+
+export const microAssignments = sqliteTable("micro_assignments", {
+  ...base(),
+  preparation_id: text("preparation_id")
+    .notNull()
+    .references(() => microPreparations.id),
+  request_id: text("request_id").notNull().unique(),
+});
+export const microAssignmentLines = sqliteTable(
+  "micro_assignment_lines",
+  {
+    ...base(),
+    assignment_id: text("assignment_id")
+      .notNull()
+      .references(() => microAssignments.id),
+    formula_line_id: text("formula_line_id")
+      .notNull()
+      .references(() => microFormulaLines.id),
+    micro_ingredient_id: text("micro_ingredient_id")
+      .notNull()
+      .references(() => microIngredients.id),
+    quantity_hundredths: integer("quantity_hundredths").notNull(),
+  },
+  (t) => [
+    uniqueIndex("micro_assignment_line_identity").on(t.assignment_id, t.micro_ingredient_id),
+    check(
+      "micro_assignment_quantity",
+      sql`typeof(${t.quantity_hundredths}) = 'integer' AND ${t.quantity_hundredths} > 0 AND ${t.quantity_hundredths} <= 9007199254740991`,
+    ),
+  ],
+);
+export const microAssignmentReversals = sqliteTable("micro_assignment_reversals", {
+  ...base(),
+  assignment_id: text("assignment_id")
+    .notNull()
+    .unique()
+    .references(() => microAssignments.id),
+  request_id: text("request_id").notNull().unique(),
+});
