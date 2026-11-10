@@ -28,6 +28,10 @@ export function microAssign({ s, p, add, request_id, microPreparationPolicies, c
     !activeAssignment(s, order.id),
     "Esta orden ya tiene ingredientes asignados; no se duplicó la asignación.",
   );
+  requireValue(
+    !s.microConfirmations.some((c) => c.preparation_id === order.id),
+    "Preparación cerrada definitivamente.",
+  );
   const formula = pick(s, "microFormulas", order.formula_id);
   const approval = preparationAuthorization(
     s,
@@ -73,6 +77,10 @@ export function microAssignmentReverse({ s, p, add, request_id }) {
   requireValue(
     !s.microAssignmentReversals.some((r) => r.assignment_id === assignment.id),
     "La asignación ya fue revertida.",
+  );
+  requireValue(
+    !s.microConfirmations.some((c) => c.assignment_id === assignment.id),
+    "Asignación consumida; reversión incompatible.",
   );
   return add("microAssignmentReversals", { assignment_id: assignment.id, request_id, reason }).id;
 }

@@ -1,7 +1,7 @@
 import { sqliteTable, text, integer, index, uniqueIndex, check } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
-// Amounts inside data are integer céntimos; weights are integer grams.
+// Amounts inside data are integer céntimos; micro fields named hundredths use 0.01 g.
 // JSON keeps historical snapshots intact; foreign keys enforce entity links.
 const base = () => ({ id: text("id").primaryKey(), data: text("data").notNull() });
 export const settings = sqliteTable("settings", {
@@ -343,3 +343,63 @@ export const microAssignmentReversals = sqliteTable("micro_assignment_reversals"
     .references(() => microAssignments.id),
   request_id: text("request_id").notNull().unique(),
 });
+
+export const microConfirmations = sqliteTable(
+  "micro_confirmations",
+  {
+    ...base(),
+    preparation_id: text("preparation_id")
+      .notNull()
+      .unique()
+      .references(() => microPreparations.id),
+    assignment_id: text("assignment_id")
+      .notNull()
+      .unique()
+      .references(() => microAssignments.id),
+    formula_id: text("formula_id")
+      .notNull()
+      .references(() => microFormulas.id),
+    request_id: text("request_id").notNull().unique(),
+    nuclei_hundredths: integer("nuclei_hundredths").notNull(),
+  },
+  (t) => [
+    check(
+      "micro_confirmation_quantity",
+      sql`typeof(${t.nuclei_hundredths}) = 'integer' AND ${t.nuclei_hundredths} > 0 AND ${t.nuclei_hundredths} <= 1000000000`,
+    ),
+  ],
+);
+export const microIssues = sqliteTable(
+  "micro_issues",
+  {
+    ...base(),
+    confirmation_id: text("confirmation_id")
+      .notNull()
+      .references(() => microConfirmations.id),
+    assignment_line_id: text("assignment_line_id")
+      .notNull()
+      .unique()
+      .references(() => microAssignmentLines.id),
+    formula_line_id: text("formula_line_id")
+      .notNull()
+      .references(() => microFormulaLines.id),
+    micro_ingredient_id: text("micro_ingredient_id")
+      .notNull()
+      .references(() => microIngredients.id),
+    ledger_id: text("ledger_id")
+      .notNull()
+      .references(() => microLedgers.id),
+    request_id: text("request_id").notNull(),
+    revision: integer("revision").notNull(),
+    quantity_hundredths: integer("quantity_hundredths").notNull(),
+  },
+  (t) => [
+    uniqueIndex("micro_issue_identity").on(t.confirmation_id, t.micro_ingredient_id),
+    uniqueIndex("micro_issue_ledger_revision").on(t.ledger_id, t.revision),
+    uniqueIndex("micro_issue_ledger_request").on(t.ledger_id, t.request_id),
+    check(
+      "micro_issue_quantity",
+      sql`typeof(${t.quantity_hundredths}) = 'integer' AND ${t.quantity_hundredths} > 0 AND ${t.quantity_hundredths} <= 100000000000000`,
+    ),
+  ],
+);

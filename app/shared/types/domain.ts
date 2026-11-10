@@ -1,4 +1,4 @@
-/** Stored amounts are integer cents and stored weights are integer grams. */
+/** Stored money uses integer cents/rationals; micro hundredths explicitly denote 0.01 g. */
 export interface Entity {
   id: string;
   created_at?: string;
@@ -126,10 +126,17 @@ export interface MicroReceiptLine extends Entity {
   is_current: boolean;
   version: number;
 }
+/** v2 quantity_hundredths is canonical; quantity_grams is a presentation projection. */
 export interface MicroLedger extends Entity {
   micro_ingredient_id: string;
   opening_id: string;
-  ledger: { quantity_grams: number; value_cents: Rational | null; revision: number; events: unknown[] };
+  ledger: {
+    quantity_hundredths?: number;
+    quantity_grams: number;
+    value_cents: Rational | null;
+    revision: number;
+    events: unknown[];
+  };
 }
 export interface MicroValuationEvent extends Entity {
   ledger_id: string;
@@ -392,7 +399,33 @@ export interface MicroAssignmentReversal extends Entity {
   request_id: string;
   reason: string;
 }
+export interface MicroConfirmation extends Entity {
+  preparation_id: string;
+  assignment_id: string;
+  formula_id: string;
+  request_id: string;
+  nuclei_hundredths: number;
+  date: string;
+  authorization_reference: string;
+  total_cost_cents: Rational;
+  unit_cost_cents: Rational;
+  posted_cost_cents: string;
+}
+export interface MicroIssue extends Entity {
+  confirmation_id: string;
+  assignment_line_id: string;
+  formula_line_id: string;
+  micro_ingredient_id: string;
+  ledger_id: string;
+  request_id: string;
+  revision: number;
+  quantity_hundredths: number;
+  released_hundredths: number;
+  event: unknown;
+}
 export interface Tables {
+  microConfirmations: MicroConfirmation[];
+  microIssues: MicroIssue[];
   microAssignments: MicroAssignment[];
   microAssignmentLines: MicroAssignmentLine[];
   microAssignmentReversals: MicroAssignmentReversal[];

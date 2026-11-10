@@ -1,3 +1,4 @@
+import { valuationHundredths } from "./valuation.mjs";
 import { activeAssignment, assignedHundredths } from "./assignment-balances.mjs";
 import { date, pick, requireValue, text } from "../../../shared/domain/core.mjs";
 import { nucleusHundredths } from "../../../shared/domain/production-quantities.mjs";
@@ -119,9 +120,7 @@ export function evaluatePreparation(s, order, evaluated_at) {
       (row) => row.micro_ingredient_id === id && row.ledger.events.length > 0,
     );
     const opening = s.microOpenings.find((row) => row.micro_ingredient_id === id);
-    const grams = ledger?.ledger.quantity_grams ?? opening?.quantity_grams ?? 0;
-    requireValue(Number.isSafeInteger(grams) && grams >= 0 && grams <= 1e12, "Saldo físico inválido.");
-    const available = grams * 100; // Up to 1e14: still an exact safe integer.
+    const available = ledger ? valuationHundredths(ledger.ledger) : (opening?.quantity_grams ?? 0) * 100; // Up to 1e14: still an exact safe integer.
     const committed = assignedHundredths(s, id);
     const own = assignment
       ? (s.microAssignmentLines.find((l) => l.assignment_id === assignment.id && l.micro_ingredient_id === id)
@@ -146,6 +145,8 @@ export function evaluatePreparation(s, order, evaluated_at) {
   });
   return {
     id: order.id,
+    status: s.microConfirmations.some((c) => c.preparation_id === order.id) ? "CONFIRMED" : "PENDING",
+    confirmation_id: s.microConfirmations.find((c) => c.preparation_id === order.id)?.id ?? null,
     assignment_id: assignment?.id ?? null,
     assignment_status: assignment ? "ASSIGNED" : "UNASSIGNED",
     evaluated_at,

@@ -2,6 +2,7 @@ import { TABLES, SQL_NAMES, seedState, executeCommand, DomainError } from "./dom
 import { writePlan } from "./persistence.mjs";
 import { assertCommandPermission } from "../shared/domain/permissions.mjs";
 import { assertEquivalentReplay } from "./command-replay.mjs";
+import { assertConfirmationIntegrity } from "../features/microinsumos/domain/confirmation-integrity.mjs";
 export function createStore(getDatabase, options = {}) {
   async function loadState() {
     const binding = getDatabase();
@@ -21,6 +22,7 @@ export function createStore(getDatabase, options = {}) {
     };
   }
   async function persistState(before, after) {
+    assertConfirmationIntegrity(after);
     const binding = getDatabase();
     const statements = writePlan(before, after).map((statement) =>
       binding.prepare(statement.sql).bind(...statement.args),
@@ -82,7 +84,9 @@ export function createStore(getDatabase, options = {}) {
         (entry) =>
           entry.request_id === command.request_id &&
           entry.created_by !== actor.id &&
-          (command.type === "MICRO_ASSIGN" ||
+          (command.type === "MICRO_PREPARATION_CONFIRM" ||
+            entry.action === "MICRO_PREPARATION_CONFIRM" ||
+            command.type === "MICRO_ASSIGN" ||
             entry.action === "MICRO_ASSIGN" ||
             command.type === "MICRO_ASSIGNMENT_REVERSE" ||
             entry.action === "MICRO_ASSIGNMENT_REVERSE" ||

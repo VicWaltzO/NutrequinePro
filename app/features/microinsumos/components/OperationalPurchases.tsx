@@ -1,3 +1,4 @@
+import { exactKg } from "./preparation-view";
 import { useEffect, useRef, useState } from "react";
 import type { AppState, Submit, MicroReceipt } from "@/lib/domain-types";
 import { Input, Field, money, kg } from "@/shared/ui";
@@ -273,12 +274,12 @@ export default function OperationalPurchases({
             return (
               <li key={l.id}>
                 {s.microIngredients.find((m) => m.id === l.micro_ingredient_id)?.name} · Stock físico:{" "}
-                {kg(l.ledger.quantity_grams)} kg · Valor:{" "}
+                {exactKg(l.ledger.quantity_hundredths ?? l.ledger.quantity_grams * 100)} kg · Valor:{" "}
                 {value ? roundedMoney(BigInt(value.n), BigInt(value.d)) : "Desconocido"} · Costo medio/kg:{" "}
                 {value && l.ledger.quantity_grams > 0
                   ? roundedMoney(
-                      BigInt(value.n) * BigInt(1000),
-                      BigInt(value.d) * BigInt(l.ledger.quantity_grams),
+                      BigInt(value.n) * BigInt(100000),
+                      BigInt(value.d) * BigInt(l.ledger.quantity_hundredths ?? l.ledger.quantity_grams * 100),
                     )
                   : "Sin stock"}
               </li>

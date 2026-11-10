@@ -20,3 +20,10 @@ export interface Evaluation {
 export function exactKg(value: number) {
   return `${Math.floor(value / 100000)}.${String(value % 100000).padStart(5, "0")}`;
 }
+
+export function rationalMoney(value: { n: string; d: string }) {
+  const n = BigInt(value.n);
+  const d = BigInt(value.d);
+  const cents = (n * BigInt(2) + d) / (BigInt(2) * d);
+  return `S/ ${cents / BigInt(100)}.${String(cents % BigInt(100)).padStart(2, "0")}`;
+}

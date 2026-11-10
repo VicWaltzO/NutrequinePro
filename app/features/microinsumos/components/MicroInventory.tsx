@@ -71,12 +71,15 @@ export default function MicroInventory({
   const balances = (id: string) => {
     const ledger = s.microLedgers.find((l) => l.micro_ingredient_id === id && l.ledger.events.length > 0);
     const opening = s.microOpenings.find((o) => o.micro_ingredient_id === id);
-    const physical = (ledger?.ledger.quantity_grams ?? opening?.quantity_grams ?? 0) * 100;
+    const physical =
+      ledger?.ledger.quantity_hundredths ??
+      (ledger?.ledger.quantity_grams ?? opening?.quantity_grams ?? 0) * 100;
     const assigned = s.microAssignmentLines
       .filter(
         (l) =>
           l.micro_ingredient_id === id &&
-          !s.microAssignmentReversals.some((r) => r.assignment_id === l.assignment_id),
+          !s.microAssignmentReversals.some((r) => r.assignment_id === l.assignment_id) &&
+          !s.microConfirmations.some((c) => c.assignment_id === l.assignment_id),
       )
       .reduce((sum, l) => sum + l.quantity_hundredths, 0);
     return { physical, assigned, free: physical - assigned };
