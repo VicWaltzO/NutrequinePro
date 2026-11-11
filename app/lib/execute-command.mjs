@@ -1,3 +1,4 @@
+import { microPreparationConfirm } from "../features/microinsumos/domain/confirmations.mjs";
 import { microAssign, microAssignmentReverse } from "../features/microinsumos/domain/assignments.mjs";
 import { microPreparationCreate } from "../features/microinsumos/domain/preparations.mjs";
 import { microFormulaSave, microFormulaActivate } from "../features/microinsumos/domain/formulas.mjs";
@@ -44,6 +45,7 @@ import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-deliver
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 import { operationalSave } from "../features/microinsumos/domain/operational-purchases.mjs";
 const handlers = {
+  MICRO_PREPARATION_CONFIRM: microPreparationConfirm,
   MICRO_ASSIGN: microAssign,
   MICRO_ASSIGNMENT_REVERSE: microAssignmentReverse,
   MICRO_PREPARATION_CREATE: microPreparationCreate,
@@ -122,7 +124,10 @@ export function executeCommand(original, command, actor, clock = new Date().toIS
         if (table === "productionProducts" && field === "nuclei_count") nucleusHundredths(value);
         else if (table === "productionCosts" && row.category === "NUCLEUS" && field === "quantity")
           scaled(value);
-        else safe(value);
+        else if (["microIssues", "microAssignmentLines"].includes(table) && field.endsWith("hundredths")) {
+          if (!Number.isSafeInteger(value) || value < 0 || value > 1e14)
+            fail("Cantidad centesimal fuera de rango.");
+        } else safe(value);
       }
   if (!type.startsWith("MICRO_")) refresh();
   add("audit", {

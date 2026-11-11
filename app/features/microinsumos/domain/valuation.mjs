@@ -85,7 +85,7 @@ function eventInput(input) {
     "micro_ingredient_id",
     "type",
     "date",
-    "quantity_grams",
+    Object.hasOwn(input, "quantity_hundredths") ? "quantity_hundredths" : "quantity_grams",
     "expected_revision",
   ];
   requireValue(["RECEIPT", "ISSUE"].includes(input.type), "Evento de valoración no admitido.");
@@ -100,12 +100,28 @@ function eventInput(input) {
     micro_ingredient_id: identifier(input.micro_ingredient_id),
     type: input.type,
     date: date(input.date),
-    quantity_grams: integer(input.quantity_grams, "Gramos", true),
+    ...(Object.hasOwn(input, "quantity_hundredths")
+      ? { quantity_hundredths: hundredths(input.quantity_hundredths, true) }
+      : { quantity_grams: integer(input.quantity_grams, "Gramos", true) }),
     expected_revision: integer(input.expected_revision, "Revisión"),
   };
   if (input.type === "RECEIPT")
     result.total_cost_cents = integer(input.total_cost_cents, "Costo de recepción");
+  requireValue(
+    input.type === "ISSUE" || !Object.hasOwn(input, "quantity_hundredths"),
+    "Recepción requiere gramos enteros.",
+  );
   return result;
+}
+function hundredths(value, positive = false) {
+  requireValue(
+    Number.isSafeInteger(value) && value >= (positive ? 1 : 0) && value <= LIMIT * 100,
+    "Centésimas fuera de rango.",
+  );
+  return value;
+}
+export function valuationHundredths(ledger) {
+  return hundredths(ledger.quantity_hundredths ?? ledger.quantity_grams * 100);
 }
 function advance(ledger, input, actorId, identities) {
   requireValue(ledger.events.length < MAX_EVENTS, "Límite de eventos alcanzado.");
@@ -126,32 +142,42 @@ function advance(ledger, input, actorId, identities) {
   );
   // This accumulator is rebuilt privately. Never mutate the caller's ledger.
   const next = ledger;
+  const precise = ledger.contract_version === 2 || Object.hasOwn(input, "quantity_hundredths");
+  const physical = precise ? valuationHundredths(ledger) : ledger.quantity_grams;
+  const quantity = precise ? (input.quantity_hundredths ?? input.quantity_grams * 100) : input.quantity_grams;
+  const perKg = precise ? 100000 : 1000;
+  let balance = physical;
   let snapshot = null;
   if (input.type === "RECEIPT") {
-    next.quantity_grams = integer(ledger.quantity_grams + input.quantity_grams, "Saldo gramos");
+    balance = precise ? hundredths(physical + quantity) : integer(physical + quantity, "Saldo gramos");
     next.value_cents = add(ledger.value_cents, fraction(BigInt(input.total_cost_cents)));
   } else {
-    requireValue(input.quantity_grams <= ledger.quantity_grams, "Stock insuficiente.");
-    const cost = prorate(ledger.value_cents, input.quantity_grams, ledger.quantity_grams);
+    requireValue(quantity <= physical, "Stock insuficiente.");
+    const cost = prorate(ledger.value_cents, quantity, physical);
     const cumulative = add(ledger.issued_exact_cents, cost);
     const posted = round(cumulative);
     snapshot = {
-      average_cents_per_kg: prorate(ledger.value_cents, 1000, ledger.quantity_grams),
+      average_cents_per_kg: prorate(ledger.value_cents, perKg, physical),
       exact_cost_cents: cost,
       posted_cost_cents: String(posted - BigInt(ledger.issued_posted_cents)),
     };
-    next.quantity_grams -= input.quantity_grams;
+    balance -= quantity;
     next.value_cents = subtract(ledger.value_cents, cost);
     next.issued_exact_cents = cumulative;
     next.issued_posted_cents = String(posted);
     next.rounding_carry_cents = subtract(cumulative, fraction(posted));
+  }
+  next.quantity_grams = precise ? balance / 100 : balance;
+  if (precise) {
+    next.contract_version = 2;
+    next.quantity_hundredths = balance;
   }
   requireValue(
     BigInt(next.value_cents.n) >= 0 && (next.quantity_grams !== 0 || next.value_cents.n === "0"),
     "Saldo inconsistente.",
   );
   // Every accepted balance must remain readable and usable by the next issue.
-  if (next.quantity_grams > 0) prorate(next.value_cents, 1000, next.quantity_grams);
+  if (balance > 0) prorate(next.value_cents, perKg, balance);
   next.revision++;
   next.events.push({ input, actor_id: actorId, revision: next.revision, snapshot });
   identities.ids.add(input.id);
@@ -193,6 +219,35 @@ export function applyValuation(ledger, event, actor) {
     requests: new Set(current.events.map((row) => row.input.request_id)),
   });
 }
+// Production permission is intentionally limited to ISSUE, never receipts or opening edits.
+export function issueValuation(ledger, event, actor) {
+  permission(actor, false);
+  requireValue(["ADMIN", "OPERATOR"].includes(actor.role) && event.type === "ISSUE", "Salida no autorizada.");
+  const current = validated(ledger);
+  const input = eventInput(event);
+  const duplicate = current.events.find((row) => row.input.request_id === input.request_id);
+  if (duplicate) {
+    requireValue(
+      duplicate.actor_id === actor.id && JSON.stringify(duplicate.input) === JSON.stringify(input),
+      "Reintento con identidad o datos diferentes.",
+    );
+    return current;
+  }
+  return advance(current, input, actor.id, {
+    ids: new Set(current.events.map((row) => row.input.id)),
+    requests: new Set(current.events.map((row) => row.input.request_id)),
+  });
+}
+export function createIssueValuation(opening, actor) {
+  permission(actor, false);
+  requireValue(["ADMIN", "OPERATOR"].includes(actor.role), "Salida no autorizada.");
+  return initial(openingSnapshot(opening));
+}
+export function summarizeIssueCosts(costs, nucleiHundredths) {
+  let total = zero();
+  for (const cost of costs) total = add(total, cost);
+  return { total_cost_cents: total, unit_cost_cents: prorate(total, 100, nucleiHundredths) };
+}
 export function inspectValuation(ledger, actor) {
   permission(actor, false);
   const current = validated(ledger);
@@ -201,7 +256,7 @@ export function inspectValuation(ledger, actor) {
     average_cents_per_kg:
       current.quantity_grams === 0 || current.value_cents === null
         ? null
-        : prorate(current.value_cents, 1000, current.quantity_grams),
+        : prorate(current.value_cents, 100000, valuationHundredths(current)),
   };
 }
 export function assertValuationOpening(ledger, opening, actor) {

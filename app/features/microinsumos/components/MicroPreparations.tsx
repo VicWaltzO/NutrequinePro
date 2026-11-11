@@ -1,4 +1,5 @@
-import { exactKg, type Evaluation } from "./preparation-view";
+import ConfirmationActions from "./ConfirmationActions";
+import { exactKg, rationalMoney, type Evaluation } from "./preparation-view";
 import AssignmentActions from "./AssignmentActions";
 import { adminFetch } from "@/client/session-api";
 import { createCommandRequest } from "@/lib/command-request.mjs";
@@ -14,6 +15,12 @@ interface Overview {
   orders: Evaluation[];
 }
 export default function MicroPreparations({ s, run, busy }: { s: AppState; run: Submit; busy: boolean }) {
+  const seenConfirmations = useRef(new Set(s.microConfirmations.map((c) => c.id)));
+  useEffect(() => {
+    const added = s.microConfirmations.find((c) => !seenConfirmations.current.has(c.id));
+    seenConfirmations.current = new Set(s.microConfirmations.map((c) => c.id));
+    if (added) document.getElementById(`confirmation-${added.id}`)?.focus();
+  }, [s.microConfirmations]);
   const [data, setData] = useState<Overview | null>(null);
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
@@ -42,7 +49,7 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
         }
       } catch (e) {
         if (current && !controller.signal.aborted) {
-          setData(null);
+          // Retain the last evaluation so a transport-uncertain operation keeps its request ID.
           setError(e instanceof Error ? e.message : "No se pudo consultar.");
         }
       }
@@ -194,6 +201,13 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
         .reverse()
         .map((order) => {
           const evaluation = data?.orders.find((entry) => entry.id === order.id);
+          const confirmation = s.microConfirmations.find((c) => c.preparation_id === order.id);
+          // Keep a transport-uncertain confirmation mounted until its stable replay resolves.
+          const locallyAssigned = s.microAssignments.some(
+            (a) =>
+              a.preparation_id === order.id &&
+              !s.microAssignmentReversals.some((r) => r.assignment_id === a.id),
+          );
           const recipe = s.microFormulas.find((f) => f.id === order.formula_id);
           return (
             <article key={order.id} className="preparation-record" aria-label={`Preparación ${order.id}`}>
@@ -202,14 +216,15 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                 núcleos planificados
               </h4>
               <p className="preparation-warning">
-                Pendiente
-                {evaluation?.assignment_status === "ASSIGNED"
-                  ? " · Ingredientes asignados, sin consumir"
-                  : evaluation
-                    ? evaluation.sufficiency === "MISSING"
-                      ? " por faltantes"
-                      : " · Potencialmente reanudable: puede solicitar asignación"
-                    : " · Evaluación pendiente"}
+                {confirmation ? "Cerrada definitivamente" : "Pendiente"}
+                {!confirmation &&
+                  (evaluation?.assignment_status === "ASSIGNED"
+                    ? " · Ingredientes asignados, sin consumir"
+                    : evaluation
+                      ? evaluation.sufficiency === "MISSING"
+                        ? " por faltantes"
+                        : " · Potencialmente reanudable: puede solicitar asignación"
+                      : " · Evaluación pendiente")}
               </p>
               <p>
                 Fecha prevista: {order.date} · Fórmula versión {recipe?.version} · {order.formula_id}
@@ -218,7 +233,7 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                 Registrado por {s.users.find((u) => u.id === order.created_by)?.name ?? order.created_by} ·{" "}
                 {order.created_at}
               </p>
-              {data?.can_create && evaluation && (
+              {!confirmation && data?.can_create && evaluation && (
                 <AssignmentActions
                   orderId={order.id}
                   evaluation={evaluation}
@@ -228,13 +243,70 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                   onRefresh={() => setRefresh((v) => v + 1)}
                 />
               )}
+              {!confirmation && data?.can_create && locallyAssigned && (
+                <ConfirmationActions
+                  orderId={order.id}
+                  planned={order.nuclei_hundredths}
+                  revision={data.revision}
+                  run={run}
+                  busy={busy}
+                  onRefresh={() => setRefresh((v) => v + 1)}
+                />
+              )}
+              {confirmation && (
+                <div
+                  id={`confirmation-${confirmation.id}`}
+                  role="status"
+                  tabIndex={-1}
+                  aria-label="Resultado de preparación"
+                >
+                  <p>
+                    Terminados reales: {confirmation.nuclei_hundredths / 100}. Restantes sin preparar:{" "}
+                    {(order.nuclei_hundredths - confirmation.nuclei_hundredths) / 100}; requieren una orden
+                    nueva.
+                  </p>
+                  <p>
+                    Costo real total: {rationalMoney(confirmation.total_cost_cents)} · Costo por núcleo:{" "}
+                    {rationalMoney(confirmation.unit_cost_cents)}.
+                  </p>
+                  <details>
+                    <summary>Costos exactos</summary>
+                    <p>
+                      Total {confirmation.total_cost_cents.n}/{confirmation.total_cost_cents.d} céntimos; por
+                      núcleo {confirmation.unit_cost_cents.n}/{confirmation.unit_cost_cents.d} céntimos. Los
+                      importes S/ son de presentación.
+                    </p>
+                  </details>
+                  <p>
+                    Confirmado por{" "}
+                    {s.users.find((u) => u.id === confirmation.created_by)?.name ?? confirmation.created_by} ·{" "}
+                    {confirmation.created_at}
+                  </p>
+                  {s.microIssues
+                    .filter((i) => i.confirmation_id === confirmation.id)
+                    .map((i) => (
+                      <p key={i.id}>
+                        ID {s.microIngredients.find((m) => m.id === i.micro_ingredient_id)?.operational_id}:
+                        consumido {exactKg(i.quantity_hundredths)} kg · asignación liberada sin consumir{" "}
+                        {exactKg(i.released_hundredths)} kg.
+                      </p>
+                    ))}
+                </div>
+              )}
               {s.microAssignments
                 .filter((a) => a.preparation_id === order.id)
                 .map((a) => {
                   const reversed = s.microAssignmentReversals.find((r) => r.assignment_id === a.id);
                   return (
                     <details key={a.id}>
-                      <summary>Historial de asignación · {reversed ? "Revertida" : "Vigente"}</summary>
+                      <summary>
+                        Historial de asignación ·{" "}
+                        {reversed
+                          ? "Revertida"
+                          : confirmation?.assignment_id === a.id
+                            ? "Liquidada por consumo"
+                            : "Vigente"}
+                      </summary>
                       <p>
                         Referencia: {a.id} · {a.created_at} ·{" "}
                         {s.users.find((u) => u.id === a.created_by)?.name ?? a.created_by}
@@ -251,7 +323,11 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                   );
                 })}
               <details>
-                <summary>Necesidades y faltantes por microinsumo</summary>
+                <summary>
+                  {confirmation
+                    ? "Receta histórica y saldo actual"
+                    : "Necesidades y faltantes por microinsumo"}
+                </summary>
                 {evaluation?.items.map((item) => (
                   <div key={item.micro_ingredient_id} className="preparation-item">
                     <strong>
