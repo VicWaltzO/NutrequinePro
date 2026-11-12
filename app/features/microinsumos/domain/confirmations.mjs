@@ -34,6 +34,10 @@ export function microPreparationConfirm({
   );
   const order = pick(s, "microPreparations", p.preparation_id);
   requireValue(
+    !s.microSupersessions.some((e) => e.source_id === order.id),
+    "Preparación supersedida; use la orden sucesora.",
+  );
+  requireValue(
     !s.microConfirmations.some((c) => c.preparation_id === order.id),
     "Preparación cerrada definitivamente.",
   );

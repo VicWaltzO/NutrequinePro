@@ -57,6 +57,13 @@
       "when": 1794319266688,
       "tag": "0007_micro_confirmations",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1794501082815,
+      "tag": "0008_micro_substitutions",
+      "breakpoints": true
     }
   ]
 }

@@ -1,3 +1,8 @@
+import {
+  microSubstitute,
+  microAdopt,
+  microGroupLink,
+} from "../features/microinsumos/domain/substitutions.mjs";
 import { microPreparationConfirm } from "../features/microinsumos/domain/confirmations.mjs";
 import { microAssign, microAssignmentReverse } from "../features/microinsumos/domain/assignments.mjs";
 import { microPreparationCreate } from "../features/microinsumos/domain/preparations.mjs";
@@ -45,6 +50,9 @@ import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-deliver
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 import { operationalSave } from "../features/microinsumos/domain/operational-purchases.mjs";
 const handlers = {
+  MICRO_SUBSTITUTE: microSubstitute,
+  MICRO_ADOPT: microAdopt,
+  MICRO_GROUP_LINK: microGroupLink,
   MICRO_PREPARATION_CONFIRM: microPreparationConfirm,
   MICRO_ASSIGN: microAssign,
   MICRO_ASSIGNMENT_REVERSE: microAssignmentReverse,

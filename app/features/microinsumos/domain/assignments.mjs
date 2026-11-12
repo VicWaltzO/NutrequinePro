@@ -25,6 +25,10 @@ export function microAssign({ s, p, add, request_id, microPreparationPolicies, c
   const reason = validate(s, p, ["preparation_id", "reason", "expected_revision"], request_id);
   const order = pick(s, "microPreparations", p.preparation_id);
   requireValue(
+    !s.microSupersessions.some((e) => e.source_id === order.id),
+    "Preparación supersedida; use la orden sucesora.",
+  );
+  requireValue(
     !activeAssignment(s, order.id),
     "Esta orden ya tiene ingredientes asignados; no se duplicó la asignación.",
   );

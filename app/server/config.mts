@@ -1,9 +1,11 @@
+import { validateSubstitutionPolicies } from "../features/microinsumos/domain/substitutions.mjs";
 import { readFileSync } from "node:fs";
 import { validatePreparationPolicies } from "../features/microinsumos/domain/preparations.mjs";
 import type { MicroPreparationPolicy } from "../shared/types/domain.ts";
 import { selectedFile } from "../lib/sqlite/files.mjs";
 
 export interface ServerConfig {
+  micro_substitution_policies?: import("../shared/types/domain").MicroSubstitutionPolicy[];
   micro_preparation_policies?: MicroPreparationPolicy[];
   database: string;
   auth_database: string;
@@ -17,6 +19,7 @@ export function validateConfig(input: unknown, allowEphemeralPort = false): Serv
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Configuración inválida.");
   const value = input as Record<string, unknown>;
   const allowed = new Set([
+    "micro_substitution_policies",
     "database",
     "micro_preparation_policies",
     "auth_database",
@@ -47,6 +50,8 @@ export function validateConfig(input: unknown, allowEphemeralPort = false): Serv
       throw new Error("Ruta TLS inválida.");
   if (value.micro_preparation_policies !== undefined)
     value.micro_preparation_policies = validatePreparationPolicies(value.micro_preparation_policies);
+  if (value.micro_substitution_policies !== undefined)
+    value.micro_substitution_policies = validateSubstitutionPolicies(value.micro_substitution_policies);
   return value as unknown as ServerConfig;
 }
 

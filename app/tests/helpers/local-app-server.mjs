@@ -15,9 +15,10 @@ export const appRoot = fileURLToPath(new URL("../../", import.meta.url));
 export async function localAppFixture({
   development = false,
   minimalEnvironment = false,
-  distributionSource,
+  distributionSource = process.env.REGRESSION_DISTRIBUTION_SOURCE,
   frontendDirectory,
   emptyBusiness = false,
+  startupTimeoutMs = 60000,
 } = {}) {
   const root = mkdtempSync(join(tmpdir(), "nutrequine-08-test-"));
   const directory = createPrivateDirectory(join(root, "private"));
@@ -106,7 +107,7 @@ export async function localAppFixture({
       env: runtimeEnvironment,
     });
     await new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error("No inició: " + log.slice(-2000))), 60000);
+      const timeout = setTimeout(() => reject(new Error("No inició: " + log.slice(-2000))), startupTimeoutMs);
       child.once("error", reject);
       child.once("exit", (code) => {
         clearTimeout(timeout);

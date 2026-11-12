@@ -72,7 +72,7 @@ test("SQLite conserva tablas históricas y añade tablas de micros con sus restr
     tables.map((row) => row.name).sort(),
     [...Object.values(SQL_NAMES), "settings", "transaction_guards"].sort(),
   );
-  assert.equal(tables.length, 44);
+  assert.equal(tables.length, 47);
   assert.equal(f.database.prepare("PRAGMA foreign_keys").get().foreign_keys, 1);
   assert.equal(f.database.prepare("PRAGMA foreign_key_check").all().length, 0);
   assert.equal(f.database.prepare("PRAGMA integrity_check").get().integrity_check, "ok");

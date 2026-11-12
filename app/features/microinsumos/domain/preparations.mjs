@@ -143,9 +143,12 @@ export function evaluatePreparation(s, order, evaluated_at) {
       stock_source,
     };
   });
+  let status = "PENDING";
+  if (s.microSupersessions.some((e) => e.source_id === order.id)) status = "SUPERSEDED";
+  if (s.microConfirmations.some((c) => c.preparation_id === order.id)) status = "CONFIRMED";
   return {
     id: order.id,
-    status: s.microConfirmations.some((c) => c.preparation_id === order.id) ? "CONFIRMED" : "PENDING",
+    status,
     confirmation_id: s.microConfirmations.find((c) => c.preparation_id === order.id)?.id ?? null,
     assignment_id: assignment?.id ?? null,
     assignment_status: assignment ? "ASSIGNED" : "UNASSIGNED",

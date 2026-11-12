@@ -1,7 +1,8 @@
+import { assertSubstitutionIntegrity } from "../features/microinsumos/domain/substitutions.mjs";
 import { TABLES, SQL_NAMES, seedState, executeCommand, DomainError } from "./domain.mjs";
 import { writePlan } from "./persistence.mjs";
 import { assertCommandPermission } from "../shared/domain/permissions.mjs";
-import { assertEquivalentReplay } from "./command-replay.mjs";
+import { assertEquivalentReplay, CommandConflictError } from "./command-replay.mjs";
 import { assertConfirmationIntegrity } from "../features/microinsumos/domain/confirmation-integrity.mjs";
 export function createStore(getDatabase, options = {}) {
   async function loadState() {
@@ -22,6 +23,7 @@ export function createStore(getDatabase, options = {}) {
     };
   }
   async function persistState(before, after) {
+    assertSubstitutionIntegrity(before, after, options.microSubstitutionPolicies ?? []);
     assertConfirmationIntegrity(after);
     const binding = getDatabase();
     const statements = writePlan(before, after).map((statement) =>
@@ -84,7 +86,9 @@ export function createStore(getDatabase, options = {}) {
         (entry) =>
           entry.request_id === command.request_id &&
           entry.created_by !== actor.id &&
-          (command.type === "MICRO_PREPARATION_CONFIRM" ||
+          (["MICRO_SUBSTITUTE", "MICRO_ADOPT", "MICRO_GROUP_LINK"].includes(command.type) ||
+            ["MICRO_SUBSTITUTE", "MICRO_ADOPT", "MICRO_GROUP_LINK"].includes(entry.action) ||
+            command.type === "MICRO_PREPARATION_CONFIRM" ||
             entry.action === "MICRO_PREPARATION_CONFIRM" ||
             command.type === "MICRO_ASSIGN" ||
             entry.action === "MICRO_ASSIGN" ||
@@ -96,7 +100,7 @@ export function createStore(getDatabase, options = {}) {
             entry.action === "MICRO_PREPARATION_CREATE"),
       )
     )
-      throw new DomainError("Identificador global de operación ya utilizado.");
+      throw new CommandConflictError("Identificador global de operación ya utilizado.");
     const duplicate = before.audit.find(
       (entry) => entry.request_id === command.request_id && entry.created_by === actor.id,
     );
