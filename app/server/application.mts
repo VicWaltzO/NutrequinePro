@@ -1,3 +1,4 @@
+import { effectivePreparationPolicies } from "../features/microinsumos/domain/substitutions.mjs";
 import { preparationOverview } from "../features/microinsumos/domain/preparations.mjs";
 import Fastify from "fastify";
 import type { FastifyInstance, FastifyRequest } from "fastify";
@@ -63,6 +64,7 @@ export async function createLocalServer(
     const store = createStore(() => existingOnly, {
       partialReservations: dependencies.partialReservations === true,
       microPreparationPolicies: config.micro_preparation_policies ?? [],
+      microSubstitutionPolicies: config.micro_substitution_policies ?? [],
     });
     const initial = await store.loadState();
     if (dependencies.partialReservations === true && config.frontend_directory)
@@ -187,10 +189,15 @@ export async function createLocalServer(
         return {
           ...preparationOverview(
             state,
-            config.micro_preparation_policies ?? [],
+            effectivePreparationPolicies(
+              state,
+              config.micro_preparation_policies ?? [],
+              config.micro_substitution_policies ?? [],
+            ),
             new Date(dependencies.clock?.() ?? Date.now()).toISOString(),
           ),
           can_create: session.actor.role !== "VIEWER",
+          substitutions: config.micro_substitution_policies ?? [],
         };
       }),
     );

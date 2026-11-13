@@ -1,5 +1,5 @@
 import type { AppState, OpenModal } from "@/lib/domain-types";
-import { SortableTable, ProductImage, kg, money } from "@/shared/ui";
+import { SortableTable, ProductImage, weight, money } from "@/shared/ui";
 import { unitLabels, productPresentation, isNucleusProduct } from "@/shared/domain/presentation.mjs";
 import { frontendPath } from "@/client/paths";
 
@@ -22,7 +22,7 @@ export default function ProductCatalog({
             "Precio base",
             "Presentación",
             "Sacos / núcleo",
-            "Kg / núcleo",
+            "Peso / núcleo",
             "Ingreso al inventario",
             "Venta",
             "Estado",
@@ -57,11 +57,11 @@ export default function ProductCatalog({
                   : money(p.default_sale_price) + " / " + unitLabels(p).singular}
               </td>
               <td>
-                {unitLabels(p).singular} · {kg(productPresentation(p).unit_weight_grams)} kg ·{" "}
+                {unitLabels(p).singular} · {weight(productPresentation(p).unit_weight_grams)} ·{" "}
                 {productPresentation(p).weight_policy === "FIXED" ? "Fijo" : "Variable"}
               </td>
               <td>{isNucleusProduct(p) ? p.bags_per_nucleus : "Ingreso directo"}</td>
-              <td>{isNucleusProduct(p) ? kg(p.commercial_weight_per_nucleus_kg ?? 0) : "—"}</td>
+              <td>{isNucleusProduct(p) ? weight(p.commercial_weight_per_nucleus_kg ?? 0) : "—"}</td>
               <td>{isNucleusProduct(p) ? "Fabricación por núcleos" : "Ingreso directo"}</td>
               <td>{p.is_sellable ? "Habilitada" : "Consumo interno"}</td>
               <td>{p.is_active ? "Activo" : "Inactivo"}</td>

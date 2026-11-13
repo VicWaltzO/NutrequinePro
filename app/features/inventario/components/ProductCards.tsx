@@ -1,6 +1,6 @@
 import type { AppState } from "@/lib/domain-types";
 import { stock } from "@/lib/domain-preview.mjs";
-import { ProductImage, kg, num } from "@/shared/ui";
+import { ProductImage, weight, num } from "@/shared/ui";
 import { unitLabels } from "@/shared/domain/presentation.mjs";
 
 export default function ProductCards({ s: state }: { s: AppState }) {
@@ -17,7 +17,7 @@ export default function ProductCards({ s: state }: { s: AppState }) {
               <strong>
                 {num(a.quantity)} <span>{unitLabels(p).plural}</span>
               </strong>
-              <p>{kg(a.weight_kg)} kg físicos</p>
+              <p>{weight(a.weight_kg)} físicos</p>
               <small>
                 {num(a.committed)} {unitLabels(p).plural} comprometidos
               </small>

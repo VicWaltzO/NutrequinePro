@@ -1,3 +1,4 @@
+import { weight } from "@/shared/ui";
 import { TriangleAlert } from "lucide-react";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { pendingStock } from "../domain/pending-stock.mjs";
@@ -49,7 +50,7 @@ export default function PendingStockBanner({ state, open }: { state: AppState; o
             <li key={group.key}>
               <div className="pending-stock-product">
                 <strong>
-                  {group.name} · {group.grams / 1000} kg por {units(1, group.unit).slice(2)}
+                  {group.name} · {weight(group.grams)} por {units(1, group.unit).slice(2)}
                 </strong>
                 <span>
                   {units(group.missing, group.unit)} · {supplyLabels[group.supply]}
@@ -57,7 +58,7 @@ export default function PendingStockBanner({ state, open }: { state: AppState; o
               </div>
               <ul
                 className="pending-stock-orders"
-                aria-label={`Pedidos de ${group.name}, ${group.grams / 1000} kg`}
+                aria-label={`Pedidos de ${group.name}, ${weight(group.grams)}`}
               >
                 {group.orders.map((order) => (
                   <li key={order.id}>

@@ -1,3 +1,4 @@
+import { weight } from "@/shared/lib/format";
 export interface Evaluation {
   assignment_id: string | null;
   assignment_status: "ASSIGNED" | "UNASSIGNED";
@@ -16,9 +17,9 @@ export interface Evaluation {
     stock_source: string;
   }[];
 }
-// Exact decimal kg: one hundredth of a gram = 0.00001 kg.
-export function exactKg(value: number) {
-  return `${Math.floor(value / 100000)}.${String(value % 100000).padStart(5, "0")}`;
+// Domain values stay in hundredths of a gram; round only for display.
+export function preparationWeight(value: number) {
+  return weight(value / 100);
 }
 
 export function rationalMoney(value: { n: string; d: string }) {

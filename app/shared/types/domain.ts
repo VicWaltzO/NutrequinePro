@@ -367,6 +367,43 @@ export interface CompanyConfig {
   default_payment_method?: "" | "CASH" | "TRANSFER" | "CHECK";
   default_expense_category?: string;
 }
+export interface MicroSubstitutionPolicy {
+  id: string;
+  reference: string;
+  from_ingredient_id: string;
+  to_ingredient_id: string;
+  families: Record<
+    MicroFamily,
+    { source_formula_id: string; lines: { micro_ingredient_id: string; dose_grams: number }[] }
+  >;
+}
+export interface MicroSubstitution extends Entity {
+  policy_id: string;
+  approval_reference: string;
+  from_ingredient_id: string;
+  to_ingredient_id: string;
+  source_rosado_id: string;
+  source_verde_id: string;
+  rosado_formula_id: string;
+  verde_formula_id: string;
+  reason: string;
+  request_id: string;
+}
+export interface MicroSupersession extends Entity {
+  source_id: string;
+  target_id: string;
+  substitution_id: string;
+  approval_reference: string;
+  reason: string;
+  consent: true;
+  request_id: string;
+}
+export interface MicroPreparationGroup extends Entity {
+  preparation_id: string;
+  group_reference: string;
+  reason: string;
+  request_id: string;
+}
 export interface MicroPreparationPolicy {
   formula_id: string;
   family: MicroFamily;
@@ -424,6 +461,9 @@ export interface MicroIssue extends Entity {
   event: unknown;
 }
 export interface Tables {
+  microSubstitutions: MicroSubstitution[];
+  microSupersessions: MicroSupersession[];
+  microPreparationGroups: MicroPreparationGroup[];
   microConfirmations: MicroConfirmation[];
   microIssues: MicroIssue[];
   microAssignments: MicroAssignment[];

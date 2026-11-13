@@ -11,6 +11,7 @@ export interface ApplicationStore {
   runCommand: (input: unknown, identity: Identity) => Promise<CommandResult>;
 }
 export interface StoreOptions {
+  microSubstitutionPolicies?: import("../shared/types/domain").MicroSubstitutionPolicy[];
   partialReservations?: boolean;
   microPreparationPolicies?: import("../shared/types/domain").MicroPreparationPolicy[];
 }

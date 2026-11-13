@@ -10,10 +10,13 @@ export const TABLES = [
   "microFormulas",
   "microFormulaLines",
   "microFormulaHeads",
+  "microSubstitutions",
   "microPreparations",
+  "microPreparationGroups",
   "microAssignments",
   "microAssignmentLines",
   "microAssignmentReversals",
+  "microSupersessions",
   "microConfirmations",
   "formulas",
   "formulaIngredients",
@@ -46,6 +49,18 @@ export const SQL_NAMES = Object.fromEntries(
   TABLES.map((t) => [t, t.replace(/[A-Z]/g, (c) => "_" + c.toLowerCase())]),
 );
 export const RELATIONS = {
+  microSubstitutions: [
+    "policy_id",
+    "request_id",
+    "rosado_formula_id",
+    "verde_formula_id",
+    "source_rosado_id",
+    "source_verde_id",
+    "from_ingredient_id",
+    "to_ingredient_id",
+  ],
+  microSupersessions: ["source_id", "target_id", "substitution_id", "request_id"],
+  microPreparationGroups: ["preparation_id", "group_reference"],
   microConfirmations: ["preparation_id", "assignment_id", "formula_id", "request_id", "nuclei_hundredths"],
   microIssues: [
     "confirmation_id",

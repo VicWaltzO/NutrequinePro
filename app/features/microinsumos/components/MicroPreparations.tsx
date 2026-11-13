@@ -1,5 +1,6 @@
+import SubstitutionActions from "./SubstitutionActions";
 import ConfirmationActions from "./ConfirmationActions";
-import { exactKg, rationalMoney, type Evaluation } from "./preparation-view";
+import { preparationWeight, rationalMoney, type Evaluation } from "./preparation-view";
 import AssignmentActions from "./AssignmentActions";
 import { adminFetch } from "@/client/session-api";
 import { createCommandRequest } from "@/lib/command-request.mjs";
@@ -9,6 +10,7 @@ import { Input, Field } from "@/shared/ui";
 
 interface Overview {
   can_create: boolean;
+  substitutions: import("@/lib/domain-types").MicroSubstitutionPolicy[];
   revision: number;
   evaluated_at: string;
   authorizations: { formula_id: string; family: string }[];
@@ -74,6 +76,13 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
   const approved = data?.authorizations.some((a) => a.formula_id === active);
   return (
     <section className="micro-preparations" aria-labelledby="micro-preparations-title">
+      <SubstitutionActions
+        s={s}
+        run={run}
+        busy={busy}
+        policies={data?.substitutions ?? []}
+        canWrite={data?.can_create ?? false}
+      />
       <h3 id="micro-preparations-title">Preparaciones pendientes</h3>
       <p>Registre la intención de preparar núcleos. Ningún núcleo se ha preparado ni consumido al guardar.</p>
       <p className="preparation-warning">
@@ -201,6 +210,8 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
         .reverse()
         .map((order) => {
           const evaluation = data?.orders.find((entry) => entry.id === order.id);
+          const supersession = s.microSupersessions.find((e) => e.source_id === order.id);
+          const group = s.microPreparationGroups.find((g) => g.preparation_id === order.id);
           const confirmation = s.microConfirmations.find((c) => c.preparation_id === order.id);
           // Keep a transport-uncertain confirmation mounted until its stable replay resolves.
           const locallyAssigned = s.microAssignments.some(
@@ -216,8 +227,13 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                 núcleos planificados
               </h4>
               <p className="preparation-warning">
-                {confirmation ? "Cerrada definitivamente" : "Pendiente"}
+                {confirmation
+                  ? "Cerrada definitivamente"
+                  : supersession
+                    ? "Supersedida; no ejecutable"
+                    : "Pendiente"}
                 {!confirmation &&
+                  !supersession &&
                   (evaluation?.assignment_status === "ASSIGNED"
                     ? " · Ingredientes asignados, sin consumir"
                     : evaluation
@@ -226,6 +242,17 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                         : " · Potencialmente reanudable: puede solicitar asignación"
                       : " · Evaluación pendiente")}
               </p>
+              {group && (
+                <p>
+                  Tanda: {group.group_reference} · Grupo: {order.id}
+                </p>
+              )}
+              {supersession && (
+                <p>
+                  Sucesora: {supersession.target_id} · Aprobación: {supersession.approval_reference} · Motivo:{" "}
+                  {supersession.reason}
+                </p>
+              )}
               <p>
                 Fecha prevista: {order.date} · Fórmula versión {recipe?.version} · {order.formula_id}
               </p>
@@ -233,7 +260,7 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                 Registrado por {s.users.find((u) => u.id === order.created_by)?.name ?? order.created_by} ·{" "}
                 {order.created_at}
               </p>
-              {!confirmation && data?.can_create && evaluation && (
+              {!confirmation && !supersession && data?.can_create && evaluation && (
                 <AssignmentActions
                   orderId={order.id}
                   evaluation={evaluation}
@@ -243,7 +270,7 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                   onRefresh={() => setRefresh((v) => v + 1)}
                 />
               )}
-              {!confirmation && data?.can_create && locallyAssigned && (
+              {!confirmation && !supersession && data?.can_create && locallyAssigned && (
                 <ConfirmationActions
                   orderId={order.id}
                   planned={order.nuclei_hundredths}
@@ -287,8 +314,8 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                     .map((i) => (
                       <p key={i.id}>
                         ID {s.microIngredients.find((m) => m.id === i.micro_ingredient_id)?.operational_id}:
-                        consumido {exactKg(i.quantity_hundredths)} kg · asignación liberada sin consumir{" "}
-                        {exactKg(i.released_hundredths)} kg.
+                        consumido {preparationWeight(i.quantity_hundredths)} · asignación liberada sin
+                        consumir {preparationWeight(i.released_hundredths)}.
                       </p>
                     ))}
                 </div>
@@ -334,11 +361,12 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                       ID {item.operational_id} · {item.name}
                     </strong>
                     <p>
-                      Requerido: {exactKg(item.required_hundredths)} kg · Asignado a esta orden:{" "}
-                      {exactKg(item.own_assigned_hundredths)} kg · Físico: {exactKg(item.physical_hundredths)}{" "}
-                      kg · Asignado total: {exactKg(item.assigned_hundredths)} kg · Libre:{" "}
-                      {exactKg(item.available_hundredths)} kg · Faltante: {exactKg(item.missing_hundredths)}{" "}
-                      kg
+                      Requerido: {preparationWeight(item.required_hundredths)} · Asignado a esta orden:{" "}
+                      {preparationWeight(item.own_assigned_hundredths)} · Físico:{" "}
+                      {preparationWeight(item.physical_hundredths)} · Asignado total:{" "}
+                      {preparationWeight(item.assigned_hundredths)} · Libre:{" "}
+                      {preparationWeight(item.available_hundredths)} · Faltante:{" "}
+                      {preparationWeight(item.missing_hundredths)}
                     </p>
                     {item.stock_source === "UNRECORDED" && (
                       <p>Sin saldo registrado; no se presume existencia.</p>

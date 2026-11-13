@@ -1,3 +1,4 @@
+export { weight } from "./weight.mjs";
 export const money = (n: number | null | undefined) =>
   new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format((n ?? 0) / 100);
 export const kg = (n: number | null | undefined) =>

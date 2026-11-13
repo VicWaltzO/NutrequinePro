@@ -60,19 +60,19 @@ test(
     await expect(area.getByRole("button", { name: "Nueva versión Rosado", exact: true })).toBeFocused();
     await pink.locator("summary").filter({ hasText: "Borradores" }).click();
     await save("Activar Rosado versión 1");
-    await expect(pink.getByText("Total: 0.2 kg/núcleo", { exact: true })).toHaveCount(1);
+    await expect(pink.getByText("Total: 200 g/núcleo", { exact: true })).toHaveCount(1);
     await area.getByRole("button", { name: "Nueva versión Rosado", exact: true }).click();
     await expect(area.getByLabel("Microinsumo 1", { exact: true })).toBeFocused();
     await area.getByLabel("Dosis 1 (kg/núcleo)", { exact: true }).fill("0.071");
     await save("Guardar borrador de fórmula");
     await save("Activar Rosado versión 2");
-    await expect(pink.getByText("Total: 0.221 kg/núcleo", { exact: true })).toBeVisible();
+    await expect(pink.getByText("Total: 221 g/núcleo", { exact: true })).toBeVisible();
     const history = pink
       .locator("details")
       .filter({ has: page.locator("summary", { hasText: "Historial Rosado" }) });
     assert.equal(await history.getAttribute("open"), null);
     await history.locator("summary").click();
-    await expect(history.getByText("Total: 0.2 kg/núcleo", { exact: true })).toBeVisible();
+    await expect(history.getByText("Total: 200 g/núcleo", { exact: true })).toBeVisible();
     await command("MICRO_FORMULA_SAVE", {
       family: "VERDE_AMARILLO",
       expected_version: 0,
@@ -85,7 +85,7 @@ test(
       formula_id: s.microFormulas.find((x) => x.family === "VERDE_AMARILLO").id,
     });
     await page.reload();
-    await expect(area.getByText("Total: 0.033 kg/núcleo", { exact: true })).toBeVisible();
+    await expect(area.getByText("Total: 33 g/núcleo", { exact: true })).toBeVisible();
     for (const width of [1440, 390])
       for (const theme of ["light", "dark"]) {
         await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
@@ -152,14 +152,14 @@ test(
       await read.goto(f.baseURL + "/#inventory/micros");
       await expect(read.locator(".micro-formulas").getByRole("button")).toHaveCount(0);
       await expect(
-        read.locator(".micro-formulas").getByText("Total: 0.221 kg/núcleo", { exact: true }),
+        read.locator(".micro-formulas").getByText("Total: 221 g/núcleo", { exact: true }),
       ).toBeVisible();
       const h = read
         .getByRole("region", { name: "Fórmula Rosado", exact: true })
         .locator("details")
         .filter({ has: read.locator("summary", { hasText: "Historial Rosado" }) });
       await h.locator("summary").click();
-      await expect(h.getByText("Total: 0.2 kg/núcleo", { exact: true })).toBeVisible();
+      await expect(h.getByText("Total: 200 g/núcleo", { exact: true })).toBeVisible();
       await account.close();
     }
     assert.deepEqual(errors, []);

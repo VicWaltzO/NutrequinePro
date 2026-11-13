@@ -165,7 +165,22 @@ for (const [id, props] of Object.entries(cases))
     assert.ok(actual, "Debe montar una tabla: " + id);
     assert.deepEqual(
       actual.heads,
-      expected.map((x) => x.Etiqueta_columna_real),
+      expected.map(
+        (x) =>
+          ({
+            Kg: "Peso",
+            "Kg físicos": "Peso físico",
+            "Kg comerciales": "Peso comercial",
+            "Kg fórmula": "Peso fórmula",
+            "Kg / unidad": "Peso / unidad",
+            "Kg totales": "Peso total",
+            "Kg / núcleo": "Peso / núcleo",
+            "Kg por núcleo": "Peso por núcleo",
+            "Venta (cantidad / kg)": "Venta (cantidad / peso)",
+            "Saldo según movimientos (cantidad / kg)": "Saldo según movimientos (cantidad / peso)",
+            "Faltan (cantidad / kg)": "Faltan (cantidad / peso)",
+          })[x.Etiqueta_columna_real] ?? x.Etiqueta_columna_real,
+      ),
     );
     assert.deepEqual(
       actual.eligible,

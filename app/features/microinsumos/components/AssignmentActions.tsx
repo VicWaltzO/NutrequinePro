@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createCommandRequest } from "@/lib/command-request.mjs";
 import type { Submit } from "@/lib/domain-types";
 import { Input } from "@/shared/ui";
-import { exactKg, type Evaluation } from "./preparation-view";
+import { preparationWeight, type Evaluation } from "./preparation-view";
 export default function AssignmentActions({
   orderId,
   evaluation,
@@ -109,10 +109,11 @@ export default function AssignmentActions({
           </p>
           {decision.evaluation.items.map((i) => (
             <p key={i.micro_ingredient_id}>
-              ID {i.operational_id} · {i.name}: requerido {exactKg(i.required_hundredths)} kg · asignado a
-              esta orden {exactKg(i.own_assigned_hundredths)} kg · físico {exactKg(i.physical_hundredths)} kg
-              · asignado total {exactKg(i.assigned_hundredths)} kg · libre {exactKg(i.available_hundredths)}{" "}
-              kg · faltante {exactKg(i.missing_hundredths)} kg
+              ID {i.operational_id} · {i.name}: requerido {preparationWeight(i.required_hundredths)} ·
+              asignado a esta orden {preparationWeight(i.own_assigned_hundredths)} · físico{" "}
+              {preparationWeight(i.physical_hundredths)} · asignado total{" "}
+              {preparationWeight(i.assigned_hundredths)} · libre {preparationWeight(i.available_hundredths)} ·
+              faltante {preparationWeight(i.missing_hundredths)}
             </p>
           ))}
           <Input

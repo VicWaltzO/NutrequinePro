@@ -1,6 +1,6 @@
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
-import { SortableTable, money, kg, find } from "@/shared/ui";
+import { SortableTable, money, weight, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";
 export default function ProductionsView({
@@ -65,7 +65,7 @@ export default function ProductionsView({
                         {f.is_active ? "Activa" : "Histórica"} · desde {f.valid_from}
                       </summary>
                       <SortableTable
-                        heads={["Insumo", "Kg / núcleo"]}
+                        heads={["Insumo", "Peso / núcleo"]}
                         rows={rows}
                         values={[
                           (x) => find(state, "ingredients", x.ingredient_id)?.name,
@@ -76,7 +76,7 @@ export default function ProductionsView({
                         {(x) => (
                           <tr key={x.id}>
                             <td>{find(state, "ingredients", x.ingredient_id)?.name}</td>
-                            <td>{kg(x.kg_per_nucleus)}</td>
+                            <td>{weight(x.kg_per_nucleus)}</td>
                           </tr>
                         )}
                       </SortableTable>
@@ -86,9 +86,9 @@ export default function ProductionsView({
                         </button>
                       )}
                       <p className="formula-total">
-                        Total fórmula: {kg(rows.reduce((n: number, x) => n + x.kg_per_nucleus, 0))} kg · Peso
+                        Total fórmula: {weight(rows.reduce((n: number, x) => n + x.kg_per_nucleus, 0))} · Peso
                         comercial:{" "}
-                        {kg(find(state, "products", f.product_id)?.commercial_weight_per_nucleus_kg)} kg
+                        {weight(find(state, "products", f.product_id)?.commercial_weight_per_nucleus_kg)}
                       </p>
                     </details>
                   );

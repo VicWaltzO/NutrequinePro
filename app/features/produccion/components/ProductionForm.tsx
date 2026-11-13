@@ -1,5 +1,5 @@
 import { useProductionFormState } from "../hooks/useProductionFormState";
-import { Input, Select, Check, money, kg } from "@/shared/ui";
+import { Input, Select, Check, money, weight as formatWeight } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import type { FormProps } from "@/shared/types/forms";
 import { CostRows } from "./CostRows";
@@ -90,9 +90,9 @@ export function ProductionForm({ s: state, record, submit, close, busy }: FormPr
         <div className="summary-strip">
           <strong>{nuclei} núcleos</strong>
           <span>{bags} sacos</span>
-          <span>{kg(weight)} kg comerciales</span>
-          {nonCommercialWeight > 0 && <span>{kg(nonCommercialWeight)} kg no comerciales</span>}
-          <span>{kg(ingredients.reduce((a, x) => a + x.w, 0))} kg de fórmula</span>
+          <span>{formatWeight(weight)} comerciales</span>
+          {nonCommercialWeight > 0 && <span>{formatWeight(nonCommercialWeight)} no comerciales</span>}
+          <span>{formatWeight(ingredients.reduce((a, x) => a + x.w, 0))} de fórmula</span>
         </div>
       </FormSection>
       <FormSection

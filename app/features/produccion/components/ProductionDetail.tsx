@@ -1,5 +1,5 @@
 import { productionSummary } from "@/lib/domain-preview.mjs";
-import { SortableTable, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
+import { SortableTable, Metrics, Badge, History, money, weight, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
 import { ProductName } from "@/shared/ui/ProductMarker";
 import DownloadPdfButton from "@/features/documentos/components/DownloadPdfButton.tsx";
@@ -21,7 +21,7 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
       </div>
       <Metrics
         items={[
-          { label: "Producción", value: a.bags + " sacos", note: kg(a.weight) + " kg comerciales" },
+          { label: "Producción", value: a.bags + " sacos", note: weight(a.weight) + " comerciales" },
           { label: "Estimado", value: money(a.estimated) },
           {
             label: a.reconciled ? "Costo real" : "Costo real parcial",
@@ -68,7 +68,7 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
       <section className="panel">
         <h3>Productos y fórmula histórica</h3>
         <SortableTable
-          heads={["Producto", "Versión", "Núcleos", "Sacos", "Kg comerciales", "Kg fórmula"]}
+          heads={["Producto", "Versión", "Núcleos", "Sacos", "Peso comercial", "Peso fórmula"]}
           rows={a.products}
           values={[
             (x) => find(state, "products", x.product_id)?.name,
@@ -88,8 +88,8 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
               <td>v{find(state, "formulas", x.formula_id)?.version}</td>
               <td>{x.nuclei_count}</td>
               <td>{x.bags_produced}</td>
-              <td>{kg(x.commercial_weight_kg)}</td>
-              <td>{kg(x.formula_weight_kg)}</td>
+              <td>{weight(x.commercial_weight_kg)}</td>
+              <td>{weight(x.formula_weight_kg)}</td>
             </tr>
           )}
         </SortableTable>
@@ -97,7 +97,7 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
           <details key={x.id}>
             <summary>Snapshot de fórmula · {find(state, "products", x.product_id)?.name}</summary>
             <SortableTable
-              heads={["Insumo", "Kg por núcleo"]}
+              heads={["Insumo", "Peso por núcleo"]}
               rows={x.formula_snapshot}
               values={[(f) => find(state, "ingredients", f.ingredient_id)?.name, (f) => f.kg_per_nucleus]}
               tie={(f) => [find(state, "ingredients", f.ingredient_id)?.name, f.ingredient_id, f.id]}
@@ -105,7 +105,7 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
               {(f) => (
                 <tr key={f.id}>
                   <td>{find(state, "ingredients", f.ingredient_id)?.name}</td>
-                  <td>{kg(f.kg_per_nucleus)}</td>
+                  <td>{weight(f.kg_per_nucleus)}</td>
                 </tr>
               )}
             </SortableTable>
@@ -117,7 +117,7 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
         <SortableTable
           heads={[
             "Insumo",
-            "Kg",
+            "Peso",
             "Precio histórico",
             "Bruto",
             "Descuento",
@@ -143,7 +143,7 @@ export default function ProductionDetail({ s: state, actor, id, open, run }: Det
           {(x) => (
             <tr key={x.id}>
               <td>{find(state, "ingredients", x.ingredient_id)?.name}</td>
-              <td>{kg(x.total_kg)}</td>
+              <td>{weight(x.total_kg)}</td>
               <td>{money(x.historical_price_per_kg)}</td>
               <td>{money(x.theoretical_gross_cost)}</td>
               <td>{money(x.discount_amount)}</td>

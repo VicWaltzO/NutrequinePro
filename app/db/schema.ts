@@ -369,6 +369,66 @@ export const microConfirmations = sqliteTable(
     ),
   ],
 );
+export const microSubstitutions = sqliteTable(
+  "micro_substitutions",
+  {
+    ...base(),
+    policy_id: text("policy_id").notNull().unique(),
+    request_id: text("request_id").notNull().unique(),
+    rosado_formula_id: text("rosado_formula_id")
+      .notNull()
+      .unique()
+      .references(() => microFormulas.id),
+    verde_formula_id: text("verde_formula_id")
+      .notNull()
+      .unique()
+      .references(() => microFormulas.id),
+    source_rosado_id: text("source_rosado_id")
+      .notNull()
+      .references(() => microFormulas.id),
+    source_verde_id: text("source_verde_id")
+      .notNull()
+      .references(() => microFormulas.id),
+    from_ingredient_id: text("from_ingredient_id")
+      .notNull()
+      .references(() => microIngredients.id),
+    to_ingredient_id: text("to_ingredient_id")
+      .notNull()
+      .references(() => microIngredients.id),
+  },
+  (t) => [check("micro_substitution_distinct", sql`${t.from_ingredient_id} <> ${t.to_ingredient_id}`)],
+);
+export const microSupersessions = sqliteTable(
+  "micro_supersessions",
+  {
+    ...base(),
+    source_id: text("source_id")
+      .notNull()
+      .unique()
+      .references(() => microPreparations.id),
+    target_id: text("target_id")
+      .notNull()
+      .unique()
+      .references(() => microPreparations.id),
+    substitution_id: text("substitution_id")
+      .notNull()
+      .references(() => microSubstitutions.id),
+    request_id: text("request_id").notNull().unique(),
+  },
+  (t) => [check("micro_supersession_distinct", sql`${t.source_id} <> ${t.target_id}`)],
+);
+export const microPreparationGroups = sqliteTable(
+  "micro_preparation_groups",
+  {
+    ...base(),
+    preparation_id: text("preparation_id")
+      .notNull()
+      .unique()
+      .references(() => microPreparations.id),
+    group_reference: text("group_reference").notNull(),
+  },
+  (t) => [check("micro_group_reference", sql`length(trim(${t.group_reference})) BETWEEN 1 AND 100`)],
+);
 export const microIssues = sqliteTable(
   "micro_issues",
   {

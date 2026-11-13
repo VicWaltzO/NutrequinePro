@@ -417,6 +417,10 @@ test("inventario histórico 64 y barrido AST: 31 selectores previos y 2 estados 
   const preparations = "features/microinsumos/components/MicroPreparations.tsx";
   assert.equal(actual.get(preparations), 1);
   actual.delete(preparations);
+  // NQP26-25: three nominal preparation/approval selectors, sorted by visible label.
+  const substitutions = "features/microinsumos/components/SubstitutionActions.tsx";
+  assert.equal(actual.get(substitutions), 3);
+  actual.delete(substitutions);
   assert.equal(
     [...actual.values()].reduce((a, b) => a + b, 0),
     31,

@@ -6,7 +6,7 @@ import { useSaleFormState } from "../hooks/useSaleFormState";
 import { unitLabels } from "@/shared/domain/presentation.mjs";
 import { SaleLineEditor } from "./SaleLineEditor";
 import { stock } from "@/lib/domain-preview.mjs";
-import { Input, Select, Check, PaymentFields, money, kg, find } from "@/shared/ui";
+import { Input, Select, Check, PaymentFields, money, weight, find } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import type { FormProps } from "@/shared/types/forms";
 
@@ -320,7 +320,7 @@ export function SaleForm({ s: state, record, kind, submit, close, busy }: FormPr
                       {find(state, "products", id)?.name}: saldo {stock(state, id).quantity}, solicitado{" "}
                       {required.q}; faltan {Math.max(0, required.q - stock(state, id).quantity)}{" "}
                       {unitLabels(find(state, "products", id)).plural} y{" "}
-                      {kg(Math.max(0, required.w - stock(state, id).weight_kg))} kg.
+                      {weight(Math.max(0, required.w - stock(state, id).weight_kg))}.
                     </p>
                   ))}
                   <p>Elija venta futura para continuar. El stock saldrá al entregar.</p>

@@ -1,4 +1,4 @@
-import { Select, Input, kg } from "@/shared/ui";
+import { Select, Input, weight } from "@/shared/ui";
 import { productPresentation, unitLabels } from "@/shared/domain/presentation.mjs";
 import { ArrowLeftRight, ClipboardList, Package } from "lucide-react";
 import { FormSection } from "@/shared/ui/FormSection";
@@ -57,8 +57,8 @@ export default function InventoryAdjustmentFields({
           />
           {fixed ? (
             <p className="notice">
-              Peso total: {kg(Number(v.quantity || 0) * presentation.unit_weight_grams)} kg ·{" "}
-              {kg(presentation.unit_weight_grams)} kg / {unitLabels(product).singular}
+              Peso total: {weight(Number(v.quantity || 0) * presentation.unit_weight_grams)} ·{" "}
+              {weight(presentation.unit_weight_grams)} / {unitLabels(product).singular}
             </p>
           ) : (
             input("weight_kg", "Peso total kg", "number")

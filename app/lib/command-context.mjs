@@ -1,3 +1,4 @@
+import { effectivePreparationPolicies } from "../features/microinsumos/domain/substitutions.mjs";
 import { text, today } from "../shared/domain/core.mjs";
 import { presentationSnapshot } from "../shared/domain/presentation.mjs";
 import { guardCoverageMovement, guardCoverageMovementBatch } from "../features/ventas/domain/coverage.mjs";
@@ -63,6 +64,11 @@ export function createCommandContext(state, type, payload, actor, clock, options
     correction,
     request_id: options.request_id,
     partialReservations: options.partialReservations === true,
-    microPreparationPolicies: options.microPreparationPolicies ?? [],
+    microSubstitutionPolicies: options.microSubstitutionPolicies ?? [],
+    microPreparationPolicies: effectivePreparationPolicies(
+      state,
+      options.microPreparationPolicies ?? [],
+      options.microSubstitutionPolicies ?? [],
+    ),
   };
 }

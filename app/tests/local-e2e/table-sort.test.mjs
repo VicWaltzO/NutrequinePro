@@ -145,14 +145,14 @@ test(
       "Cantidad",
       "Cantidad física",
       "Cantidad comprometida",
-      "Kg",
-      "Kg físicos",
-      "Kg / unidad",
-      "Kg totales",
-      "Kg comerciales",
-      "Kg fórmula",
-      "Kg / núcleo",
-      "Kg por núcleo",
+      "Peso",
+      "Peso físico",
+      "Peso / unidad",
+      "Peso total",
+      "Peso comercial",
+      "Peso fórmula",
+      "Peso / núcleo",
+      "Peso por núcleo",
       "Precio base",
       "Precio actual S/ por kg",
       "Precio histórico",
@@ -171,16 +171,16 @@ test(
       "Teórico neto",
       "Sacos",
       "Sacos / núcleo",
-      "Kg / núcleo",
+      "Peso / núcleo",
       "Núcleos",
       "Núcleos originales",
       "Versión",
       "Ventas registradas",
       "Cobros netos",
       "Reducción económica",
-      "Venta (cantidad / kg)",
-      "Saldo según movimientos (cantidad / kg)",
-      "Faltan (cantidad / kg)",
+      "Venta (cantidad / peso)",
+      "Saldo según movimientos (cantidad / peso)",
+      "Faltan (cantidad / peso)",
       "Entregado",
       "Ya devuelto",
     ]);
@@ -199,7 +199,9 @@ test(
       );
       const values = texts.map((text) => {
         const match = text.match(/[-+]?\d[\d,]*(?:\.\d+)?/);
-        return match ? Number(match[0].replaceAll(",", "")) : null;
+        if (!match) return null;
+        const value = Number(match[0].replaceAll(",", ""));
+        return heading.startsWith("Peso") && /\bkg\b/.test(text) ? value * 1000 : value;
       });
       for (let i = 1; i < values.length; i++) {
         if (values[i] === null) continue;
