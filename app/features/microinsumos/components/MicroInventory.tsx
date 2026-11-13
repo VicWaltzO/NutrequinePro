@@ -1,12 +1,12 @@
 import MicroPreparations from "./MicroPreparations";
-import { exactKg } from "./preparation-view";
+import { preparationWeight } from "./preparation-view";
 import MicroFormulas from "./MicroFormulas";
 import OperationalPurchases from "./OperationalPurchases";
 import HistoricalPurchases from "./HistoricalPurchases";
 import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import { useEffect, useRef, useState } from "react";
 import type { AppState, Submit, MicroIngredient, MicroOpening } from "@/lib/domain-types";
-import { Input, Field, SortableTable, kg, money } from "@/shared/ui";
+import { Input, Field, SortableTable, weight, money } from "@/shared/ui";
 
 export default function MicroInventory({
   s,
@@ -94,7 +94,7 @@ export default function MicroInventory({
   return (
     <section className="panel micro-inventory">
       <h2>Microinsumos</h2>
-      <p>Almacén único de micros · Cantidades netas en kg.</p>
+      <p>Almacén único de micros · Cantidades netas en kg o g según el peso.</p>
       <p>
         El saldo inicial requiere una cantidad física real o estimada. Las dosis de fórmula no son
         existencias.
@@ -238,8 +238,8 @@ export default function MicroInventory({
             "Microinsumo",
             "ID operativo",
             "Estado",
-            "Saldo inicial (kg)",
-            "Físico / asignado / libre (kg)",
+            "Saldo inicial",
+            "Físico / asignado / libre",
             "Medición",
             "Fecha de corte",
             "Valor inicial",
@@ -294,11 +294,11 @@ export default function MicroInventory({
                 </td>
                 <td>{micro.operational_id}</td>
                 <td>{micro.is_active ? "Activo" : "Inactivo"}</td>
-                <td>{row ? kg(row.quantity_grams) : "Sin registrar"}</td>
+                <td>{row ? weight(row.quantity_grams) : "Sin registrar"}</td>
                 <td>
-                  <p>Físico: {exactKg(balances(micro.id).physical)}</p>
-                  <p>Asignado: {exactKg(balances(micro.id).assigned)}</p>
-                  <p>Libre: {exactKg(balances(micro.id).free)}</p>
+                  <p>Físico: {preparationWeight(balances(micro.id).physical)}</p>
+                  <p>Asignado: {preparationWeight(balances(micro.id).assigned)}</p>
+                  <p>Libre: {preparationWeight(balances(micro.id).free)}</p>
                 </td>
                 <td>{row ? (row.measurement === "REAL" ? "Real" : "Estimada") : "—"}</td>
                 <td>{row?.cutoff_date ?? "—"}</td>

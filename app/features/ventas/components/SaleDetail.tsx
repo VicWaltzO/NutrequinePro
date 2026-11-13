@@ -1,5 +1,5 @@
 import { saleSummary, deliveryAvailability } from "@/lib/domain-preview.mjs";
-import { SortableTable, Metrics, Badge, History, money, kg, find, stamp, label } from "@/shared/ui";
+import { SortableTable, Metrics, Badge, History, money, weight, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
 import DownloadPdfButton from "@/features/documentos/components/DownloadPdfButton.tsx";
 import { unitLabels } from "@/shared/domain/presentation.mjs";
@@ -107,9 +107,9 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
             <SortableTable
               heads={[
                 "Producto",
-                "Venta (cantidad / kg)",
-                "Saldo según movimientos (cantidad / kg)",
-                "Faltan (cantidad / kg)",
+                "Venta (cantidad / peso)",
+                "Saldo según movimientos (cantidad / peso)",
+                "Faltan (cantidad / peso)",
               ]}
               rows={availability}
               values={[
@@ -127,13 +127,13 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
                     {unitLabels(a.items.find((row) => row.product_id === x.product_id)).plural}
                   </td>
                   <td>
-                    {x.requested} / {kg(x.weight)}
+                    {x.requested} / {weight(x.weight)}
                   </td>
                   <td>
-                    {x.quantity} / {kg(x.weight_kg)}
+                    {x.quantity} / {weight(x.weight_kg)}
                   </td>
                   <td>
-                    {x.missing_quantity} / {kg(x.missing_weight)}
+                    {x.missing_quantity} / {weight(x.missing_weight)}
                   </td>
                 </tr>
               )}
@@ -146,8 +146,8 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
           heads={[
             "Producto",
             "Cantidad",
-            "Kg / unidad",
-            "Kg totales",
+            "Peso / unidad",
+            "Peso total",
             "Precio lista",
             "Precio aplicado",
             "Subtotal",
@@ -171,9 +171,9 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
                 {x.quantity} {unitLabels(x).plural}
               </td>
               <td>
-                {kg(x.unit_weight_kg)} / {unitLabels(x).singular}
+                {weight(x.unit_weight_kg)} / {unitLabels(x).singular}
               </td>
-              <td>{kg(x.total_weight_kg)}</td>
+              <td>{weight(x.total_weight_kg)}</td>
               <td>{money(x.reference_unit_price)}</td>
               <td>
                 {money(x.unit_price)} / {unitLabels(x).singular}
@@ -272,7 +272,7 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
                   <td>
                     {x.quantity} {unitLabels(find(state, "saleItems", x.sale_item_id)).plural}
                   </td>
-                  <td>{kg(x.weight_kg)} kg</td>
+                  <td>{weight(x.weight_kg)}</td>
                 </tr>
               )}
             </SortableTable>

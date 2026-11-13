@@ -1,4 +1,4 @@
-import { SortableTable, kg, money } from "@/shared/ui";
+import { SortableTable, weight, money } from "@/shared/ui";
 import { ProductionPriceCell } from "./ProductionPriceCell";
 import type { productionFormPreview } from "../hooks/production-form-preview";
 import type { ProductionIngredientDraft } from "../hooks/production-ingredient-input";
@@ -13,7 +13,7 @@ export function ProductionIngredients({
 }) {
   return (
     <SortableTable
-      heads={["Insumo", "Kg", "S/ por kg", "Teórico neto", "Descuento S/", "Cobro real S/", "Pagado"]}
+      heads={["Insumo", "Peso", "S/ por kg", "Teórico neto", "Descuento S/", "Cobro real S/", "Pagado"]}
       rows={rows}
       values={[(row) => row.ing.name, (row) => row.w, null, (row) => row.net, null, null, null]}
       tie={(row) => [row.ing.name, row.ing.id]}
@@ -23,7 +23,7 @@ export function ProductionIngredients({
         return (
           <tr key={ing.id}>
             <td>{ing.name}</td>
-            <td>{kg(w)}</td>
+            <td>{weight(w)}</td>
             <td>
               <ProductionPriceCell
                 name={ing.name}

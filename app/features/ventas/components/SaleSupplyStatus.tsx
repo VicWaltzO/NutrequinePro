@@ -1,6 +1,6 @@
 import type { Sale, SaleSummary, AppState } from "@/lib/domain-types";
 import { unitLabels } from "@/shared/domain/presentation.mjs";
-import { find, kg } from "@/shared/ui";
+import { find, weight } from "@/shared/ui";
 
 /** Read-only presentation of the domain contract; never allocates or infers coverage. */
 export function SaleSupplyStatus({
@@ -35,7 +35,7 @@ export function SaleSupplyStatus({
       </p>
       {summary.coverage_lines?.map(({ item, covered, missing }) => (
         <p key={item.id} className="sale-supply-line">
-          {find(state, "products", item.product_id)?.name} · {kg(item.unit_weight_kg)} kg por{" "}
+          {find(state, "products", item.product_id)?.name} · {weight(item.unit_weight_kg)} por{" "}
           {unitLabels(item).singular}: {covered} de {item.quantity} {unitLabels(item).plural} cubiertos.
           {missing > 0 && (
             <strong>

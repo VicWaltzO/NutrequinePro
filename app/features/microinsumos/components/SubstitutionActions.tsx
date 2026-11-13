@@ -2,7 +2,7 @@ import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import { useEffect, useRef, useState } from "react";
 import type { AppState, Submit, MicroSubstitutionPolicy } from "@/lib/domain-types";
 import { createCommandRequest } from "@/lib/command-request.mjs";
-import { Field, Input } from "@/shared/ui";
+import { Field, Input, weight } from "@/shared/ui";
 
 export default function SubstitutionActions({
   s,
@@ -140,7 +140,14 @@ export default function SubstitutionActions({
             </legend>
             {mode !== "MICRO_SUBSTITUTE" && (
               <Field label="Preparación del grupo">
-                <select required value={orderId} onChange={(e) => setOrderId(e.target.value)}>
+                <select
+                  required
+                  value={orderId}
+                  onChange={(e) => {
+                    setOrderId(e.target.value);
+                    setConsent(false);
+                  }}
+                >
                   <option value="">Seleccione preparación</option>
                   {(mode === "MICRO_ADOPT"
                     ? pending
@@ -160,7 +167,14 @@ export default function SubstitutionActions({
             {mode === "MICRO_SUBSTITUTE" && (
               <>
                 <Field label="Aprobación técnica">
-                  <select required value={selected} onChange={(e) => setSelected(e.target.value)}>
+                  <select
+                    required
+                    value={selected}
+                    onChange={(e) => {
+                      setSelected(e.target.value);
+                      setConsent(false);
+                    }}
+                  >
                     <option value="">Seleccione aprobación</option>
                     {sortedPolicies
                       .filter(
@@ -181,7 +195,7 @@ export default function SubstitutionActions({
                       {f.lines.map((l) => (
                         <p key={l.micro_ingredient_id}>
                           {s.microIngredients.find((m) => m.id === l.micro_ingredient_id)?.name}: nueva dosis{" "}
-                          {l.dose_grams} g/núcleo
+                          {weight(l.dose_grams)}/núcleo
                         </p>
                       ))}
                     </div>
@@ -191,7 +205,14 @@ export default function SubstitutionActions({
             {mode === "MICRO_ADOPT" && (
               <>
                 <Field label="Sustitución propuesta">
-                  <select required value={selected} onChange={(e) => setSelected(e.target.value)}>
+                  <select
+                    required
+                    value={selected}
+                    onChange={(e) => {
+                      setSelected(e.target.value);
+                      setConsent(false);
+                    }}
+                  >
                     <option value="">Seleccione sustitución</option>
                     {sortedSubstitutions
                       .filter((e) => {
@@ -236,7 +257,7 @@ export default function SubstitutionActions({
                           .filter((l) => l.formula_id === id)
                           .map((l) => (
                             <p key={l.id}>
-                              {l.name_snapshot}: {l.dose_grams} g/núcleo
+                              {l.name_snapshot}: {weight(l.dose_grams)}/núcleo
                             </p>
                           ))}
                       </div>

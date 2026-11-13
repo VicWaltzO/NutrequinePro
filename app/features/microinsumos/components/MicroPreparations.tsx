@@ -1,6 +1,6 @@
 import SubstitutionActions from "./SubstitutionActions";
 import ConfirmationActions from "./ConfirmationActions";
-import { exactKg, rationalMoney, type Evaluation } from "./preparation-view";
+import { preparationWeight, rationalMoney, type Evaluation } from "./preparation-view";
 import AssignmentActions from "./AssignmentActions";
 import { adminFetch } from "@/client/session-api";
 import { createCommandRequest } from "@/lib/command-request.mjs";
@@ -314,8 +314,8 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                     .map((i) => (
                       <p key={i.id}>
                         ID {s.microIngredients.find((m) => m.id === i.micro_ingredient_id)?.operational_id}:
-                        consumido {exactKg(i.quantity_hundredths)} kg · asignación liberada sin consumir{" "}
-                        {exactKg(i.released_hundredths)} kg.
+                        consumido {preparationWeight(i.quantity_hundredths)} · asignación liberada sin
+                        consumir {preparationWeight(i.released_hundredths)}.
                       </p>
                     ))}
                 </div>
@@ -361,11 +361,12 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                       ID {item.operational_id} · {item.name}
                     </strong>
                     <p>
-                      Requerido: {exactKg(item.required_hundredths)} kg · Asignado a esta orden:{" "}
-                      {exactKg(item.own_assigned_hundredths)} kg · Físico: {exactKg(item.physical_hundredths)}{" "}
-                      kg · Asignado total: {exactKg(item.assigned_hundredths)} kg · Libre:{" "}
-                      {exactKg(item.available_hundredths)} kg · Faltante: {exactKg(item.missing_hundredths)}{" "}
-                      kg
+                      Requerido: {preparationWeight(item.required_hundredths)} · Asignado a esta orden:{" "}
+                      {preparationWeight(item.own_assigned_hundredths)} · Físico:{" "}
+                      {preparationWeight(item.physical_hundredths)} · Asignado total:{" "}
+                      {preparationWeight(item.assigned_hundredths)} · Libre:{" "}
+                      {preparationWeight(item.available_hundredths)} · Faltante:{" "}
+                      {preparationWeight(item.missing_hundredths)}
                     </p>
                     {item.stock_source === "UNRECORDED" && (
                       <p>Sin saldo registrado; no se presume existencia.</p>

@@ -10,11 +10,15 @@ import { originalCompanyCatalog, catalogTables } from "../../lib/company-catalog
 
 const money = (value) =>
   new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(value / 100);
-const kg = (value) => new Intl.NumberFormat("es-PE", { maximumFractionDigits: 3 }).format(value / 1000);
+const weight = (value) =>
+  Math.abs(value) >= 1000
+    ? new Intl.NumberFormat("es-PE", { maximumFractionDigits: 2 }).format(value / 1000) + " kg"
+    : new Intl.NumberFormat("es-PE", { maximumFractionDigits: 0 }).format(value) + " g";
 
 test(
   "catálogo empresarial: aprovisionamiento explícito, fotografías originales, cantidades, sedes y edición posterior",
-  { timeout: 240000 },
+  // Windows starts PowerShell for each private-directory ACL check in the CLI workflow.
+  { timeout: process.platform === "win32" ? 600000 : 240000 },
   async (t) => {
     const server = await localAppFixture({ emptyBusiness: true });
     let browser;
@@ -127,9 +131,9 @@ test(
       await expect(row.locator("td:nth-child(-n+8)")).toHaveText([
         product.name,
         money(product.default_sale_price) + " / saco",
-        "saco · " + kg(product.standard_bag_weight_kg) + " kg · Variable",
+        "saco · " + weight(product.standard_bag_weight_kg) + " · Variable",
         String(product.bags_per_nucleus),
-        kg(product.commercial_weight_per_nucleus_kg),
+        weight(product.commercial_weight_per_nucleus_kg),
         "Fabricación por núcleos",
         product.is_sellable ? "Habilitada" : "Consumo interno",
         "Activo",
@@ -173,11 +177,14 @@ test(
       for (let index = 0; index < lines.length; index++) {
         const line = lines[index];
         const ingredient = catalog.ingredients.find((row) => row.id === line.ingredient_id);
-        await expect(rows[index].getByRole("cell")).toHaveText([ingredient.name, kg(line.kg_per_nucleus)]);
+        await expect(rows[index].getByRole("cell")).toHaveText([
+          ingredient.name,
+          weight(line.kg_per_nucleus),
+        ]);
       }
       assert.match(
         await details.locator(".formula-total").innerText(),
-        new RegExp(kg(lines.reduce((sum, line) => sum + line.kg_per_nucleus, 0))),
+        new RegExp(weight(lines.reduce((sum, line) => sum + line.kg_per_nucleus, 0))),
       );
     }
     await page.screenshot({ path: join(server.evidence, "catalog-four-formulas.png"), fullPage: true });

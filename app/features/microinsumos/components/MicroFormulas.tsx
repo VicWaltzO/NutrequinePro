@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { AppState, Submit, MicroFamily, MicroFormula } from "@/lib/domain-types";
-import { Input, Select } from "@/shared/ui";
+import { Input, Select, weight } from "@/shared/ui";
 import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 const families: { id: MicroFamily; label: string; products: string }[] = [
   { id: "ROSADO", label: "Rosado", products: "Potripregnant" },
@@ -55,12 +55,12 @@ export default function MicroFormulas({
           .map((l) => (
             <li key={l.id}>
               ID {l.operational_id_snapshot} · {l.name_snapshot}:{" "}
-              <strong>{kg(l.dose_grams)} kg/núcleo</strong>
+              <strong>{weight(l.dose_grams)}/núcleo</strong>
             </li>
           ))}
       </ul>
       <p>
-        <strong>Total: {kg(f.total_grams)} kg/núcleo</strong>
+        <strong>Total: {weight(f.total_grams)}/núcleo</strong>
       </p>
       {f.notes && <p>{f.notes}</p>}
     </div>

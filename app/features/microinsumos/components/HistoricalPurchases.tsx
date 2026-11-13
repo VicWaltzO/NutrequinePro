@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { AppState, Submit, MicroPurchase } from "@/lib/domain-types";
-import { Input, Field, money, kg } from "@/shared/ui";
+import { Input, Field, money, weight } from "@/shared/ui";
 import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 
 type Line = { micro_ingredient_id: string; quantity_kg: string; unit_price: string; amount: string };
@@ -377,7 +377,7 @@ export default function HistoricalPurchases({
                     {s.microIngredients.find((m) => m.id === x.micro_ingredient_id)?.name} ·{" "}
                     {x.quantity_grams === null
                       ? "Kg desconocidos"
-                      : `${kg(x.quantity_grams)} kg documentales`}{" "}
+                      : `${weight(x.quantity_grams)} documentales`}{" "}
                     · {x.amount_cents === null ? "Importe no desglosado" : money(x.amount_cents)} · Corte
                     validado: {x.cutoff_date_snapshot ?? "Sin corte"}
                   </p>

@@ -200,7 +200,7 @@ test(
     await b.getByText("Necesidades y faltantes por microinsumo", { exact: true }).click();
     await expect(
       b.getByText(
-        "Requerido: 0.02000 kg · Asignado a esta orden: 0.02000 kg · Físico: 0.02500 kg · Asignado total: 0.02000 kg · Libre: 0.00500 kg · Faltante: 0.00000 kg",
+        "Requerido: 20 g · Asignado a esta orden: 20 g · Físico: 25 g · Asignado total: 20 g · Libre: 5 g · Faltante: 0 g",
         { exact: true },
       ),
     ).toBeVisible();

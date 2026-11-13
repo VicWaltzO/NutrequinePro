@@ -5,7 +5,7 @@ import { Check, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import type { AppState } from "@/lib/domain-types";
 import type { SaleLine } from "@/shared/types/forms";
 import { stock } from "../../inventario/domain/stock.mjs";
-import { Input, ProductImage, money, kg, find, num } from "@/shared/ui";
+import { Input, ProductImage, money, weight, find, num } from "@/shared/ui";
 import {
   addSaleProduct,
   createSaleLine,
@@ -144,7 +144,8 @@ export function SaleLineEditor({
                   setAnnouncement(choiceProduct.name + " agregado a la línea " + (index + 1) + ".");
                 }}
               >
-                Línea {index + 1} · {rows[index].unit_weight_kg} kg / {unitLabels(choiceProduct).singular}
+                Línea {index + 1} · {weight(Number(rows[index].unit_weight_kg) * 1000)} /{" "}
+                {unitLabels(choiceProduct).singular}
                 {" · "}
                 {money(Math.round(Number(rows[index].unit_price) * 100))}
               </button>
@@ -204,7 +205,7 @@ export function SaleLineEditor({
                     </select>
                     {available && (
                       <small>
-                        Stock: {num(available.quantity)} {unit.plural} · {kg(available.weight_kg)} kg
+                        Stock: {num(available.quantity)} {unit.plural} · {weight(available.weight_kg)}
                       </small>
                     )}
                   </label>

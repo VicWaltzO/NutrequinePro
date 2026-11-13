@@ -43,7 +43,7 @@ test(
     await page.getByLabel("Procedencia de la cantidad").fill("Pesaje sintético sin tara");
     await save();
     const row = page.getByRole("row").filter({ hasText: "Micro sintético Z" });
-    await expect(row).toContainText("0.05");
+    await expect(row).toContainText("50 g");
     await expect(row).toContainText("Estimada");
     await expect(row).toContainText("Desconocido");
     await page.getByRole("button", { name: "Corregir saldo de Micro sintético Z", exact: true }).click();

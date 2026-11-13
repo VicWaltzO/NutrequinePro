@@ -138,7 +138,7 @@ test(
         .locator(".preparation-record")
         .first()
         .getByText(
-          "Requerido: 0.02000 kg · Asignado a esta orden: 0.00000 kg · Físico: 0.00500 kg · Asignado total: 0.00000 kg · Libre: 0.00500 kg · Faltante: 0.01500 kg",
+          "Requerido: 20 g · Asignado a esta orden: 0 g · Físico: 5 g · Asignado total: 0 g · Libre: 5 g · Faltante: 15 g",
           {
             exact: true,
           },

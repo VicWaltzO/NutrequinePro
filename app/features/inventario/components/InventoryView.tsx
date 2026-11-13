@@ -3,7 +3,7 @@ import ProductCatalog from "./ProductCatalog";
 import type { AppState, OpenModal, Submit } from "@/lib/domain-types";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
 import { stock } from "@/lib/domain-preview.mjs";
-import { SortableTable, kg, num, label, find } from "@/shared/ui";
+import { SortableTable, weight, num, label, find } from "@/shared/ui";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";
 import { unitLabels } from "@/shared/domain/presentation.mjs";
@@ -49,7 +49,7 @@ export default function InventoryView({
             {productCards}
             <section className="panel">
               <SortableTable
-                heads={["Producto", "Cantidad física", "Kg físicos", "Cantidad comprometida"]}
+                heads={["Producto", "Cantidad física", "Peso físico", "Cantidad comprometida"]}
                 rows={state.products}
                 values={[
                   (p) => p.name,
@@ -67,7 +67,7 @@ export default function InventoryView({
                       <td>
                         {num(a.quantity)} {unitLabels(p).plural}
                       </td>
-                      <td>{kg(a.weight_kg)}</td>
+                      <td>{weight(a.weight_kg)}</td>
                       <td>
                         {num(a.committed)} {unitLabels(p).plural}
                       </td>
@@ -81,7 +81,7 @@ export default function InventoryView({
           <>
             <section className="panel flush">
               <SortableTable
-                heads={["Fecha", "Ítem", "Movimiento", "Cantidad", "Kg", "Origen", "Notas"]}
+                heads={["Fecha", "Ítem", "Movimiento", "Cantidad", "Peso", "Origen", "Notas"]}
                 rows={state.inventoryMovements.filter(match).slice().reverse()}
                 values={[
                   (x) => x.date,
@@ -113,7 +113,7 @@ export default function InventoryView({
                       {x.quantity > 0 ? "+" : ""}
                       {x.quantity} {x.item_type === "PRODUCT" ? unitLabels(x).plural : ""}
                     </td>
-                    <td>{kg(x.weight_kg)}</td>
+                    <td>{weight(x.weight_kg)}</td>
                     <td>
                       {["SALE", "PRODUCTION"].includes(x.source_type) ? (
                         <button

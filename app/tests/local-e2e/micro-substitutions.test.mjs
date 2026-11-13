@@ -116,6 +116,12 @@ test(
     const history = JSON.stringify((await state()).microConfirmations[0]);
     console.log("NQP25 E2E: grupo A cerrado, snapshot conservado");
     const pending = await create("20");
+    const otherPending = await rev("MICRO_PREPARATION_CREATE", {
+      family: "VERDE_AMARILLO",
+      formula_id: policies[1].formula_id,
+      nuclei: "10",
+      date: "2026-11-09",
+    });
     await rev("MICRO_ASSIGN", { preparation_id: pending, reason: "PendienteA" });
     const page = await context.newPage();
     const errors = [];
@@ -146,6 +152,25 @@ test(
     console.log("NQP25 E2E: cancelación sin escritura");
     await open();
     await expect(panel.getByLabel("Comparación de recetas")).toContainText("137 g/núcleo");
+    const consent = panel.getByLabel("Confirmo expresamente adoptar", { exact: false });
+    const confirm = panel.getByRole("button", { name: "Confirmar operación autorizada" });
+    await consent.check();
+    await panel.getByLabel("Preparación del grupo").selectOption(otherPending);
+    await expect(consent).not.toBeChecked();
+    await expect(confirm).toBeDisabled();
+    await expect(panel.getByLabel("Comparación de recetas")).toContainText("71 g/núcleo");
+    await consent.check();
+    await panel.getByLabel("Sustitución propuesta").selectOption("");
+    await expect(consent).not.toBeChecked();
+    await expect(confirm).toBeDisabled();
+    await panel.getByLabel("Sustitución propuesta").selectOption((await state()).microSubstitutions[0].id);
+    await expect(consent).not.toBeChecked();
+    await consent.check();
+    await panel.getByLabel("Preparación del grupo").selectOption(pending);
+    await expect(consent).not.toBeChecked();
+    await expect(confirm).toBeDisabled();
+    assert.equal((await state()).revision, before);
+
     await expect(page.locator(".toast")).toBeHidden({ timeout: 10000 });
     for (const width of [1440, 390])
       for (const theme of ["light", "dark"]) {

@@ -1,7 +1,7 @@
-import { exactKg } from "./preparation-view";
+import { preparationWeight } from "./preparation-view";
 import { useEffect, useRef, useState } from "react";
 import type { AppState, Submit, MicroReceipt } from "@/lib/domain-types";
-import { Input, Field, money, kg } from "@/shared/ui";
+import { Input, Field, money, weight } from "@/shared/ui";
 import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 
 type Line = {
@@ -274,7 +274,7 @@ export default function OperationalPurchases({
             return (
               <li key={l.id}>
                 {s.microIngredients.find((m) => m.id === l.micro_ingredient_id)?.name} · Stock físico:{" "}
-                {exactKg(l.ledger.quantity_hundredths ?? l.ledger.quantity_grams * 100)} kg · Valor:{" "}
+                {preparationWeight(l.ledger.quantity_hundredths ?? l.ledger.quantity_grams * 100)} · Valor:{" "}
                 {value ? roundedMoney(BigInt(value.n), BigInt(value.d)) : "Desconocido"} · Costo medio/kg:{" "}
                 {value && l.ledger.quantity_grams > 0
                   ? roundedMoney(
@@ -307,7 +307,7 @@ export default function OperationalPurchases({
               .map((l) => (
                 <li key={l.id}>
                   {s.microIngredients.find((m) => m.id === l.micro_ingredient_id)?.name} ·{" "}
-                  {kg(l.quantity_grams)} kg · Precio/kg: {money(l.unit_price_cents)} · Bruto:{" "}
+                  {weight(l.quantity_grams)} · Precio/kg: {money(l.unit_price_cents)} · Bruto:{" "}
                   {money(l.amount_cents)} · Descuento: {money(l.discount_cents)} · Recibido:{" "}
                   {money(l.total_cost_cents)}
                 </li>

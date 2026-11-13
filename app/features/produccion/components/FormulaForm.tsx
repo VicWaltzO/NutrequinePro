@@ -1,7 +1,7 @@
 import { orderNominal } from "@/shared/lib/nominal-order.mjs";
 import { useState } from "react";
 import type { NumericInput } from "@/lib/domain-types";
-import { Input, Select, Table, day } from "@/shared/ui";
+import { Input, Select, Table, day, weight } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import type { FormProps } from "@/shared/types/forms";
 import { isNucleusProduct } from "@/shared/domain/presentation.mjs";
@@ -104,7 +104,7 @@ export function FormulaForm({ s: state, record, submit, close, busy }: FormProps
       </button>
       <div className="total-line">
         Peso de fórmula por núcleo{" "}
-        <strong>{rows.reduce((n, x) => n + Number(x.kg_per_nucleus), 0)} kg</strong>
+        <strong>{weight(rows.reduce((n, x) => n + Number(x.kg_per_nucleus), 0) * 1000)}</strong>
       </div>
       <Footer busy={busy} close={close} label="Crear versión de fórmula" />
     </form>
