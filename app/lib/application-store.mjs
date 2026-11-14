@@ -1,3 +1,4 @@
+import { assertMillCostIntegrity } from "../features/produccion/domain/mill-cost.mjs";
 import { assertMillIntegrity } from "../features/produccion/domain/mill-integrity.mjs";
 import { assertMillChargeIntegrity } from "../features/produccion/domain/mill-charge.mjs";
 import { assertSubstitutionIntegrity } from "../features/microinsumos/domain/substitutions.mjs";
@@ -29,6 +30,7 @@ export function createStore(getDatabase, options = {}) {
     assertConfirmationIntegrity(after);
     assertMillIntegrity(before, after);
     assertMillChargeIntegrity(before, after);
+    assertMillCostIntegrity(before, after);
     const binding = getDatabase();
     const statements = writePlan(before, after).map((statement) =>
       binding.prepare(statement.sql).bind(...statement.args),
@@ -91,6 +93,7 @@ export function createStore(getDatabase, options = {}) {
           entry.request_id === command.request_id &&
           entry.created_by !== actor.id &&
           ([
+            "MILL_COST_INPUT",
             "MILL_RECONCILE",
             "MILL_CLOSE",
             "JOURNEY_CREATE",
@@ -100,6 +103,7 @@ export function createStore(getDatabase, options = {}) {
             "MICRO_GROUP_LINK",
           ].includes(command.type) ||
             [
+              "MILL_COST_INPUT",
               "MILL_RECONCILE",
               "MILL_CLOSE",
               "JOURNEY_CREATE",

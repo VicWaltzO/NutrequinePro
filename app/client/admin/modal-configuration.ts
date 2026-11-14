@@ -1,5 +1,6 @@
 export const titles: Record<string, string> = {
   "mill-close": "Cierre físico del molino",
+  "mill-cost": "Costos documentados por producto",
   "mill-charge": "Cobro teórico y real del molino",
   journey: "Nueva orden de jornada",
   "journey-link": "Vincular núcleos confirmados",
