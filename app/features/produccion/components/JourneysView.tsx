@@ -1,3 +1,4 @@
+import { MillCostDetail } from "./MillCostDetail";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { journeyFamily, journeySummary } from "../domain/journey-view.mjs";
 import { millChargeHistory } from "../domain/mill-charge.mjs";
@@ -108,6 +109,12 @@ export default function JourneysView({
                   </p>
                 ) : (
                   <p>Sacos reales y merma: pendientes del molino · Costo final: pendiente</p>
+                )}
+                <MillCostDetail s={s} lineId={line.id} />
+                {write && line.closure && (
+                  <button onClick={() => open("mill-cost", { id: line.id })}>
+                    Registrar costos de {line.product_name}
+                  </button>
                 )}
                 {line.closure && (
                   <>
