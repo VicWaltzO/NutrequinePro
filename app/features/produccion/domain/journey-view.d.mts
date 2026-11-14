@@ -5,9 +5,11 @@ import type {
   ProductionJourneyLine,
   ProductionJourneyLink,
   Rational,
+  MillClosure,
 } from "../../../shared/types/domain";
 export function journeyFamily(product: Product): string | null;
 export interface JourneyLineSummary extends ProductionJourneyLine {
+  closure: MillClosure | null;
   confirmed_hundredths: number;
   status: string;
   links: (ProductionJourneyLink & {

@@ -38,6 +38,7 @@ export const names: Record<string, string> = {
   LOGISTICS: "Logística",
   OPERATING: "Operativo",
   ADMINISTRATIVE: "Administrativo",
+  MILL_CLOSURE: "Cierre de molino",
   PRODUCTION_IN: "Entrada de producción",
   SALE_OUT: "Salida de venta",
   RETURN_IN: "Devolución",

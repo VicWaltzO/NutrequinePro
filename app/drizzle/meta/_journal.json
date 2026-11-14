@@ -71,6 +71,13 @@
       "when": 1794614075592,
       "tag": "0009_production_journeys",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1794630637097,
+      "tag": "0010_mill_closures",
+      "breakpoints": true
     }
   ]
 }

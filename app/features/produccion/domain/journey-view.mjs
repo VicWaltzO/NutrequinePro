@@ -42,19 +42,28 @@ export function journeySummary(s, journey) {
           };
         });
       const confirmed_hundredths = links.reduce((n, l) => n + l.nuclei_hundredths, 0);
+      const closure = s.millClosures.find((c) => c.line_id === line.id) ?? null;
       return {
         ...line,
+        closure,
+        actual_bags: closure?.actual_bags ?? null,
+        waste_grams: closure?.waste_grams ?? null,
         links,
         confirmed_hundredths,
-        status: coverageStatus(confirmed_hundredths === line.nuclei_hundredths, confirmed_hundredths > 0),
+        status: closure
+          ? "CLOSED"
+          : coverageStatus(confirmed_hundredths === line.nuclei_hundredths, confirmed_hundredths > 0),
       };
     });
   return {
     ...journey,
     lines,
-    status: coverageStatus(
-      lines.length && lines.every((l) => l.status === "READY"),
-      lines.some((l) => l.confirmed_hundredths > 0),
-    ),
+    status:
+      lines.length && lines.every((l) => l.closure)
+        ? "CLOSED"
+        : coverageStatus(
+            lines.length && lines.every((l) => l.confirmed_hundredths === l.nuclei_hundredths),
+            lines.some((l) => l.confirmed_hundredths > 0),
+          ),
   };
 }

@@ -92,7 +92,7 @@ export default function InventoryView({
                   (x) => [
                     find(state, x.source_type === "SALE" ? "sales" : "productions", x.source_id)?.code ??
                       x.source_type,
-                    x.source_type,
+                    label(x.source_type),
                   ],
                   (x) => x.notes,
                 ]}
@@ -127,7 +127,7 @@ export default function InventoryView({
                           {find(state, x.source_type === "SALE" ? "sales" : "productions", x.source_id)?.code}
                         </button>
                       ) : (
-                        x.source_type
+                        label(x.source_type)
                       )}
                     </td>
                     <td>{x.notes}</td>

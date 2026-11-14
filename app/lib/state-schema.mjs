@@ -46,12 +46,22 @@ export const TABLES = [
   "microValuationEvents",
   "microIssues",
   "inventoryMovements",
+  "millClosures",
   "audit",
 ];
 export const SQL_NAMES = Object.fromEntries(
   TABLES.map((t) => [t, t.replace(/[A-Z]/g, (c) => "_" + c.toLowerCase())]),
 );
 export const RELATIONS = {
+  millClosures: [
+    "journey_id",
+    "line_id",
+    "product_id",
+    "request_id",
+    "actual_bags",
+    "waste_grams",
+    "movement_id",
+  ],
   productionJourneys: ["request_id"],
   productionJourneyLines: [
     "journey_id",

@@ -35,7 +35,7 @@ export default function JourneysView({
       <div className="section-heading">
         <div>
           <h2>Órdenes de jornada</h2>
-          <p>Planificación y núcleos por producto. El cierre del molino queda pendiente.</p>
+          <p>Planificación, núcleos y cierre del molino por producto terminado.</p>
         </div>
       </div>
       {!journeys.length && <Empty text="No hay jornadas registradas." />}
@@ -100,7 +100,19 @@ export default function JourneysView({
                     </details>
                   </div>
                 ))}
-                <p>Merma: pendiente del molino · Costo final: pendiente</p>
+                {line.closure ? (
+                  <p>
+                    Sacos completos reales: {num(line.actual_bags ?? 0)} · Merma equivalente estimada:{" "}
+                    {weight(line.waste_grams ?? 0)} · Cierre: {line.closure.date} · Costo final: pendiente
+                  </p>
+                ) : (
+                  <p>Sacos reales y merma: pendientes del molino · Costo final: pendiente</p>
+                )}
+                {write && line.status === "READY" && !line.closure && (
+                  <button onClick={() => open("mill-close", { id: line.id })}>
+                    Cerrar lote de {line.product_name}
+                  </button>
+                )}
                 {write && line.confirmed_hundredths < line.nuclei_hundredths && (
                   <button onClick={() => open("journey-link", { id: line.id })}>
                     Vincular núcleos a {line.product_name}
@@ -115,6 +127,7 @@ export default function JourneysView({
   );
 }
 export function journeyStatus(status: string) {
+  if (status === "CLOSED") return "Molino cerrado";
   return status === "READY"
     ? "Núcleos vinculados"
     : status === "PARTIAL"

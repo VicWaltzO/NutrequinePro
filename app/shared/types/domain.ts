@@ -486,8 +486,8 @@ export interface ProductionJourneyLine extends Entity {
     price_cents_per_kg: number;
     estimated_cents: number;
   }[];
-  actual_bags: null;
-  waste_grams: null;
+  actual_bags: number | null;
+  waste_grams: number | null;
   final_cost_cents: null;
 }
 export interface ProductionJourneyLink extends Entity {
@@ -497,7 +497,24 @@ export interface ProductionJourneyLink extends Entity {
   nuclei_hundredths: number;
   request_id: string;
 }
+export interface MillClosure extends Entity {
+  journey_id: string;
+  line_id: string;
+  product_id: string;
+  request_id: string;
+  date: string;
+  lot_complete: boolean;
+  formula_consent: boolean;
+  formula_mismatch: boolean;
+  actual_bags: number;
+  waste_grams: number;
+  theoretical_weight_grams: number;
+  unit_weight_grams: number;
+  movement_id: string | null;
+  final_cost_cents: null;
+}
 export interface Tables {
+  millClosures: MillClosure[];
   productionJourneys: ProductionJourney[];
   productionJourneyLines: ProductionJourneyLine[];
   productionJourneyLinks: ProductionJourneyLink[];
