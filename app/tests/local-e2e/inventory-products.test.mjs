@@ -60,6 +60,7 @@ test(
       await expect(target.locator("main .tabs").first().getByRole("button")).toHaveText([
         "Stock actual",
         "Movimientos",
+        "Valoración",
         "Productos",
         "Microinsumos",
       ]);

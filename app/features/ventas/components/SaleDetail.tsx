@@ -1,3 +1,4 @@
+import { saleCommercialCost, costMoney } from "@/features/inventario/domain/commercial-cost.mjs";
 import { saleSummary, deliveryAvailability } from "@/lib/domain-preview.mjs";
 import { SortableTable, Metrics, Badge, History, money, weight, find, stamp, label } from "@/shared/ui";
 import type { DetailProps } from "@/shared/types/details";
@@ -10,6 +11,7 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
   const sale = find(state, "sales", id);
   if (!sale) return null;
   const a = saleSummary(state, sale);
+  const economic = saleCommercialCost(state, id);
   const payments = state.paymentApplications.filter((x) => x.sale_id === id);
   const availability = sale.coverage_version === 1 ? [] : deliveryAvailability(state, a.items);
   const shortage =
@@ -49,6 +51,21 @@ export default function SaleDetail({ s: state, actor, id, open, run }: DetailPro
           { label: "Saldo", value: money(a.balance) },
         ]}
       />
+      <section className="panel" aria-label="Costo histórico comercial">
+        <h3>Costo y margen de la entrega</h3>
+        {economic.status === "RECOGNIZED" ? (
+          <p>
+            Costo reconocido: {money(costMoney(economic.cost)!)}. Margen comercial:{" "}
+            {money(a.total - costMoney(economic.cost)!)}.
+          </p>
+        ) : (
+          <p>
+            {economic.status === "PENDING"
+              ? "Costo y margen pendientes de valoración. La entrega permanece registrada."
+              : "Sin valoración histórica en este registro. Los pedidos pendientes no reconocen costo de venta."}
+          </p>
+        )}
+      </section>
       <div className="detail-actions">
         {admin &&
           ["CONFIRMED", "RECTIFIED"].includes(sale.commercial_status) &&

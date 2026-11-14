@@ -104,10 +104,11 @@ export function createSaleOperations(context) {
     );
   };
   const outputSale = (sale, rows, mult = 1, kind = "SALE_OUT") =>
-    rows.forEach((x) =>
+    rows.map((x) =>
       movement({
         ...presentationSnapshot(x, true),
         item_type: "PRODUCT",
+        sale_item_id: x.id,
         item_id: x.product_id,
         movement_type: kind,
         quantity: -mult * x.quantity,

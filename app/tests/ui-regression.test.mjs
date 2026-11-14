@@ -12,6 +12,10 @@ test("vistas por rol, rutas antiguas y formularios conservan la referencia del r
       html
         // The only new navigation control; micros has its own interactive E2E.
         .replace('<button type="button" class="">Microinsumos</button>', "")
+        // NQP33 adds this tab; its valuation flow has dedicated interactive coverage.
+        .replace('<button type="button" class="">Valoración</button>', "")
+        // NQP33 economic detail is asserted below and through its interactive E2E.
+        .replace(/<section class="panel" aria-label="Costo histórico comercial">[\s\S]*?<\/section>/g, "")
         // NQP29 adds only this tab to legacy routes; its flow is covered by E2E.
         .replace('<button type="button" class="">Jornadas</button>', "")
         .replace(
@@ -34,5 +38,16 @@ test("NQP29 navegación ofrece jornada por rol sin cambiar el ingreso histórico
     assert.match(html, /Órdenes de jornada/);
     if (role === "VIEWER") assert.doesNotMatch(html, />Nueva jornada<\/button>/);
     else assert.match(html, />Nueva jornada<\/button>/);
+  }
+});
+
+test("NQP33 valoración visible en tres roles y escritura restringida a ADMIN", () => {
+  const harness = createUiHarness();
+  for (const role of ["ADMIN", "OPERATOR", "VIEWER"]) {
+    const html = harness.render("inventory/valuation", role);
+    assert.match(html, /Valoración comercial/);
+    assert.match(html, /saldo físico actual como apertura pendiente/);
+    if (role === "ADMIN") assert.match(html, />Iniciar valoración comercial<\/button>/);
+    else assert.doesNotMatch(html, /aria-label="Registrar valoración comercial"/);
   }
 });
