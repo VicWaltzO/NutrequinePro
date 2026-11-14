@@ -12,6 +12,6 @@ La migración aditiva 0009 incorpora cabeceras, líneas y vínculos inmutables, 
 
 Pruebas automatizadas: tests/production-journeys.test.mjs y tests/local-e2e/production-journeys.test.mjs; datos exclusivamente sintéticos. Los cuatro entregables detallados permanecen en las carpetas oficiales locales 03_REPORTES, 04_EVIDENCIAS y 05_BITACORA. La entrega requiere revisión técnica posterior y aprobación expresa; no incluye fusión ni despliegue.
 
-## Estado de esta entrega
+## Trazabilidad de ejecución
 
-Trabajo local incompleto: BLOQUEADO_CICLOS_AUTO. Se agotaron los dos ciclos automáticos de corrección autorizados. La ejecución completa de verify terminó con 624 casos: 611 aprobados, siete fallidos y seis TODO históricos. Permanecen incompatibilidades del arnés de interfaz con la importación local de CSS y expectativas de tablas/selectores en pruebas históricas. La suite E2E completa y las CI del SHA final no están aprobadas. El E2E específico y las pruebas independientes aprobadas corresponden a revisiones intermedias, no certifican el árbol final. No publicar ni integrar este estado sin resolver los hallazgos y repetir las verificaciones autorizadas.
+El límite de dos ciclos automáticos detuvo un intento previo. El usuario autorizó expresamente continuar esta misma tarea más allá de ese límite; se conservaron el worktree y la rama y se atendieron las incompatibilidades de las pruebas históricas con las nuevas tablas, selector y CSS. La autorización de continuidad no concede fusión, despliegue ni uso de datos empresariales. Los incidentes, resultados comprobados y revisión independiente quedan registrados en los cuatro entregables oficiales locales y en el PR de revisión.

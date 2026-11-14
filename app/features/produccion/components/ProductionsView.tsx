@@ -1,5 +1,4 @@
 import JourneysView from "./JourneysView";
-import "./journeys.css";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
 import { SortableTable, money, weight, find } from "@/shared/ui";
