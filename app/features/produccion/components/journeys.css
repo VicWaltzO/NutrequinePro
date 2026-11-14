@@ -1,0 +1,43 @@
+.journey-list {
+  padding: 22px;
+}
+.journey-list > details {
+  border-top: 1px solid var(--border);
+  padding: 20px 0;
+}
+.journey-list summary {
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.journey-line {
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+.journey-list p,
+.journey-reference {
+  overflow-wrap: anywhere;
+}
+.journey-reference {
+  margin: 12px 0;
+  padding: 12px;
+  background: var(--surface-subtle);
+}
+.journey-list .section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+@media (max-width: 760px) {
+  .journey-list {
+    padding: 18px;
+  }
+}
+
+.journey-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}

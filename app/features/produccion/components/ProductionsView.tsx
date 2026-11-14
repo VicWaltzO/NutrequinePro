@@ -1,3 +1,5 @@
+import JourneysView from "./JourneysView";
+import "./journeys.css";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
 import { SortableTable, money, weight, find } from "@/shared/ui";
@@ -12,6 +14,7 @@ export default function ProductionsView({
   match,
   filters,
   productionList,
+  filter = "",
   tabs,
 }: {
   s: AppState;
@@ -22,20 +25,24 @@ export default function ProductionsView({
   match: (record: Searchable) => boolean;
   filters: ReactNode;
   productionList: ReactNode;
+  filter?: string;
   tabs: (options: [string, string][]) => ReactNode;
 }) {
   return (
     <>
       {tabs([
         ["all", "Historial"],
+        ["journeys", "Jornadas"],
         ["draft", "Lotes a producir"],
         ["ingredients", "Insumos"],
         ["formulas", "Fórmulas"],
       ])}
       {filters}
-      <SubtabContent tab={tab} order={["all", "draft", "ingredients", "formulas"]}>
+      <SubtabContent tab={tab} order={["all", "draft", "journeys", "ingredients", "formulas"]}>
         <section className="panel flush">
-          {tab === "ingredients" ? (
+          {tab === "journeys" ? (
+            <JourneysView s={state} write={write} open={open} match={match} filter={filter} />
+          ) : tab === "ingredients" ? (
             <SortableTable
               heads={["Insumo", "Precio actual S/ por kg", "Estado", ""]}
               rows={state.ingredients.filter(match)}

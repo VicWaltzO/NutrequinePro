@@ -1,4 +1,6 @@
 export const titles: Record<string, string> = {
+  journey: "Nueva orden de jornada",
+  "journey-link": "Vincular núcleos confirmados",
   sale: "Nueva venta",
   "sale-delivery-date": "Cambiar fecha de entrega",
   production: "Registrar producción",

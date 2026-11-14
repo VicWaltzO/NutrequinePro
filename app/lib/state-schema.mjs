@@ -24,6 +24,9 @@ export const TABLES = [
   "productionProducts",
   "productionIngredients",
   "productionCosts",
+  "productionJourneys",
+  "productionJourneyLines",
+  "productionJourneyLinks",
   "sales",
   "saleItems",
   "saleProductionLinks",
@@ -49,6 +52,16 @@ export const SQL_NAMES = Object.fromEntries(
   TABLES.map((t) => [t, t.replace(/[A-Z]/g, (c) => "_" + c.toLowerCase())]),
 );
 export const RELATIONS = {
+  productionJourneys: ["request_id"],
+  productionJourneyLines: [
+    "journey_id",
+    "product_id",
+    "formula_id",
+    "micro_formula_id",
+    "nuclei_hundredths",
+    "family",
+  ],
+  productionJourneyLinks: ["line_id", "preparation_id", "confirmation_id", "nuclei_hundredths", "request_id"],
   microSubstitutions: [
     "policy_id",
     "request_id",
