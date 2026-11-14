@@ -60,7 +60,7 @@ export function saleSave(context) {
       coverSale(context, sale, savedRows);
     } else if (payload.deliver) {
       assertStock(rows);
-      outputSale(sale, rows);
+      outputSale(sale, savedRows);
       sale.fulfillment_status = "DELIVERED";
       sale.delivered_at = clock;
       sale.delivered_by = actor.id;
@@ -190,13 +190,17 @@ export function saleCorrect(context) {
     sum(rows, (x) => x.subtotal) >= before.summary.paid,
     "Hay pago excedente. Revierta el pago antes de completar la rectificación.",
   );
+  let correctedMovements = [];
   if (sale.fulfillment_status === "DELIVERED") {
     assertStock(rows, old);
     outputSale(sale, old, -1, "CANCELLATION_REVERSAL");
-    outputSale(sale, rows, 1, "ADJUSTMENT_OUT");
+    correctedMovements = outputSale(sale, rows, 1, "ADJUSTMENT_OUT");
   }
   old.forEach((x) => (pick(state, "saleItems", x.id).is_current = false));
-  rows.forEach((x) => add("saleItems", x));
+  rows.forEach((x, index) => {
+    const saved = add("saleItems", x);
+    if (correctedMovements[index]) correctedMovements[index].sale_item_id = saved.id;
+  });
   sale.commercial_status = "RECTIFIED";
   sale.notes = payload.notes ?? sale.notes;
   sale.updated_at = clock;
@@ -228,6 +232,7 @@ export function saleCancel(context) {
           ...presentationSnapshot(row, true),
           item_type: "PRODUCT",
           item_id: row.product_id,
+          sale_item_id: row.id,
           movement_type: "CANCELLATION_REVERSAL",
           quantity: quantity,
           weight_kg: weight,
@@ -302,6 +307,7 @@ export function returnCreate(context) {
       date: returnRecord.return_date,
       item_type: "PRODUCT",
       item_id: saleItem.product_id,
+      sale_item_id: saleItem.id,
       movement_type: "RETURN_IN",
       quantity: quantity,
       weight_kg: weight,

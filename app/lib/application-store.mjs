@@ -1,3 +1,7 @@
+import {
+  assertCommercialCostIntegrity,
+  costCommands,
+} from "../features/inventario/domain/commercial-cost.mjs";
 import { assertMillCostIntegrity } from "../features/produccion/domain/mill-cost.mjs";
 import { assertMillIntegrity } from "../features/produccion/domain/mill-integrity.mjs";
 import { assertMillChargeIntegrity } from "../features/produccion/domain/mill-charge.mjs";
@@ -31,6 +35,7 @@ export function createStore(getDatabase, options = {}) {
     assertMillIntegrity(before, after);
     assertMillChargeIntegrity(before, after);
     assertMillCostIntegrity(before, after);
+    assertCommercialCostIntegrity(before, after);
     const binding = getDatabase();
     const statements = writePlan(before, after).map((statement) =>
       binding.prepare(statement.sql).bind(...statement.args),
@@ -92,16 +97,18 @@ export function createStore(getDatabase, options = {}) {
         (entry) =>
           entry.request_id === command.request_id &&
           entry.created_by !== actor.id &&
-          ([
-            "MILL_COST_INPUT",
-            "MILL_RECONCILE",
-            "MILL_CLOSE",
-            "JOURNEY_CREATE",
-            "JOURNEY_LINK",
-            "MICRO_SUBSTITUTE",
-            "MICRO_ADOPT",
-            "MICRO_GROUP_LINK",
-          ].includes(command.type) ||
+          (costCommands.includes(command.type) ||
+            costCommands.includes(entry.action) ||
+            [
+              "MILL_COST_INPUT",
+              "MILL_RECONCILE",
+              "MILL_CLOSE",
+              "JOURNEY_CREATE",
+              "JOURNEY_LINK",
+              "MICRO_SUBSTITUTE",
+              "MICRO_ADOPT",
+              "MICRO_GROUP_LINK",
+            ].includes(command.type) ||
             [
               "MILL_COST_INPUT",
               "MILL_RECONCILE",

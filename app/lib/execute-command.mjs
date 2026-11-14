@@ -1,3 +1,7 @@
+import {
+  commercialCostCommand,
+  captureCommercialCosts,
+} from "../features/inventario/domain/commercial-cost.mjs";
 import { millCostInputs } from "../features/produccion/domain/mill-cost.mjs";
 import { millClose } from "../features/produccion/domain/mill-close.mjs";
 import { millReconcile } from "../features/produccion/domain/mill-charge.mjs";
@@ -54,6 +58,10 @@ import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-deliver
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 import { operationalSave } from "../features/microinsumos/domain/operational-purchases.mjs";
 const handlers = {
+  COST_START: commercialCostCommand,
+  COST_RECOGNIZE: commercialCostCommand,
+  COST_SETTLE: commercialCostCommand,
+  COST_ADJUST: commercialCostCommand,
   MILL_COST_INPUT: millCostInputs,
   MILL_RECONCILE: millReconcile,
   MILL_CLOSE: millClose,
@@ -134,6 +142,7 @@ export function executeCommand(original, command, actor, clock = new Date().toIS
     if (changedInventory) allocatePendingCoverage(context);
     assertCoverageIntegrity(state);
   }
+  captureCommercialCosts(original, context);
   for (const table of TABLES)
     for (const row of state[table])
       for (const [field, value] of Object.entries(row)) {

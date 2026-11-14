@@ -428,6 +428,10 @@ test("inventario histórico 64 y barrido AST: 31 selectores previos y 2 estados 
   const millCharge = "features/produccion/components/MillChargeForm.tsx";
   assert.equal(actual.get(millCharge), 1);
   actual.delete(millCharge);
+  // NQP33: action/direction are fixed states; entry targets retain audit sequence.
+  const commercialCosts = "features/inventario/components/CommercialCosts.tsx";
+  assert.equal(actual.get(commercialCosts), 3);
+  actual.delete(commercialCosts);
   assert.equal(
     [...actual.values()].reduce((a, b) => a + b, 0),
     31,

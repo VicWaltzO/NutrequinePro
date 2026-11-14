@@ -1,3 +1,4 @@
+import CommercialCosts from "./CommercialCosts";
 import MicroInventory from "@/features/microinsumos/components/MicroInventory";
 import ProductCatalog from "./ProductCatalog";
 import type { AppState, OpenModal, Submit } from "@/lib/domain-types";
@@ -35,12 +36,15 @@ export default function InventoryView({
       {tabs([
         ["all", "Stock actual"],
         ["movements", "Movimientos"],
+        ["valuation", "Valoración"],
         ["products", "Productos"],
         ["micros", "Microinsumos"],
       ])}
       <div hidden={tab !== "movements"}>{filters}</div>
-      <SubtabContent tab={tab} order={["all", "movements", "products", "micros"]}>
-        {tab === "micros" ? (
+      <SubtabContent tab={tab} order={["all", "movements", "valuation", "products", "micros"]}>
+        {tab === "valuation" ? (
+          <CommercialCosts s={state} admin={admin} run={run} busy={busy} />
+        ) : tab === "micros" ? (
           <MicroInventory s={state} admin={admin} run={run} busy={busy} />
         ) : tab === "products" ? (
           <ProductCatalog s={state} admin={admin} open={open} />
