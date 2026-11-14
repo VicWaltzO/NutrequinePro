@@ -246,6 +246,8 @@ export interface ProductionIngredient extends Entity {
   theoretical_gross_cost: number;
   discount_amount: number;
   theoretical_net_cost: number;
+  charged_grams?: number;
+  charged_price_cents_per_kg?: number;
   actual_charge: number | null;
   difference: number | null;
   is_paid: boolean;
