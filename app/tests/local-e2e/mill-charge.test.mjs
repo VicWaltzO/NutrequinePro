@@ -129,7 +129,9 @@ test(
     assert.deepEqual(errors, []);
     // The existing legacy reconciliation keeps its command, permissions and null history.
     const legacy = before.productions[0];
-    const ingredient = before.productionIngredients.find((r) => r.production_id === legacy.id);
+    const ingredient = before.productionIngredients.find(
+      (r) => r.production_id === legacy.id && r.theoretical_gross_cost >= 10,
+    );
     const ingredientName = before.ingredients.find((r) => r.id === ingredient.ingredient_id).name;
     assert.equal(ingredient.actual_charge, null);
     await page.goto(f.baseURL + "/#productions/all");
@@ -160,8 +162,20 @@ test(
     await legacyQty.fill("2");
     await legacyPrice.fill("4");
     await expect(row.getByLabel("Cobro real", { exact: true })).toHaveValue("8.00");
-    await dialog.getByRole("button", { name: "Restablecer al teórico neto", exact: true }).click();
+    for (let cents = 1; cents <= 10; cents++) {
+      await row.getByLabel("Descuento", { exact: true }).fill((cents / 100).toFixed(2));
+      await dialog.getByRole("button", { name: "Restablecer al teórico neto", exact: true }).click();
+      await expect(row.getByLabel("Cobro real", { exact: true })).toHaveValue(
+        ((ingredient.theoretical_gross_cost - cents) / 100).toFixed(2),
+      );
+    }
     await expect(legacyQty).toHaveValue(String(ingredient.total_kg / 1000));
+    await dialog.getByRole("button", { name: "Guardar conciliación", exact: true }).click();
+    await expect(dialog.getByRole("button", { name: "Guardar conciliación", exact: true })).toHaveCount(0);
+    const restored = (await state()).productionIngredients.find((r) => r.id === ingredient.id);
+    assert.equal(restored.actual_charge, ingredient.theoretical_gross_cost - 10);
+    assert.equal(restored.discount_amount, 10);
+    await dialog.getByRole("button", { name: "Conciliar costos", exact: true }).click();
     await legacyPrice.fill("4");
     await dialog.getByRole("button", { name: "Guardar conciliación", exact: true }).click();
     await expect(dialog.getByRole("button", { name: "Guardar conciliación", exact: true })).toHaveCount(0);
@@ -170,8 +184,10 @@ test(
     const billed = saved.productionIngredients.find((r) => r.id === ingredient.id);
     assert.equal(billed.charged_grams, ingredient.total_kg);
     assert.equal(billed.charged_price_cents_per_kg, 400);
-    assert.equal(billed.actual_charge, Math.round((ingredient.total_kg * 400) / 1000));
-    assert.equal(billed.theoretical_net_cost, ingredient.theoretical_net_cost);
+    assert.equal(billed.actual_charge, Math.round((ingredient.total_kg * 400) / 1000) - 10);
+    assert.equal(billed.discount_amount, 10);
+    assert.equal(billed.theoretical_gross_cost, ingredient.theoretical_gross_cost);
+    assert.equal(billed.theoretical_net_cost, ingredient.theoretical_gross_cost - 10);
     assert.deepEqual(saved.inventoryMovements, before.inventoryMovements);
     assert.deepEqual(saved.productionCosts, before.productionCosts);
     assert.deepEqual(errors, []);

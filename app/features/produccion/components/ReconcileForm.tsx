@@ -178,7 +178,7 @@ export function ReconcileForm({ s: state, record, submit, close, busy }: FormPro
           setRows((rows) =>
             rows.map((r) => ({
               ...r,
-              actual_charge: r.theoretical_gross_cost / 100 - Number(r.discount_amount),
+              actual_charge: (r.theoretical_gross_cost / 100 - Number(r.discount_amount)).toFixed(2),
               quantity_kg: r.total_kg / 1000,
               price_per_kg: r.historical_price_per_kg / 100,
               charged_grams: undefined,
