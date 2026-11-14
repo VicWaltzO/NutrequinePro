@@ -1,3 +1,4 @@
+import { MillCostForm } from "@/features/produccion/components/MillCostForm";
 import { MillCloseForm } from "@/features/produccion/components/MillCloseForm";
 import { MillChargeForm } from "@/features/produccion/components/MillChargeForm";
 import { JourneyForm } from "@/features/produccion/components/JourneyForm";
@@ -53,6 +54,7 @@ export default function ModalContent({
     close,
     busy,
   };
+  if (modal.type === "mill-cost") return <MillCostForm {...props} record={modal.record} />;
   if (modal.type === "mill-charge") return <MillChargeForm {...props} record={modal.record} />;
   if (modal.type === "mill-close") return <MillCloseForm {...props} record={modal.record} />;
   if (modal.type === "journey" || modal.type === "journey-link")
