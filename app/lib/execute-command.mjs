@@ -1,4 +1,5 @@
 import { millClose } from "../features/produccion/domain/mill-close.mjs";
+import { millReconcile } from "../features/produccion/domain/mill-charge.mjs";
 import { journeyCreate, journeyLink } from "../features/produccion/domain/journeys.mjs";
 import {
   microSubstitute,
@@ -52,6 +53,7 @@ import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-deliver
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 import { operationalSave } from "../features/microinsumos/domain/operational-purchases.mjs";
 const handlers = {
+  MILL_RECONCILE: millReconcile,
   MILL_CLOSE: millClose,
   JOURNEY_CREATE: journeyCreate,
   JOURNEY_LINK: journeyLink,

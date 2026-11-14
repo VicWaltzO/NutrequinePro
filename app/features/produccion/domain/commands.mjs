@@ -15,6 +15,7 @@ import {
 } from "../../../shared/domain/production-quantities.mjs";
 import { stock } from "../../inventario/domain/stock.mjs";
 import { productionSummary } from "./summary.mjs";
+import { chargedMacro } from "./mill-charge.mjs";
 import { isNucleusProduct } from "../../../shared/domain/presentation.mjs";
 export function formulaSave(context) {
   const { s: state, p: payload, add } = context;
@@ -133,10 +134,26 @@ export function productionReconcile(context) {
     );
     const discount = scaled(row.discount_amount ?? x.discount_amount / 100);
     requireValue(discount <= x.theoretical_gross_cost, "Descuento supera costo teórico.");
+    let actual = row.actual_charge === "" || row.actual_charge == null ? null : scaled(row.actual_charge);
+    if (row.quantity_kg !== undefined || row.price_per_kg !== undefined) {
+      const billed = chargedMacro(
+        x.charged_grams ?? x.total_kg,
+        x.charged_price_cents_per_kg ?? x.historical_price_per_kg,
+        row.quantity_kg,
+        row.price_per_kg,
+      );
+      requireValue(billed.actual_charge >= discount, "Descuento supera cobro del insumo.");
+      actual = billed.actual_charge - discount;
+      x.charged_grams = billed.actual_grams;
+      x.charged_price_cents_per_kg = billed.actual_price_cents_per_kg;
+    } else if (actual !== x.actual_charge || discount !== x.discount_amount) {
+      delete x.charged_grams;
+      delete x.charged_price_cents_per_kg;
+    }
     Object.assign(x, {
       discount_amount: discount,
       theoretical_net_cost: x.theoretical_gross_cost - discount,
-      actual_charge: row.actual_charge === "" || row.actual_charge == null ? null : scaled(row.actual_charge),
+      actual_charge: actual,
       is_paid: !!row.is_paid,
       notes: row.notes ?? x.notes,
     });

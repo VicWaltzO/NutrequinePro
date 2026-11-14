@@ -67,6 +67,8 @@ export interface ProductionValues {
   confirm: boolean;
 }
 export type ReconcileIngredient = Omit<ProductionIngredient, "actual_charge" | "discount_amount"> & {
+  quantity_kg?: NumericInput;
+  price_per_kg?: NumericInput;
   actual_charge: NumericInput;
   discount_amount: NumericInput;
 };

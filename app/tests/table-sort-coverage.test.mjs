@@ -161,6 +161,15 @@ for (const [id, props] of Object.entries(cases))
       assert.doesNotMatch(html, /table-sort/);
       return;
     }
+    if (id === "LOTE-CONCILIAR-INSUMOS") {
+      // Billing inputs added by NQP32 remain non-sortable; existing columns retain their contract.
+      expected.splice(
+        2,
+        0,
+        { Etiqueta_columna_real: "Kg cobrados", Ordenable_SI_NO: "NO" },
+        { Etiqueta_columna_real: "S/ por kg cobrado", Ordenable_SI_NO: "NO" },
+      );
+    }
     const actual = contracts(html)[props.index ?? 0];
     assert.ok(actual, "Debe montar una tabla: " + id);
     assert.deepEqual(

@@ -424,6 +424,10 @@ test("inventario histórico 64 y barrido AST: 31 selectores previos y 2 estados 
   const journeys = "features/produccion/components/JourneyForm.tsx";
   assert.equal(actual.get(journeys), 1);
   actual.delete(journeys);
+  // NQP32: two fixed billing modes, not a list of nominal entities.
+  const millCharge = "features/produccion/components/MillChargeForm.tsx";
+  assert.equal(actual.get(millCharge), 1);
+  actual.delete(millCharge);
   assert.equal(
     [...actual.values()].reduce((a, b) => a + b, 0),
     31,
