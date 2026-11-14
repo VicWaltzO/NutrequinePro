@@ -109,6 +109,7 @@ export function journeyLink(context) {
   fields(p, ["line_id", "preparation_id", "nuclei", "expected_revision"]);
   preflight(context);
   const line = pick(s, "productionJourneyLines", p.line_id);
+  requireValue(!s.millClosures.some((c) => c.line_id === line.id), "El lote ya está cerrado.");
   const prep = pick(s, "microPreparations", p.preparation_id);
   requireValue(prep.family === line.family, "Familia incompatible con el producto.");
   requireValue(!s.microSupersessions.some((x) => x.source_id === prep.id), "Preparación supersedida.");

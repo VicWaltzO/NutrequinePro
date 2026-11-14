@@ -51,6 +51,7 @@ export default function RecordFilters({
       { id: "PENDING", name: "Pendiente de núcleos" },
       { id: "PARTIAL", name: "Vinculación parcial" },
       { id: "READY", name: "Núcleos vinculados" },
+      { id: "CLOSED", name: "Molino cerrado" },
     ];
   else if (view === "productions") statusOptions = ["DRAFT", "CONFIRMED", "CLOSED", "CANCELLED"];
   else if (view === "collections") statusOptions = ["PENDING", "PARTIAL"];

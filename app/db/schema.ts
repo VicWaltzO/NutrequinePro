@@ -512,3 +512,36 @@ export const productionJourneyLinks = sqliteTable(
   },
   (t) => [check("journey_link_positive", sql`${t.nuclei_hundredths} BETWEEN 1 AND 1000000000000`)],
 );
+
+export const millClosures = sqliteTable(
+  "mill_closures",
+  {
+    ...base(),
+    journey_id: text("journey_id")
+      .notNull()
+      .references(() => productionJourneys.id),
+    line_id: text("line_id")
+      .notNull()
+      .unique()
+      .references(() => productionJourneyLines.id),
+    product_id: text("product_id")
+      .notNull()
+      .references(() => products.id),
+    request_id: text("request_id").notNull().unique(),
+    actual_bags: integer("actual_bags").notNull(),
+    waste_grams: integer("waste_grams").notNull(),
+    movement_id: text("movement_id")
+      .unique()
+      .references(() => inventoryMovements.id),
+  },
+  (t) => [
+    check(
+      "mill_bags_integer",
+      sql`typeof(${t.actual_bags}) = 'integer' AND ${t.actual_bags} BETWEEN 0 AND 1000000000000`,
+    ),
+    check(
+      "mill_waste_integer",
+      sql`typeof(${t.waste_grams}) = 'integer' AND ${t.waste_grams} BETWEEN 0 AND 1000000000000`,
+    ),
+  ],
+);

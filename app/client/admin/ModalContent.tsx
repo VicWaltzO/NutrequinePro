@@ -1,3 +1,4 @@
+import { MillCloseForm } from "@/features/produccion/components/MillCloseForm";
 import { JourneyForm } from "@/features/produccion/components/JourneyForm";
 import { recordId } from "@/lib/domain-types";
 import type { AppState, User, Sale, OpenModal, Submit } from "@/lib/domain-types";
@@ -51,6 +52,7 @@ export default function ModalContent({
     close,
     busy,
   };
+  if (modal.type === "mill-close") return <MillCloseForm {...props} record={modal.record} />;
   if (modal.type === "journey" || modal.type === "journey-link")
     return (
       <JourneyForm

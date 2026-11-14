@@ -172,7 +172,7 @@ test("NQP29 SQLite replay, colisión actor/payload, rollback tardío y concurren
   t.after(() => sql.close());
   assert.throws(() => sql.prepare("DELETE FROM production_journeys WHERE id=?").run(out.result), /Immutable/);
   assert.throws(() => sql.prepare("UPDATE production_journey_lines SET data=data").run(), /Immutable/);
-  assert.equal(inspectDatabase(f.file).version, 10);
+  assert.equal(inspectDatabase(f.file).version, 11);
 });
 test("NQP29 SQL adversarial: atribución excesiva, identidad falsa y FK", async (t) => {
   const f = journeyFixture();

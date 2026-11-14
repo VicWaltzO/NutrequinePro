@@ -216,6 +216,7 @@ export function guardCoverageMovementBatch(state, values) {
 }
 
 const inventoryCommands = new Set([
+  "MILL_CLOSE",
   "SALE_SAVE",
   "SALE_DELIVER",
   "SALE_CORRECT",
