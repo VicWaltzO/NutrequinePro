@@ -421,6 +421,9 @@ test("inventario histórico 64 y barrido AST: 31 selectores previos y 2 estados 
   const substitutions = "features/microinsumos/components/SubstitutionActions.tsx";
   assert.equal(actual.get(substitutions), 3);
   actual.delete(substitutions);
+  const journeys = "features/produccion/components/JourneyForm.tsx";
+  assert.equal(actual.get(journeys), 1);
+  actual.delete(journeys);
   assert.equal(
     [...actual.values()].reduce((a, b) => a + b, 0),
     31,

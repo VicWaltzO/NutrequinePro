@@ -8,6 +8,7 @@ import "./customer-name.css";
 import "./sale-form.css";
 import "./operation-forms.css";
 import "./production-entry.css";
+import "../features/produccion/components/journeys.css";
 import "./pending-stock.css";
 import "../features/microinsumos/components/micro-inventory.css";
 

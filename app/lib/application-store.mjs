@@ -86,8 +86,16 @@ export function createStore(getDatabase, options = {}) {
         (entry) =>
           entry.request_id === command.request_id &&
           entry.created_by !== actor.id &&
-          (["MICRO_SUBSTITUTE", "MICRO_ADOPT", "MICRO_GROUP_LINK"].includes(command.type) ||
-            ["MICRO_SUBSTITUTE", "MICRO_ADOPT", "MICRO_GROUP_LINK"].includes(entry.action) ||
+          (["JOURNEY_CREATE", "JOURNEY_LINK", "MICRO_SUBSTITUTE", "MICRO_ADOPT", "MICRO_GROUP_LINK"].includes(
+            command.type,
+          ) ||
+            [
+              "JOURNEY_CREATE",
+              "JOURNEY_LINK",
+              "MICRO_SUBSTITUTE",
+              "MICRO_ADOPT",
+              "MICRO_GROUP_LINK",
+            ].includes(entry.action) ||
             command.type === "MICRO_PREPARATION_CONFIRM" ||
             entry.action === "MICRO_PREPARATION_CONFIRM" ||
             command.type === "MICRO_ASSIGN" ||

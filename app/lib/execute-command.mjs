@@ -1,3 +1,4 @@
+import { journeyCreate, journeyLink } from "../features/produccion/domain/journeys.mjs";
 import {
   microSubstitute,
   microAdopt,
@@ -50,6 +51,8 @@ import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-deliver
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 import { operationalSave } from "../features/microinsumos/domain/operational-purchases.mjs";
 const handlers = {
+  JOURNEY_CREATE: journeyCreate,
+  JOURNEY_LINK: journeyLink,
   MICRO_SUBSTITUTE: microSubstitute,
   MICRO_ADOPT: microAdopt,
   MICRO_GROUP_LINK: microGroupLink,

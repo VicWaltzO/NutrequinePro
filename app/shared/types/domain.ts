@@ -460,7 +460,47 @@ export interface MicroIssue extends Entity {
   released_hundredths: number;
   event: unknown;
 }
+export interface ProductionJourney extends Entity {
+  code: string;
+  date: string;
+  timezone: string;
+  notes: string;
+  request_id: string;
+}
+export interface ProductionJourneyLine extends Entity {
+  journey_id: string;
+  product_id: string;
+  product_name: string;
+  family: string;
+  formula_id: string;
+  micro_formula_id: string;
+  nuclei_hundredths: number;
+  formula_snapshot: FormulaIngredient[];
+  micro_formula_snapshot: MicroFormulaLine[];
+  planned_weight_grams: number;
+  planned_bags: number;
+  macro_estimate: {
+    ingredient_id: string;
+    name: string;
+    grams: number;
+    price_cents_per_kg: number;
+    estimated_cents: number;
+  }[];
+  actual_bags: null;
+  waste_grams: null;
+  final_cost_cents: null;
+}
+export interface ProductionJourneyLink extends Entity {
+  line_id: string;
+  preparation_id: string;
+  confirmation_id: string;
+  nuclei_hundredths: number;
+  request_id: string;
+}
 export interface Tables {
+  productionJourneys: ProductionJourney[];
+  productionJourneyLines: ProductionJourneyLine[];
+  productionJourneyLinks: ProductionJourneyLink[];
   microSubstitutions: MicroSubstitution[];
   microSupersessions: MicroSupersession[];
   microPreparationGroups: MicroPreparationGroup[];

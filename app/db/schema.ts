@@ -463,3 +463,52 @@ export const microIssues = sqliteTable(
     ),
   ],
 );
+
+// Planning references do not create inventory or cost ledger entries.
+export const productionJourneys = sqliteTable("production_journeys", {
+  ...base(),
+  request_id: text("request_id").notNull().unique(),
+});
+export const productionJourneyLines = sqliteTable(
+  "production_journey_lines",
+  {
+    ...base(),
+    journey_id: text("journey_id")
+      .notNull()
+      .references(() => productionJourneys.id),
+    product_id: text("product_id")
+      .notNull()
+      .references(() => products.id),
+    formula_id: text("formula_id")
+      .notNull()
+      .references(() => formulas.id),
+    micro_formula_id: text("micro_formula_id")
+      .notNull()
+      .references(() => microFormulas.id),
+    nuclei_hundredths: integer("nuclei_hundredths").notNull(),
+    family: text("family").notNull(),
+  },
+  (t) => [
+    uniqueIndex("journey_product_unique").on(t.journey_id, t.product_id),
+    check("journey_nuclei_positive", sql`${t.nuclei_hundredths} BETWEEN 1 AND 1000000000000`),
+    check("journey_family", sql`${t.family} IN ('ROSADO','VERDE_AMARILLO')`),
+  ],
+);
+export const productionJourneyLinks = sqliteTable(
+  "production_journey_links",
+  {
+    ...base(),
+    line_id: text("line_id")
+      .notNull()
+      .references(() => productionJourneyLines.id),
+    preparation_id: text("preparation_id")
+      .notNull()
+      .references(() => microPreparations.id),
+    confirmation_id: text("confirmation_id")
+      .notNull()
+      .references(() => microConfirmations.id),
+    nuclei_hundredths: integer("nuclei_hundredths").notNull(),
+    request_id: text("request_id").notNull().unique(),
+  },
+  (t) => [check("journey_link_positive", sql`${t.nuclei_hundredths} BETWEEN 1 AND 1000000000000`)],
+);

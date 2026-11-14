@@ -6,6 +6,7 @@ import type { Dispatch, SetStateAction } from "react";
 export default function RecordFilters({
   s: state,
   view,
+  tab = "",
   q,
   setQ,
   filter,
@@ -21,6 +22,7 @@ export default function RecordFilters({
 }: {
   s: AppState;
   view: string;
+  tab?: string;
   q: string;
   setQ: Dispatch<SetStateAction<string>>;
   filter: string;
@@ -34,7 +36,7 @@ export default function RecordFilters({
   to: string;
   setTo: Dispatch<SetStateAction<string>>;
 }) {
-  let statusOptions = [
+  let statusOptions: (string | { id: string; name: string })[] = [
     "DRAFT",
     "CONFIRMED",
     "RECTIFIED",
@@ -44,7 +46,13 @@ export default function RecordFilters({
     "DELIVERED",
     "CANCELLED",
   ];
-  if (view === "productions") statusOptions = ["DRAFT", "CONFIRMED", "CLOSED", "CANCELLED"];
+  if (view === "productions" && tab === "journeys")
+    statusOptions = [
+      { id: "PENDING", name: "Pendiente de núcleos" },
+      { id: "PARTIAL", name: "Vinculación parcial" },
+      { id: "READY", name: "Núcleos vinculados" },
+    ];
+  else if (view === "productions") statusOptions = ["DRAFT", "CONFIRMED", "CLOSED", "CANCELLED"];
   else if (view === "collections") statusOptions = ["PENDING", "PARTIAL"];
   return (
     <div className="filters">

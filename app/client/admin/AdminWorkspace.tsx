@@ -77,6 +77,7 @@ export default function AdminWorkspace({
     <RecordFilters
       s={state}
       view={view}
+      tab={tab}
       q={q}
       setQ={setQ}
       filter={filter}
@@ -153,6 +154,7 @@ export default function AdminWorkspace({
           open={open}
           match={match}
           filters={filters}
+          filter={filter}
           productionList={productionList}
           tabs={tabs}
         />

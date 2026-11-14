@@ -1,3 +1,4 @@
+import { JourneyForm } from "@/features/produccion/components/JourneyForm";
 import { recordId } from "@/lib/domain-types";
 import type { AppState, User, Sale, OpenModal, Submit } from "@/lib/domain-types";
 import { SaleDeliveryDateForm } from "@/features/ventas/components/SaleDeliveryDateForm";
@@ -50,6 +51,14 @@ export default function ModalContent({
     close,
     busy,
   };
+  if (modal.type === "journey" || modal.type === "journey-link")
+    return (
+      <JourneyForm
+        {...props}
+        record={modal.record}
+        kind={modal.type === "journey-link" ? "link" : "create"}
+      />
+    );
   if (modal.type === "sale-delivery-date") return <SaleDeliveryDateForm {...props} />;
   if (modal.type === "sale") return <SaleForm {...props} />;
   if (modal.type === "production") return <ProductionForm {...props} />;

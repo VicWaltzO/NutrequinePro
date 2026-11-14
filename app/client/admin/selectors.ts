@@ -72,7 +72,8 @@ export function adminSelectors(
     .slice()
     .reverse();
   let productionAction: [string, string] = ["production", "Nueva producción"];
-  if (tab === "ingredients") productionAction = ["ingredient", "Nuevo insumo"];
+  if (tab === "journeys") productionAction = ["journey", "Nueva jornada"];
+  else if (tab === "ingredients") productionAction = ["ingredient", "Nuevo insumo"];
   else if (tab === "formulas") productionAction = ["formula", "Nueva fórmula"];
 
   const primary: Record<string, [string, string]> = {
