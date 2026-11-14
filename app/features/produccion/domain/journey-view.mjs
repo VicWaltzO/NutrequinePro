@@ -1,3 +1,4 @@
+import { correctedPreparation } from "../../microinsumos/domain/rectifications.mjs";
 import { pick } from "../../../shared/domain/core.mjs";
 import { MICRO_FAMILIES } from "../../microinsumos/domain/formulas.mjs";
 export function journeyFamily(product) {
@@ -22,9 +23,10 @@ export function journeySummary(s, journey) {
         .filter((l) => l.line_id === line.id)
         .map((link) => {
           const confirmation = pick(s, "microConfirmations", link.confirmation_id);
+          const current = correctedPreparation(s, confirmation);
           const ratio = BigInt(link.nuclei_hundredths);
-          const denominator = BigInt(confirmation.nuclei_hundredths);
-          const cost = confirmation.total_cost_cents;
+          const denominator = BigInt(current.usable_nuclei_hundredths ?? current.nuclei_hundredths);
+          const cost = current.total_cost_cents;
           return {
             ...link,
             formula_id: confirmation.formula_id,
@@ -37,7 +39,10 @@ export function journeySummary(s, journey) {
               .map((i) => ({
                 issue_id: i.id,
                 micro_ingredient_id: i.micro_ingredient_id,
-                quantity_hundredths: fraction(BigInt(i.quantity_hundredths) * ratio, denominator),
+                quantity_hundredths: fraction(
+                  BigInt(i.quantity_hundredths) * ratio,
+                  BigInt(confirmation.nuclei_hundredths),
+                ),
               })),
           };
         });
