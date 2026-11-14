@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import type { FormProps } from "@/shared/types/forms";
-import { Input, weight, num } from "@/shared/ui";
+import { Input, kg, num } from "@/shared/ui";
 import { Footer } from "@/shared/ui/FormFooter";
 import { createCommandRequest } from "@/lib/command-request.mjs";
 import { journeySummary } from "../domain/journey-view.mjs";
@@ -75,7 +75,7 @@ export function MillCloseForm({ s, record, submit, close, busy }: FormProps) {
         {valid && (
           <p role="status">
             Rendimiento real: {bags} sacos · Merma equivalente estimada:{" "}
-            {weight(line.planned_weight_grams - Number(bags) * 25000)}. No representa un pesaje del sobrante.
+            {kg(line.planned_weight_grams - Number(bags) * 25000)} kg. No representa un pesaje del sobrante.
           </p>
         )}
         <p>

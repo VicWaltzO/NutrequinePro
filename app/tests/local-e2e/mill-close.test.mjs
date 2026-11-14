@@ -66,7 +66,7 @@ test(
       ).toBeDisabled();
       await form.getByLabel("El molino terminó la totalidad de este lote-producto").check();
       await expect(form.getByText(/Merma equivalente estimada/)).toContainText(
-        bags === 39 ? "25" : bags === 38 ? "50" : "0",
+        bags === 39 ? "25 kg" : bags === 38 ? "50 kg" : "0 kg",
       );
       if (i === 0) {
         for (const width of [1440, 390]) {
@@ -98,6 +98,11 @@ test(
       await page.reload();
       await expect(page.getByRole("button", { name: `Cerrar lote de ${name}`, exact: true })).toHaveCount(0);
     }
+    await expect(
+      page
+        .getByRole("region", { name: synthetic.s.productionJourneyLines[2].product_name, exact: true })
+        .getByText(/Sacos completos reales:/),
+    ).toContainText("Merma equivalente estimada: 0 kg");
     const s = await state();
     assert.equal(
       JSON.stringify([s.microIssues, s.microConfirmations, s.productionJourneyLines, s.sales]),

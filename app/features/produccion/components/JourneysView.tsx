@@ -1,6 +1,6 @@
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { journeyFamily, journeySummary } from "../domain/journey-view.mjs";
-import { Empty, money, num, weight } from "@/shared/ui";
+import { Empty, money, num, weight, kg } from "@/shared/ui";
 import type { Searchable } from "@/shared/types/admin";
 
 export default function JourneysView({
@@ -103,7 +103,7 @@ export default function JourneysView({
                 {line.closure ? (
                   <p>
                     Sacos completos reales: {num(line.actual_bags ?? 0)} · Merma equivalente estimada:{" "}
-                    {weight(line.waste_grams ?? 0)} · Cierre: {line.closure.date} · Costo final: pendiente
+                    {kg(line.waste_grams ?? 0)} kg · Cierre: {line.closure.date} · Costo final: pendiente
                   </p>
                 ) : (
                   <p>Sacos reales y merma: pendientes del molino · Costo final: pendiente</p>
