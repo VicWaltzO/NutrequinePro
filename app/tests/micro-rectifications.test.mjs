@@ -63,6 +63,54 @@ test("NQP34 importación rechaza cierre omitido incluso con auditoría reordenad
     other.close();
   }
 });
+test("NQP34 importa aumento18 a20 vinculado y conserva rollback ante exceso", async () => {
+  const f = rectificationFixture();
+  let s = structuredClone(f.s);
+  s.microConfirmations = [];
+  s.microIssues = [];
+  s.microLedgers = [];
+  s = apply34(
+    s,
+    command("MICRO_PREPARATION_CONFIRM", {
+      preparation_id: f.id,
+      nuclei: "18",
+      date: "2026-11-14",
+      expected_revision: s.revision,
+    }),
+    f.options,
+  ).state;
+  s = apply34(s, rectify(s, "20", { recoverable: false }), f.options).state;
+  s = apply34(s, create(s, ["20"]), f.options).state;
+  s = apply34(s, link(s, s.productionJourneyLines[0].id, f.id, "20"), f.options).state;
+  const memory = memoryPersistence();
+  try {
+    const store = createStore(() => memory.binding, f.options);
+    const invalid = structuredClone(s);
+    invalid.productionJourneyLinks[0].nuclei_hundredths = 2100;
+    await assert.rejects(store.persistState(null, invalid));
+    assert.equal(await store.loadState(), null);
+    await store.persistState(null, s);
+    assert.deepEqual(await store.loadState(), s);
+  } finally {
+    memory.close();
+  }
+});
+
+test("NQP34 importa rectificacion auditada posterior a vinculos historicos", async () => {
+  const f = ready(["1"]);
+  let s = apply34(f.s, closeCommand(f.s), f.options).state;
+  s = apply34(s, rectify(s, "8", { recoverable: false }), f.options).state;
+  assert.equal(current(s).mode, "AUDIT_ONLY");
+  const memory = memoryPersistence();
+  try {
+    const store = createStore(() => memory.binding, f.options);
+    await store.persistState(null, s);
+    assert.deepEqual(await store.loadState(), s);
+  } finally {
+    memory.close();
+  }
+});
+
 function immutable(a, b) {
   for (const table of [
     "microIssues",
