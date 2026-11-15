@@ -1,3 +1,4 @@
+import { microPreparationRectify } from "../features/microinsumos/domain/rectifications.mjs";
 import {
   commercialCostCommand,
   captureCommercialCosts,
@@ -58,6 +59,7 @@ import { saleDeliveryDateUpdate } from "../features/ventas/domain/update-deliver
 import { saleCoverageAdopt } from "../features/ventas/domain/adopt-coverage.mjs";
 import { operationalSave } from "../features/microinsumos/domain/operational-purchases.mjs";
 const handlers = {
+  MICRO_PREPARATION_RECTIFY: microPreparationRectify,
   COST_START: commercialCostCommand,
   COST_RECOGNIZE: commercialCostCommand,
   COST_SETTLE: commercialCostCommand,

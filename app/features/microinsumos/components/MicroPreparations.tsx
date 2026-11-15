@@ -1,4 +1,5 @@
 import SubstitutionActions from "./SubstitutionActions";
+import RectificationActions from "./RectificationActions";
 import ConfirmationActions from "./ConfirmationActions";
 import { preparationWeight, rationalMoney, type Evaluation } from "./preparation-view";
 import AssignmentActions from "./AssignmentActions";
@@ -319,6 +320,15 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                       </p>
                     ))}
                 </div>
+              )}
+              {confirmation && (
+                <RectificationActions
+                  s={s}
+                  confirmation={confirmation}
+                  canWrite={data?.can_create ?? false}
+                  run={run}
+                  busy={busy}
+                />
               )}
               {s.microAssignments
                 .filter((a) => a.preparation_id === order.id)

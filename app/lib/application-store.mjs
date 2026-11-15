@@ -1,3 +1,4 @@
+import { assertRectificationIntegrity } from "../features/microinsumos/domain/rectifications.mjs";
 import {
   assertCommercialCostIntegrity,
   costCommands,
@@ -32,6 +33,7 @@ export function createStore(getDatabase, options = {}) {
   async function persistState(before, after) {
     assertSubstitutionIntegrity(before, after, options.microSubstitutionPolicies ?? []);
     assertConfirmationIntegrity(after);
+    assertRectificationIntegrity(before, after);
     assertMillIntegrity(before, after);
     assertMillChargeIntegrity(before, after);
     assertMillCostIntegrity(before, after);
@@ -119,6 +121,8 @@ export function createStore(getDatabase, options = {}) {
               "MICRO_ADOPT",
               "MICRO_GROUP_LINK",
             ].includes(entry.action) ||
+            command.type === "MICRO_PREPARATION_RECTIFY" ||
+            entry.action === "MICRO_PREPARATION_RECTIFY" ||
             command.type === "MICRO_PREPARATION_CONFIRM" ||
             entry.action === "MICRO_PREPARATION_CONFIRM" ||
             command.type === "MICRO_ASSIGN" ||

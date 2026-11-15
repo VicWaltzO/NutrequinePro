@@ -12,9 +12,29 @@ export function writePlan(before, after, guardId = crypto.randomUUID()) {
       sql: "INSERT INTO settings(id,data,revision) VALUES ('company',?,?)",
       args: [JSON.stringify(after.config), after.revision],
     });
-  for (const table of TABLES) {
+  // Imported links need physical rectifications already present. Audit-only
+  // rectifications follow historical links because they prohibit new links.
+  const isPhysicalRectification = (row) =>
+    row.entity_type === "MICRO_PREPARATION_RECTIFY" && row.new_snapshot?.mode === "PHYSICAL";
+  const writes = TABLES.flatMap((table) => {
+    if (!before && table === "productionJourneyLinks")
+      return [
+        { table: "corrections", rows: after.corrections.filter(isPhysicalRectification) },
+        { table, rows: after[table] },
+      ];
+    return [
+      {
+        table,
+        rows:
+          !before && table === "corrections"
+            ? after.corrections.filter((row) => !isPhysicalRectification(row))
+            : after[table],
+      },
+    ];
+  });
+  for (const { table, rows } of writes) {
     const previousRows = new Map((before?.[table] ?? []).map((x) => [x.id, JSON.stringify(x)]));
-    for (const row of after[table])
+    for (const row of rows)
       if (previousRows.get(row.id) !== JSON.stringify(row)) {
         const newPublication = table === "microFormulas" && !previousRows.has(row.id) && row.published_at;
         const columns = ["id", "data", ...(RELATIONS[table] ?? [])];

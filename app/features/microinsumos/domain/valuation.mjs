@@ -88,8 +88,9 @@ function eventInput(input) {
     Object.hasOwn(input, "quantity_hundredths") ? "quantity_hundredths" : "quantity_grams",
     "expected_revision",
   ];
-  requireValue(["RECEIPT", "ISSUE"].includes(input.type), "Evento de valoración no admitido.");
+  requireValue(["RECEIPT", "ISSUE", "RETURN"].includes(input.type), "Evento de valoración no admitido.");
   if (input.type === "RECEIPT") keys.push("total_cost_cents");
+  if (input.type === "RETURN") keys.push("source_issue_id");
   requireValue(
     Object.keys(input).length === keys.length && keys.every((key) => Object.hasOwn(input, key)),
     "Contrato de evento inválido; no admite gastos ni campos adicionales.",
@@ -107,8 +108,9 @@ function eventInput(input) {
   };
   if (input.type === "RECEIPT")
     result.total_cost_cents = integer(input.total_cost_cents, "Costo de recepción");
+  if (input.type === "RETURN") result.source_issue_id = identifier(input.source_issue_id);
   requireValue(
-    input.type === "ISSUE" || !Object.hasOwn(input, "quantity_hundredths"),
+    input.type !== "RECEIPT" || !Object.hasOwn(input, "quantity_hundredths"),
     "Recepción requiere gramos enteros.",
   );
   return result;
@@ -151,6 +153,21 @@ function advance(ledger, input, actorId, identities) {
   if (input.type === "RECEIPT") {
     balance = precise ? hundredths(physical + quantity) : integer(physical + quantity, "Saldo gramos");
     next.value_cents = add(ledger.value_cents, fraction(BigInt(input.total_cost_cents)));
+  } else if (input.type === "RETURN") {
+    const source = ledger.events.find(
+      (e) => e.input.id === input.source_issue_id && e.input.type === "ISSUE",
+    );
+    requireValue(source && precise, "Devolución requiere salida histórica exacta.");
+    const sourceQuantity = source.input.quantity_hundredths ?? source.input.quantity_grams * 100;
+    const returned = ledger.events
+      .filter((e) => e.input.type === "RETURN" && e.input.source_issue_id === source.input.id)
+      .reduce((n, e) => n + e.input.quantity_hundredths, 0);
+    requireValue(returned + quantity <= sourceQuantity, "Devolución superior al consumo histórico restante.");
+    const cost = prorate(source.snapshot.exact_cost_cents, quantity, sourceQuantity);
+    balance = hundredths(physical + quantity);
+    next.value_cents = add(ledger.value_cents, cost);
+    // Returns retain their own exact compensation. Original ISSUE/carry never change.
+    snapshot = { source_issue_id: source.input.id, exact_cost_cents: cost };
   } else {
     requireValue(quantity <= physical, "Stock insuficiente.");
     const cost = prorate(ledger.value_cents, quantity, physical);
@@ -242,6 +259,18 @@ export function createIssueValuation(opening, actor) {
   permission(actor, false);
   requireValue(["ADMIN", "OPERATOR"].includes(actor.role), "Salida no autorizada.");
   return initial(openingSnapshot(opening));
+}
+export function returnIssueValuation(ledger, event, actor) {
+  permission(actor, false);
+  requireValue(
+    ["ADMIN", "OPERATOR"].includes(actor.role) && event.type === "RETURN",
+    "Devolución no autorizada.",
+  );
+  const current = validated(ledger);
+  return advance(current, eventInput(event), actor.id, {
+    ids: new Set(current.events.map((row) => row.input.id)),
+    requests: new Set(current.events.map((row) => row.input.request_id)),
+  });
 }
 export function summarizeIssueCosts(costs, nucleiHundredths) {
   let total = zero();

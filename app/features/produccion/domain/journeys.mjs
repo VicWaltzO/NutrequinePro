@@ -1,3 +1,4 @@
+import { correctedPreparation } from "../../microinsumos/domain/rectifications.mjs";
 import { date, pick, requireValue, text, roundedProduct } from "../../../shared/domain/core.mjs";
 import { nucleusHundredths, perNucleusAmount } from "../../../shared/domain/production-quantities.mjs";
 import { journeyFamily } from "./journey-view.mjs";
@@ -118,11 +119,16 @@ export function journeyLink(context) {
   requireValue(typeof p.nuclei === "string", "Cantidad debe ser decimal explícito.");
   const nuclei = nucleusHundredths(p.nuclei);
   requireValue(nuclei > 0, "Cantidad vinculada debe ser positiva.");
+  const corrected = correctedPreparation(s, confirmation);
+  requireValue(
+    corrected.mode !== "AUDIT_ONLY",
+    "Preparación rectificada después de cierre comercial; no admite nuevos vínculos.",
+  );
   const assigned = s.productionJourneyLinks;
   requireValue(
     assigned.filter((x) => x.preparation_id === prep.id).reduce((n, x) => n + x.nuclei_hundredths, 0) +
       nuclei <=
-      confirmation.nuclei_hundredths,
+      corrected.usable_nuclei_hundredths,
     "Cantidad supera los núcleos confirmados disponibles.",
   );
   requireValue(
