@@ -66,7 +66,7 @@ export function operationalSave({ s, p, actor, add, clock, request_id }) {
   const current = p.id ? pick(s, "microReceipts", p.id) : null;
   requireValue(
     !current || current.status === "DRAFT",
-    "Compra confirmada inmutable; correcciones pendientes de NQP26-35.",
+    "Compra confirmada inmutable en este flujo; use la corrección auditada de compras.",
   );
   requireValue(!current || current.version === p.expected_version, "Versión obsoleta. Recargue la compra.");
   const supplier = literal(p.supplier, "Proveedor");
@@ -79,53 +79,7 @@ export function operationalSave({ s, p, actor, add, clock, request_id }) {
   );
   const documentDate = date(literal(p.document_date, "Fecha"));
   const source = literal(p.source, "Fuente / observaciones");
-  const total = decimal(p.total, 2);
-  const discount = decimal(p.discount ?? "0", 2);
-  requireValue(
-    Array.isArray(p.lines) && p.lines.length > 0 && p.lines.length <= 100,
-    "Incluya de 1 a 100 renglones.",
-  );
-  requireValue(
-    new Set(p.lines.map((line) => line?.micro_ingredient_id)).size === p.lines.length,
-    "Agrupe cada microinsumo en un solo renglón documentado.",
-  );
-  let gross = 0;
-  let discounts = 0;
-  const lines = p.lines.map((line) => {
-    fields(line, ["micro_ingredient_id", "quantity_kg", "unit_price", "amount", "discount"]);
-    const micro = pick(s, "microIngredients", literal(line.micro_ingredient_id, "Microinsumo"));
-    requireValue(micro.is_active, "Microinsumo inactivo.");
-    const opening = s.microOpenings.find((o) => o.micro_ingredient_id === micro.id);
-    requireValue(
-      opening && documentDate > opening.cutoff_date,
-      "La compra debe ser posterior al corte de cada microinsumo. Use compras históricas para fechas anteriores.",
-    );
-    const quantity = decimal(line.quantity_kg, 3);
-    const price = decimal(line.unit_price, 2);
-    const amount = decimal(line.amount, 2);
-    const reduction = decimal(line.discount ?? "0", 2);
-    requireValue(quantity > 0, "Cantidad recibida debe ser mayor que cero.");
-    requireValue(
-      roundedProduct(quantity, price, 1000) === amount,
-      "Importe no concilia con kg y precio del comprobante.",
-    );
-    requireValue(reduction <= amount, "Descuento de renglón excede su importe.");
-    gross = safe(gross + amount);
-    discounts = safe(discounts + reduction);
-    return {
-      micro_ingredient_id: micro.id,
-      quantity_grams: quantity,
-      unit_price_cents: price,
-      amount_cents: amount,
-      discount_cents: reduction,
-      total_cost_cents: amount - reduction,
-      cutoff_date_snapshot: opening.cutoff_date,
-    };
-  });
-  requireValue(
-    discounts === discount && gross - discount === total,
-    "Total y descuentos no concilian. Documente el descuento de cada renglón; no se reparte automáticamente.",
-  );
+  const { total, discount, lines } = receiptAmounts(s, p, documentDate);
   const confirmed = p.status === "CONFIRMED";
   if (confirmed) {
     requireValue(
@@ -214,4 +168,55 @@ export function operationalSave({ s, p, actor, add, clock, request_id }) {
       notes: source,
     }).id;
   return receipt.id;
+}
+
+export function receiptAmounts(s, p, documentDate) {
+  const total = decimal(p.total, 2);
+  const discount = decimal(p.discount ?? "0", 2);
+  requireValue(
+    Array.isArray(p.lines) && p.lines.length > 0 && p.lines.length <= 100,
+    "Incluya de 1 a 100 renglones.",
+  );
+  requireValue(
+    new Set(p.lines.map((line) => line?.micro_ingredient_id)).size === p.lines.length,
+    "Agrupe cada microinsumo en un solo renglón documentado.",
+  );
+  let gross = 0;
+  let discounts = 0;
+  const lines = p.lines.map((line) => {
+    fields(line, ["micro_ingredient_id", "quantity_kg", "unit_price", "amount", "discount"]);
+    const micro = pick(s, "microIngredients", literal(line.micro_ingredient_id, "Microinsumo"));
+    requireValue(micro.is_active, "Microinsumo inactivo.");
+    const opening = s.microOpenings.find((o) => o.micro_ingredient_id === micro.id);
+    requireValue(
+      opening && documentDate > opening.cutoff_date,
+      "La compra debe ser posterior al corte de cada microinsumo. Use compras históricas para fechas anteriores.",
+    );
+    const quantity = decimal(line.quantity_kg, 3);
+    const price = decimal(line.unit_price, 2);
+    const amount = decimal(line.amount, 2);
+    const reduction = decimal(line.discount ?? "0", 2);
+    requireValue(quantity > 0, "Cantidad recibida debe ser mayor que cero.");
+    requireValue(
+      roundedProduct(quantity, price, 1000) === amount,
+      "Importe no concilia con kg y precio del comprobante.",
+    );
+    requireValue(reduction <= amount, "Descuento de renglón excede su importe.");
+    gross = safe(gross + amount);
+    discounts = safe(discounts + reduction);
+    return {
+      micro_ingredient_id: micro.id,
+      quantity_grams: quantity,
+      unit_price_cents: price,
+      amount_cents: amount,
+      discount_cents: reduction,
+      total_cost_cents: amount - reduction,
+      cutoff_date_snapshot: opening.cutoff_date,
+    };
+  });
+  requireValue(
+    discounts === discount && gross - discount === total,
+    "Total y descuentos no concilian. Documente el descuento de cada renglón; no se reparte automáticamente.",
+  );
+  return { total, discount, lines };
 }

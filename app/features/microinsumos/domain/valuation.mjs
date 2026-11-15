@@ -88,8 +88,13 @@ function eventInput(input) {
     Object.hasOwn(input, "quantity_hundredths") ? "quantity_hundredths" : "quantity_grams",
     "expected_revision",
   ];
-  requireValue(["RECEIPT", "ISSUE", "RETURN"].includes(input.type), "Evento de valoración no admitido.");
+  requireValue(
+    ["RECEIPT", "ISSUE", "RETURN", "PURCHASE_ADJUSTMENT"].includes(input.type),
+    "Evento de valoración no admitido.",
+  );
+  const adjustment = input.type === "PURCHASE_ADJUSTMENT";
   if (input.type === "RECEIPT") keys.push("total_cost_cents");
+  if (adjustment) keys.push("cost_delta_cents", "receipt_id");
   if (input.type === "RETURN") keys.push("source_issue_id");
   requireValue(
     Object.keys(input).length === keys.length && keys.every((key) => Object.hasOwn(input, key)),
@@ -103,17 +108,34 @@ function eventInput(input) {
     date: date(input.date),
     ...(Object.hasOwn(input, "quantity_hundredths")
       ? { quantity_hundredths: hundredths(input.quantity_hundredths, true) }
-      : { quantity_grams: integer(input.quantity_grams, "Gramos", true) }),
+      : {
+          quantity_grams: adjustment
+            ? signed(input.quantity_grams, "Diferencia gramos")
+            : integer(input.quantity_grams, "Gramos", true),
+        }),
     expected_revision: integer(input.expected_revision, "Revisión"),
   };
   if (input.type === "RECEIPT")
     result.total_cost_cents = integer(input.total_cost_cents, "Costo de recepción");
   if (input.type === "RETURN") result.source_issue_id = identifier(input.source_issue_id);
+  if (adjustment) {
+    requireValue(
+      !Object.hasOwn(input, "quantity_hundredths"),
+      "Corrección documental requiere gramos enteros.",
+    );
+    result.cost_delta_cents = signed(input.cost_delta_cents, "Diferencia monetaria");
+    result.receipt_id = identifier(input.receipt_id);
+    requireValue(result.quantity_grams !== 0 || result.cost_delta_cents !== 0, "Corrección sin diferencias.");
+  }
   requireValue(
     input.type !== "RECEIPT" || !Object.hasOwn(input, "quantity_hundredths"),
     "Recepción requiere gramos enteros.",
   );
   return result;
+}
+function signed(value, label) {
+  requireValue(Number.isSafeInteger(value) && Math.abs(value) <= LIMIT, `${label}: entero fuera de rango.`);
+  return value;
 }
 function hundredths(value, positive = false) {
   requireValue(
@@ -150,7 +172,15 @@ function advance(ledger, input, actorId, identities) {
   const perKg = precise ? 100000 : 1000;
   let balance = physical;
   let snapshot = null;
-  if (input.type === "RECEIPT") {
+  if (input.type === "PURCHASE_ADJUSTMENT") {
+    balance = precise ? hundredths(physical + quantity) : integer(physical + quantity, "Saldo gramos");
+    next.value_cents = add(ledger.value_cents, fraction(BigInt(input.cost_delta_cents)));
+    snapshot = {
+      receipt_id: input.receipt_id,
+      quantity_delta_grams: input.quantity_grams,
+      cost_delta_cents: input.cost_delta_cents,
+    };
+  } else if (input.type === "RECEIPT") {
     balance = precise ? hundredths(physical + quantity) : integer(physical + quantity, "Saldo gramos");
     next.value_cents = add(ledger.value_cents, fraction(BigInt(input.total_cost_cents)));
   } else if (input.type === "RETURN") {

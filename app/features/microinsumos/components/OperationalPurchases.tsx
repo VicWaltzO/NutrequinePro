@@ -1,4 +1,5 @@
 import { preparationWeight } from "./preparation-view";
+import PurchaseRectificationActions from "./PurchaseRectificationActions";
 import { useEffect, useRef, useState } from "react";
 import type { AppState, Submit, MicroReceipt } from "@/lib/domain-types";
 import { Input, Field, money, weight } from "@/shared/ui";
@@ -244,8 +245,8 @@ export default function OperationalPurchases({
             Confirmo la recepción física y el pago de esta compra
           </label>
           <p>
-            Una compra confirmada conserva sus renglones y gasto. Las correcciones posteriores aún no están
-            habilitadas.
+            Una compra confirmada conserva su comprobante y gasto. Sus correcciones se registran por separado
+            con historial y validación de saldo.
           </p>
           <div className="form-actions">
             <button type="button" disabled={busy} onClick={() => setEditing(null)}>
@@ -317,6 +318,9 @@ export default function OperationalPurchases({
             <button type="button" disabled={busy} onClick={(e) => start(r, e.currentTarget)}>
               Completar {r.reference}
             </button>
+          )}
+          {r.status === "CONFIRMED" && (
+            <PurchaseRectificationActions s={s} receipt={r} admin={admin} run={run} busy={busy} />
           )}
         </details>
       ))}
