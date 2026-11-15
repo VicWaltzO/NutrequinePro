@@ -11,6 +11,7 @@ export function assertCommandPermission(actor, type) {
     "MICRO_FORMULA_SAVE",
     "MICRO_FORMULA_ACTIVATE",
     "MICRO_RECEIPT_SAVE",
+    "MICRO_RECEIPT_RECTIFY",
     "MICRO_PURCHASE_SAVE",
     "MICRO_PURCHASE_CANCEL",
     "MICRO_SAVE",
