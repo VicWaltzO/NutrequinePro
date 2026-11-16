@@ -7,6 +7,7 @@ import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { localAppFixture } from "../helpers/local-app-server.mjs";
+import { reachLoginAfterRevocation } from "../helpers/session-expiry-ui.mjs";
 import { cashCreditScenario, scenarioDate } from "../helpers/regression-scenarios.mjs";
 import { saleSummary, paymentSummary, stock, balanceSummary } from "../../lib/domain.mjs";
 
@@ -454,8 +455,8 @@ test(
         data: { user_id: server.admin.userId },
       });
       assert.equal(response.status(), 200);
-      await page.getByRole("button", { name: "Actualizar datos", exact: true }).click();
-      await page.getByRole("heading", { name: "Iniciar sesión", exact: true }).waitFor();
+      assert.equal((await context.request.get(server.baseURL + "/api/state")).status(), 401);
+      await reachLoginAfterRevocation(page);
       await loginPage();
       await page.getByRole("button", { name: "Salir", exact: true }).click();
       await page.getByRole("heading", { name: "Iniciar sesión", exact: true }).waitFor();
