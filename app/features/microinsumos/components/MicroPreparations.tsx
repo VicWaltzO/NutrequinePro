@@ -1,3 +1,5 @@
+import { PreventiveAlerts, OrderAlerts } from "./MicroAlerts";
+import type { MicroAlertOverview } from "./preparation-view";
 import SubstitutionActions from "./SubstitutionActions";
 import RectificationActions from "./RectificationActions";
 import ConfirmationActions from "./ConfirmationActions";
@@ -10,6 +12,7 @@ import type { AppState, Submit } from "@/lib/domain-types";
 import { Input, Field } from "@/shared/ui";
 
 interface Overview {
+  alerts: MicroAlertOverview;
   can_create: boolean;
   substitutions: import("@/lib/domain-types").MicroSubstitutionPolicy[];
   revision: number;
@@ -101,6 +104,12 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
           <time dateTime={data.evaluated_at}>{new Date(data.evaluated_at).toLocaleString("es-PE")}</time>
         </p>
       )}
+      <div role="status" aria-atomic="true">
+        {data?.revision === s.revision
+          ? `${data.alerts.preventive.items.filter((item) => item.status !== "COVERED").length} avisos preventivos; ${data.alerts.by_order.length} órdenes con avisos.`
+          : "Actualizando avisos de materiales…"}
+      </div>
+      {data?.revision === s.revision && <PreventiveAlerts alerts={data.alerts.preventive} />}
       {data?.can_create && !editing && (
         <button
           ref={trigger}
@@ -243,6 +252,10 @@ export default function MicroPreparations({ s, run, busy }: { s: AppState; run: 
                         : " · Potencialmente reanudable: puede solicitar asignación"
                       : " · Evaluación pendiente")}
               </p>
+              {data?.revision === s.revision &&
+                data.alerts.by_order
+                  .filter((alert) => alert.preparation_id === order.id)
+                  .map((alert) => <OrderAlerts key={alert.preparation_id} items={alert.items} />)}
               {group && (
                 <p>
                   Tanda: {group.group_reference} · Grupo: {order.id}

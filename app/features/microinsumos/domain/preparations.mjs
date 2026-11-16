@@ -1,4 +1,5 @@
-import { valuationHundredths } from "./valuation.mjs";
+import { microPhysicalStock } from "./stock-balances.mjs";
+import { microAlerts } from "./alerts.mjs";
 import { activeAssignment, assignedHundredths } from "./assignment-balances.mjs";
 import { date, pick, requireValue, text } from "../../../shared/domain/core.mjs";
 import { nucleusHundredths } from "../../../shared/domain/production-quantities.mjs";
@@ -116,20 +117,13 @@ export function evaluatePreparation(s, order, evaluated_at) {
   const assignment = activeAssignment(s, order.id);
   const items = requirements.map((requirement, i) => {
     const id = requirement.micro_ingredient_id;
-    const ledger = s.microLedgers.find(
-      (row) => row.micro_ingredient_id === id && row.ledger.events.length > 0,
-    );
-    const opening = s.microOpenings.find((row) => row.micro_ingredient_id === id);
-    const available = ledger ? valuationHundredths(ledger.ledger) : (opening?.quantity_grams ?? 0) * 100; // Up to 1e14: still an exact safe integer.
+    const { physical_hundredths: available, stock_source } = microPhysicalStock(s, id);
     const committed = assignedHundredths(s, id);
     const own = assignment
       ? (s.microAssignmentLines.find((l) => l.assignment_id === assignment.id && l.micro_ingredient_id === id)
           ?.quantity_hundredths ?? 0)
       : 0;
     const free = Math.max(0, available - committed);
-    let stock_source = "UNRECORDED";
-    if (ledger) stock_source = "LEDGER";
-    else if (opening) stock_source = "OPENING";
     return {
       micro_ingredient_id: id,
       name: lines[i].name_snapshot,
@@ -162,15 +156,16 @@ export function evaluatePreparation(s, order, evaluated_at) {
   };
 }
 export function preparationOverview(s, policies, evaluated_at) {
+  const orders = s.microPreparations.map((order) => evaluatePreparation(s, order, evaluated_at));
+  const authorized = s.microFormulas.filter((f) => preparationAuthorization(s, f, policies));
   return {
+    alerts: microAlerts(s, authorized, orders),
     evaluated_at,
     revision: s.revision,
-    authorizations: s.microFormulas
-      .filter((f) => preparationAuthorization(s, f, policies))
-      .map((f) => ({
-        formula_id: f.id,
-        family: f.family,
-      })),
-    orders: s.microPreparations.map((order) => evaluatePreparation(s, order, evaluated_at)),
+    authorizations: authorized.map((f) => ({
+      formula_id: f.id,
+      family: f.family,
+    })),
+    orders,
   };
 }
