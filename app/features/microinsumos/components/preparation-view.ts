@@ -28,3 +28,23 @@ export function rationalMoney(value: { n: string; d: string }) {
   const cents = (n * BigInt(2) + d) / (BigInt(2) * d);
   return `S/ ${cents / BigInt(100)}.${String(cents % BigInt(100)).padStart(2, "0")}`;
 }
+
+export interface MicroAlertOverview {
+  preventive: {
+    unavailable_families: string[];
+    items: {
+      micro_ingredient_id: string;
+      operational_id: number;
+      name: string;
+      minimum_hundredths: number;
+      physical_hundredths: number;
+      missing_hundredths: number;
+      status: "UNAVAILABLE" | "LOW" | "COVERED";
+    }[];
+  };
+  by_order: { preparation_id: string; items: Evaluation["items"] }[];
+}
+// Alerts must retain 0.01 g even for amounts displayed elsewhere in rounded kg.
+export function alertWeight(hundredths: number) {
+  return `${new Intl.NumberFormat("es-PE", { maximumFractionDigits: 2 }).format(hundredths / 100)} g`;
+}

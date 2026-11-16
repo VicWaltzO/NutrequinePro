@@ -81,6 +81,8 @@ test(
     await login();
     await page.reload();
     area = page.locator(".micro-preparations");
+    await expect(area.getByRole("heading", { name: "Alertas preventivas · 20 núcleos" })).toBeVisible();
+    await expect(area.getByText("faltan 15 g para el mínimo preventivo.", { exact: false })).toBeVisible();
     const before = await state();
     for (let i = 0; i < 2; i++) {
       await area.getByRole("button", { name: "Nueva preparación pendiente", exact: true }).click();
@@ -126,6 +128,7 @@ test(
       ).toBeFocused();
       await expect(area.getByText("Pendiente por faltantes", { exact: true })).toHaveCount(i + 1);
     }
+    await expect(area.getByRole("heading", { name: "Faltantes de esta orden", exact: true })).toHaveCount(2);
     let s = await state();
     assert.equal(s.microPreparations.length, 2);
     for (const table of Object.keys(before).filter(
@@ -191,6 +194,8 @@ test(
     await expect(
       area.getByText("Pendiente · Potencialmente reanudable: puede solicitar asignación", { exact: true }),
     ).toHaveCount(2);
+    await expect(area.getByRole("heading", { name: "Faltantes de esta orden", exact: true })).toHaveCount(0);
+    await expect(area.getByText("faltan 15 g para el mínimo preventivo.", { exact: false })).toHaveCount(0);
     s = await state();
     assert.deepEqual(s.microPreparations, orders);
     assert.deepEqual(s.inventoryMovements, before.inventoryMovements);
@@ -239,6 +244,38 @@ test(
       ).toHaveCount(role === "OPERATOR" ? 1 : 0);
       await account.close();
     }
+    s = await state();
+    const preparation_id = s.microPreparations[0].id;
+    await command("MICRO_ASSIGN", {
+      preparation_id,
+      reason: "Ensayo sintetico de precision",
+      expected_revision: s.revision,
+    });
+    s = await state();
+    await command("MICRO_PREPARATION_CONFIRM", {
+      preparation_id,
+      nuclei: "5.01",
+      date: "2026-11-10",
+      expected_revision: s.revision,
+    });
+    await page.reload();
+    await expect(area.getByText("faltan 0.01 g para el mínimo preventivo.", { exact: false })).toBeVisible();
+    await expect(area.getByRole("heading", { name: "Faltantes de esta orden", exact: true })).toHaveCount(1);
+    await expect(
+      area.getByLabel("Alerta por orden").getByText("faltan 0.01 g.", { exact: false }),
+    ).toBeVisible();
+    for (const width of [1440, 390])
+      for (const theme of ["light", "dark"]) {
+        await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+        await page.evaluate((theme) => {
+          document.documentElement.dataset.theme = theme;
+        }, theme);
+        await area.screenshot({
+          path: join(f.evidence, `NQP26-36-alerts-${width}-${theme}.png`),
+          animations: "disabled",
+        });
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
+      }
     assert.deepEqual(errors, []);
   },
 );
