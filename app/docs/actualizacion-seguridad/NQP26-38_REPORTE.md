@@ -75,3 +75,11 @@ Resumen: test/verify 775 casos con 768 PASS, 1 FAIL (referencia HTML), 6 TODO I1
 El revisor demostró adicionalmente, mediante proveedor de fuente en memoria y sin editar aplicación ni referencias, que las 66 referencias vuelven a coincidir al omitir exclusivamente la nueva franja y su envoltura. Esto delimita el desajuste al cambio visual previsto, pero NO convierte verify en aprobado. Acta y script reproducible en el ZIP.
 
 Matriz de cierre: 49 controles con evidencia técnica, A38-50 y A38-51 BLOQUEADOS, A38-52 NO_EJECUTADO y A38-53 PARCIAL (cuatro archivos entregados; PR no abierto). Estado final: BLOQUEADO. Commit únicamente local; sin push, PR ni CI. Sin merge, despliegue ni bases empresariales reales. Se mantienen pendientes revisión ChatGPT y autorización humana de integración.
+
+## Recuperación autorizada · tercer y último ciclo
+
+Autorización humana posterior a BLOQUEADO_AUTORIZACION: «AUTORIZO REALIZAR LAS TAREAS NECESARIAS PARA ARREGLAR». Se aplica exclusivamente a B1/B2 y validaciones necesarias según paquete condicionado. Commit 62b5bcc y worktree limpios conservados; origin/main sigue 6c75d44b. Sin modificar checkout ajeno ni datos reales.
+
+Diagnóstico focal previo guardado en evidencias de ciclo3: referencia corporativa y lint reproducidos sobre estado inicial. Solución prevista B1: conservar los 66 hashes históricos, aislar únicamente el segmento SSR exacto de carga de la nueva franja y su envoltura, exigir su presencia única inmediatamente al abrir main y agregar pruebas negativas (ausencia, duplicación, desplazamiento) que fallen si desaparece o cambia su posición. No normalizar el contenido histórico ni actualizar golden. La agrupación real sigue cubierta por tests específicos y E2E.
+
+Solución prevista B2: contador local a cada ejecución del efecto, con active, AbortController e invalidación por sesión y cleanup conservados. Solicitudes dentro de una ejecución comparten contador; ejecuciones anteriores quedan invalidadas por su active=false y abort. Sin eslint-disable ni relajación de reglas. Revalidar respuesta tardía, cambio de revisión, sesión y reautenticación mismo actor/rol. Un único ciclo extraordinario; si falla su validación final, detener sin un cuarto ciclo.

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { TriangleAlert } from "lucide-react";
 import { adminFetch, onSessionRequired, onSessionRestored } from "@/client/session-api";
 import { alertWeight, type MicroAlertOverview } from "./preparation-view";
@@ -15,12 +15,14 @@ export default function GlobalMicroAlerts({ state, context }: { state: AppState;
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
-  const sequence = useRef(0);
   useEffect(() => {
     let active = true;
+    // Each effect owns its requests. Cleanup also invalidates the entire effect
+    // through active, so a previous revision/session cannot publish into this one.
+    let sequence = 0;
     let controller: AbortController | undefined;
     const load = async () => {
-      const request = ++sequence.current;
+      const request = ++sequence;
       controller?.abort();
       controller = new AbortController();
       setLoading(true);
@@ -28,20 +30,20 @@ export default function GlobalMicroAlerts({ state, context }: { state: AppState;
       try {
         const response = await adminFetch("/api/micro-preparations", { signal: controller.signal });
         const next: Snapshot = await response.json();
-        if (!active || request !== sequence.current) return;
+        if (!active || request !== sequence) return;
         if (next.revision !== revision) throw new Error("Revisión diferente");
         setSnapshot({
           revision: next.revision,
           alerts: { preventive: next.alerts.preventive, by_order: [] },
         });
       } catch {
-        if (active && request === sequence.current) setError(true);
+        if (active && request === sequence) setError(true);
       } finally {
-        if (active && request === sequence.current) setLoading(false);
+        if (active && request === sequence) setLoading(false);
       }
     };
     const unsubscribe = onSessionRequired(() => {
-      ++sequence.current;
+      ++sequence;
       controller?.abort();
       setSnapshot(null);
       setError(true);
@@ -52,7 +54,7 @@ export default function GlobalMicroAlerts({ state, context }: { state: AppState;
     window.addEventListener("focus", load);
     return () => {
       active = false;
-      ++sequence.current;
+      ++sequence;
       controller?.abort();
       unsubscribe();
       unsubscribeRestored();
