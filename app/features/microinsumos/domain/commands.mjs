@@ -51,7 +51,7 @@ export function microSave({ s, p, add, clock }) {
   }
   return add("microIngredients", values).id;
 }
-function openingValues(p) {
+export function openingValues(p) {
   requireValue(["REAL", "ESTIMATED"].includes(p.measurement), "Indique cantidad real o estimada.");
   const quantity = decimal(p.quantity_kg, 3);
   const cost = p.unit_cost == null || p.unit_cost === "" ? null : decimal(p.unit_cost, 2);

@@ -2,6 +2,7 @@ import { pick, requireValue, text, date, roundedProduct, safe } from "../../../s
 import { receiptAmounts } from "./operational-purchases.mjs";
 import { applyValuation, valuationHundredths } from "./valuation.mjs";
 import { assignedHundredths } from "./assignment-balances.mjs";
+import { assertDraftChronology, draftOpeningState } from "./draft-opening-history.mjs";
 
 export const PURCHASE_RECTIFY = "MICRO_RECEIPT_RECTIFY";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -279,6 +280,7 @@ export function assertPurchaseRectificationIntegrity(before, s) {
       confirmations.length === 1 && confirmation.actor_role === "ADMIN",
       "Falta auditoría de recepción original.",
     );
+    assertDraftChronology(s, receipt, confirmation, original.receipt.version);
     const originalPayload = confirmation.payload;
     const canonical = (value) =>
       value.normalize("NFKC").trim().replace(/\s+/gu, " ").toLocaleUpperCase("es-PE");
@@ -515,8 +517,14 @@ export function assertPurchaseRectificationIntegrity(before, s) {
           (a.payload.expected_version ?? 0) + 1 === line.version,
       );
       requireValue(drafts.length === 1, "Renglón histórico sin borrador auditable.");
+      const draftLines = s.microReceiptLines.filter(
+        (l) => l.receipt_id === receipt.id && l.version === line.version,
+      );
       const values = receiptAmounts(
-        { ...s, microIngredients: s.microIngredients.map((m) => ({ ...m, is_active: true })) },
+        {
+          ...draftOpeningState(s, drafts[0], draftLines),
+          microIngredients: s.microIngredients.map((m) => ({ ...m, is_active: true })),
+        },
         drafts[0].payload,
         drafts[0].payload.document_date,
       ).lines;

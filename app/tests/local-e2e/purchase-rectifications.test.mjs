@@ -122,3 +122,85 @@ test(
     assert.deepEqual(errors, []);
   },
 );
+
+test(
+  "HF01 UI: confirmar borrador despues de corregir corte conserva historico al recargar",
+  { timeout: 120000 },
+  async (t) => {
+    const f = await localAppFixture();
+    t.after(f.stop);
+    const browser = await chromium.launch({ channel: process.env.REGRESSION_BROWSER_CHANNEL || undefined });
+    t.after(() => browser.close());
+    const context = await browser.newContext();
+    const login = await context.request.post(f.baseURL + "/api/auth/login", {
+      headers: { Origin: f.baseURL },
+      data: { login: "admin.local", password: f.password },
+    });
+    const session = await login.json();
+    const command = async (type, payload) => {
+      const r = await context.request.post(f.baseURL + "/api/command", {
+        headers: { Origin: f.baseURL, "X-CSRF-Token": session.csrf_token },
+        data: { type, payload, request_id: randomUUID() },
+      });
+      assert.equal(r.status(), 200, await r.text());
+      return (await r.json()).result;
+    };
+    const micro = await command("MICRO_SAVE", {
+      name: "Micro sintetico HF01",
+      operational_id: 1,
+      is_active: true,
+    });
+    const opening = {
+      micro_ingredient_id: micro,
+      quantity_kg: "0",
+      unit_cost: "0",
+      cutoff_date: "2026-10-30",
+      measurement: "REAL",
+      source: "Apertura sintetica",
+    };
+    const openingId = await command("MICRO_OPEN", opening);
+    await command("MICRO_RECEIPT_SAVE", {
+      status: "DRAFT",
+      supplier: "Proveedor sintetico HF01",
+      reference: "FACT-HF01",
+      source: "Ensayo sintetico",
+      document_date: "2026-11-01",
+      total: "20",
+      discount: "0",
+      currency: "PEN",
+      payment_method: "CASH",
+      reviewed_expenses: false,
+      receive_confirmed: false,
+      lines: [{ micro_ingredient_id: micro, quantity_kg: "5", unit_price: "4", amount: "20", discount: "0" }],
+    });
+    await command("MICRO_CORRECT", {
+      ...opening,
+      id: openingId,
+      expected_version: 1,
+      cutoff_date: "2026-10-29",
+      reason: "Correccion legal sintetica",
+    });
+    const state = async () => (await (await context.request.get(f.baseURL + "/api/state")).json()).state;
+    const before = await state(),
+      page = await context.newPage();
+    await page.goto(f.baseURL + "/#inventory/micros");
+    const area = page.locator(".operational-purchases");
+    await area.locator("summary").filter({ hasText: "FACT-HF01" }).click();
+    await area.getByRole("button", { name: "Completar FACT-HF01", exact: true }).click();
+    await area.getByLabel("Revisé los gastos previos para evitar duplicados").check();
+    await area.getByLabel("Confirmo la recepción física y el pago de esta compra").check();
+    await area.getByRole("button", { name: "Confirmar compra y recepción", exact: true }).click();
+    await expect(area.getByRole("button", { name: "Completar FACT-HF01", exact: true })).toHaveCount(0);
+    const after = await state();
+    assert.equal(after.microReceipts[0].status, "CONFIRMED");
+    assert.equal(after.expenses.length, 1);
+    assert.equal(after.microLedgers[0].ledger.quantity_grams, 5000);
+    assert.equal(after.microReceiptLines[0].cutoff_date_snapshot, "2026-10-30");
+    assert.equal(after.microReceiptLines[1].cutoff_date_snapshot, "2026-10-29");
+    assert.deepEqual(after.sales, before.sales);
+    assert.deepEqual(after.productions, before.productions);
+    await page.reload();
+    await expect(area.getByText(/Stock físico: 5/)).toBeVisible();
+    assert.deepEqual(await state(), after);
+  },
+);
