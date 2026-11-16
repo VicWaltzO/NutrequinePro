@@ -1,3 +1,13 @@
+.global-alerts {
+  display: grid;
+  gap: 12px;
+}
+.global-alerts > .pending-stock {
+  margin-bottom: 0;
+}
+.global-alerts:has(> .pending-stock) {
+  margin-bottom: 24px;
+}
 .pending-stock {
   margin-bottom: 24px;
   padding: 16px 20px;

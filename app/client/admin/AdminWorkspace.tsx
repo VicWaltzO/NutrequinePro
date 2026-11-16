@@ -1,5 +1,6 @@
 import { adminSelectors } from "./selectors";
 import PendingStockBanner from "@/features/ventas/components/PendingStockBanner";
+import GlobalMicroAlerts from "@/features/microinsumos/components/GlobalMicroAlerts";
 import { Tabs } from "@/shared/ui/Tabs";
 import type { AppState, User, OpenModal, Sale, Submit } from "@/lib/domain-types";
 import { balanceSummary } from "@/lib/domain-preview.mjs";
@@ -105,7 +106,10 @@ export default function AdminWorkspace({
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <PendingStockBanner state={state} open={open} />
+      <div className="global-alerts">
+        <PendingStockBanner state={state} open={open} />
+        <GlobalMicroAlerts key={actor.id + ":" + actor.role} state={state} context={view + ":" + tab} />
+      </div>
       <PageHeading tab={tab} view={view} admin={admin} write={write} open={open} primary={primary} />
       {error && (
         <div className="error" role="alert">
