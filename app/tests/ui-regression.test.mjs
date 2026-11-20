@@ -3,13 +3,29 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createUiHarness } from "./helpers/ui-harness.mjs";
 
+// Only this exact new SSR loading segment is isolated from the historical golden.
+// Requiring it immediately inside main also tests presence, uniqueness and order.
+// Loaded content, grouping, precision and resolution have their own unit/E2E tests.
+const alertHarness = createUiHarness();
+const globalAlerts = `<div class="global-alerts">${alertHarness.renderComponent(
+  "features/microinsumos/components/GlobalMicroAlerts.tsx",
+  "default",
+  { state: alertHarness.state(), context: "dashboard" },
+)}</div>`;
+const mainOpening = '<main id="main-content" tabindex="-1">';
+function isolateGlobalAlerts(html) {
+  assert.equal(html.split(globalAlerts).length - 1, 1, "Una única franja global SSR debe existir");
+  assert.ok(html.includes(mainOpening + globalAlerts), "La franja global debe preceder al contenido de main");
+  return html.replace(mainOpening + globalAlerts, mainOpening);
+}
+
 test("vistas por rol, rutas antiguas y formularios conservan la referencia del rediseño corporativo", () => {
   const baseline = JSON.parse(readFileSync(new URL("./fixtures/ui-corporate.json", import.meta.url), "utf8"));
   const current = createUiHarness().snapshots({
     // NQP12 changes only column headers. Keep the existing golden for every cell,
     // form control and surrounding screen; new headers are checked separately.
     normalize: (html) =>
-      html
+      isolateGlobalAlerts(html)
         // The only new navigation control; micros has its own interactive E2E.
         .replace('<button type="button" class="">Microinsumos</button>', "")
         // NQP33 adds this tab; its valuation flow has dedicated interactive coverage.
@@ -28,6 +44,20 @@ test("vistas por rol, rutas antiguas y formularios conservan la referencia del r
   for (const [scenario, expected] of Object.entries(baseline.snapshots)) {
     assert.equal(current[scenario], expected, `Cambió el HTML del escenario ${scenario}`);
   }
+});
+
+test("NQP38: aislamiento exacto exige franja única, posición global y conserva HTML adyacente", () => {
+  const historical = "<h1>Contenido histórico</h1>";
+  const html = mainOpening + globalAlerts + historical + "</main>";
+  assert.equal(isolateGlobalAlerts(html), mainOpening + historical + "</main>");
+  assert.throws(() => isolateGlobalAlerts(html.replace(globalAlerts, "")), /única franja/);
+  assert.throws(
+    () => isolateGlobalAlerts(html.replace(globalAlerts, globalAlerts + globalAlerts)),
+    /única franja/,
+  );
+  assert.throws(() => isolateGlobalAlerts(mainOpening + historical + globalAlerts + "</main>"), /preceder/);
+  const changed = html.replace(historical, "<h1>Cambio colateral</h1>");
+  assert.notEqual(isolateGlobalAlerts(changed), mainOpening + historical + "</main>");
 });
 
 test("NQP29 navegación ofrece jornada por rol sin cambiar el ingreso histórico", () => {

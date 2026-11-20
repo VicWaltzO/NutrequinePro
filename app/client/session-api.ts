@@ -15,6 +15,13 @@ export class ApiError extends Error {
 }
 let csrf = "";
 const listeners = new Set<(message: string, discard: boolean) => void>();
+const restoredListeners = new Set<() => void>();
+export function onSessionRestored(listener: () => void) {
+  restoredListeners.add(listener);
+  return () => {
+    restoredListeners.delete(listener);
+  };
+}
 export function onSessionRequired(listener: (message: string, discard: boolean) => void) {
   listeners.add(listener);
   return () => {
@@ -58,6 +65,7 @@ async function sessionResponse(response: Response): Promise<LocalSession> {
   if (!body.actor?.id || !/^[a-f0-9]{64}$/.test(body.csrf_token))
     throw new ApiError(503, "Respuesta de sesión inválida.");
   csrf = body.csrf_token;
+  for (const listener of restoredListeners) listener();
   return body;
 }
 export const recoverSession = () => send("/api/auth/session").then(sessionResponse);
