@@ -1380,3 +1380,22 @@ code {
   max-width: 580px;
   overflow-wrap: anywhere;
 }
+
+.formula-list h2 {
+  margin: 0 0 16px;
+  font-size: 1.0625rem;
+}
+.formula-history > section {
+  padding: 16px;
+}
+.formula-history > section > p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+.formula-list summary {
+  overflow-wrap: anywhere;
+  min-height: 44px;
+}
+.formula-list summary:focus-visible {
+  outline-offset: -3px;
+}

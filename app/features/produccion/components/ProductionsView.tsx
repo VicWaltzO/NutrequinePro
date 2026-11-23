@@ -1,7 +1,8 @@
 import JourneysView from "./JourneysView";
 import type { AppState, OpenModal } from "@/lib/domain-types";
 import { SubtabContent } from "@/shared/ui/SubtabContent";
-import { SortableTable, money, weight, find } from "@/shared/ui";
+import { SortableTable, money } from "@/shared/ui";
+import MacroFormulaList from "./MacroFormulaList";
 import type { ReactNode } from "react";
 import type { Searchable } from "@/shared/types/admin";
 export default function ProductionsView({
@@ -58,48 +59,7 @@ export default function ProductionsView({
               )}
             </SortableTable>
           ) : tab === "formulas" ? (
-            <div className="formula-list">
-              {state.formulas
-                .slice()
-                .reverse()
-                .map((f) => {
-                  const rows = state.formulaIngredients.filter((x) => x.formula_id === f.id);
-                  return (
-                    <details key={f.id} open={f.is_active}>
-                      <summary>
-                        {find(state, "products", f.product_id)?.name} · v{f.version} ·{" "}
-                        {f.is_active ? "Activa" : "Histórica"} · desde {f.valid_from}
-                      </summary>
-                      <SortableTable
-                        heads={["Insumo", "Peso / núcleo"]}
-                        rows={rows}
-                        values={[
-                          (x) => find(state, "ingredients", x.ingredient_id)?.name,
-                          (x) => x.kg_per_nucleus,
-                        ]}
-                        tie={(x) => [find(state, "ingredients", x.ingredient_id)?.name, x.id]}
-                      >
-                        {(x) => (
-                          <tr key={x.id}>
-                            <td>{find(state, "ingredients", x.ingredient_id)?.name}</td>
-                            <td>{weight(x.kg_per_nucleus)}</td>
-                          </tr>
-                        )}
-                      </SortableTable>
-                      {write && f.is_active && (
-                        <button className="formula-edit" onClick={() => open("formula", f)}>
-                          Editar fórmula
-                        </button>
-                      )}
-                      <p className="formula-total">
-                        Total fórmula: {weight(rows.reduce((n: number, x) => n + x.kg_per_nucleus, 0))} · Peso
-                        comercial:{" "}
-                        {weight(find(state, "products", f.product_id)?.commercial_weight_per_nucleus_kg)}
-                      </p>
-                    </details>
-                  );
-                })}
-            </div>
+            <MacroFormulaList state={state} write={write} open={open} />
           ) : (
             productionList
           )}
