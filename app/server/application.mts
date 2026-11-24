@@ -266,11 +266,11 @@ export async function createLocalServer(
               "Vincule credenciales a otro administrador activo antes de retirar el último acceso administrativo local.",
             );
         }
-        const outcome = await store.runCommand(command, {
+        const { replayed, ...outcome } = await store.runCommandWithReplay(command, {
           userId: session.actor.id,
           displayName: session.actor.name,
         });
-        if (command.type === "USER_SAVE" && typeof outcome.result === "string")
+        if (!replayed && command.type === "USER_SAVE" && typeof outcome.result === "string")
           authentication.revoke(outcome.result, session.actor.id);
         return outcome;
       }),

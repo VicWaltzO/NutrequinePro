@@ -46,3 +46,8 @@ export function saleSummary(state, sale) {
     financial_status: financialStatus,
   };
 }
+
+export function saleCorrectionSnapshot(state, sale) {
+  const summary = saleSummary(state, sale);
+  return structuredClone({ sale: { ...sale, financial_status: summary.financial_status }, summary });
+}

@@ -1,5 +1,5 @@
 import { requireValue, scaled, positiveInt, date, pick, sum } from "../../../shared/domain/core.mjs";
-import { saleSummary } from "./summary.mjs";
+import { saleCorrectionSnapshot, saleSummary } from "./summary.mjs";
 import { stock } from "../../inventario/domain/stock.mjs";
 import { isNucleusProduct, presentationSnapshot } from "../../../shared/domain/presentation.mjs";
 import { savedDeliveryFields } from "./delivery-date.mjs";
@@ -204,7 +204,7 @@ export function saleCorrect(context) {
   sale.commercial_status = "RECTIFIED";
   sale.notes = payload.notes ?? sale.notes;
   sale.updated_at = clock;
-  correction("SALE", sale.id, before, { sale, summary: saleSummary(state, sale) }, why);
+  correction("SALE", sale.id, before, saleCorrectionSnapshot(state, sale), why);
   result = sale.id;
   return result;
 }

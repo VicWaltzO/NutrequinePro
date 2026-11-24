@@ -317,10 +317,24 @@ test("Node permisos: ADMIN, OPERATOR y VIEWER, cambios de rol, desactivación y 
     ).status,
     403,
   );
-  await app.client.command("USER_SAVE", { id: "writer", name: "Consulta", role: "VIEWER" });
+  const roleChange = { id: "writer", name: "Consulta", role: "VIEWER" };
+  const roleChangeId = randomUUID();
+  await app.client.command("USER_SAVE", roleChange, roleChangeId);
   assert.equal((await operator.call("/api/state")).status, 401);
-  await operator.login("login-writer", operator.password);
+  assert.equal((await operator.login("login-writer", operator.password)).status, 200);
   const afterRoleChange = await app.client.state();
+  const access = new DatabaseSync(f.auth_database, { readOnly: true });
+  try {
+    const revocations = () =>
+      access.prepare("SELECT count(*) AS n FROM security_events WHERE event='REVOKE'").get().n;
+    const beforeReplay = revocations();
+    assert.equal(await app.client.command("USER_SAVE", roleChange, roleChangeId), "writer");
+    assert.equal((await operator.call("/api/state")).status, 200);
+    assert.equal(revocations(), beforeReplay);
+    assert.deepEqual(await app.client.state(), afterRoleChange);
+  } finally {
+    access.close();
+  }
   assert.equal(
     (
       await operator.call("/api/command", {

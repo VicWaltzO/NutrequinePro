@@ -74,7 +74,7 @@ export function createStore(getDatabase, options = {}) {
     if (!state) throw new Error("No se pudo inicializar la base de datos.");
     return state;
   }
-  async function runCommand(input, identity) {
+  async function runCommandWithReplay(input, identity) {
     const before = await ensureState(identity);
     const actor = before.users.find((user) => user.id === identity.userId && user.is_active);
     if (!actor)
@@ -145,7 +145,7 @@ export function createStore(getDatabase, options = {}) {
     );
     if (duplicate) {
       assertEquivalentReplay(duplicate, command);
-      return { state: before, result: duplicate.entity_id };
+      return { state: before, result: duplicate.entity_id, replayed: true };
     }
     const outcome = executeCommand(before, command, actor, undefined, options);
     const audit = outcome.state.audit.at(-1);
@@ -155,5 +155,9 @@ export function createStore(getDatabase, options = {}) {
     await persistState(before, outcome.state);
     return outcome;
   }
-  return { loadState, persistState, ensureState, runCommand };
+  async function runCommand(input, identity) {
+    const { state, result } = await runCommandWithReplay(input, identity);
+    return { state, result };
+  }
+  return { loadState, persistState, ensureState, runCommand, runCommandWithReplay };
 }
