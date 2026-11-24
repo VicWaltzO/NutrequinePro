@@ -50,15 +50,31 @@ export function assertMillIntegrity(before, s) {
         moves.every((m) => m.created_by === c.created_by && m.date === c.date),
       "Movimiento del molino inválido.",
     );
+    const audits = s.audit.filter((a) => a.action === "MILL_CLOSE" && a.entity_id === c.id);
+    const [audit] = audits;
     requireValue(
-      s.audit.some(
-        (a) =>
-          a.action === "MILL_CLOSE" &&
-          a.entity_id === c.id &&
-          a.created_by === c.created_by &&
-          a.request_id === c.request_id,
-      ),
-      "Falta auditoría del cierre del molino.",
+      audits.length === 1 &&
+        audit.created_by === c.created_by &&
+        audit.created_at === c.created_at &&
+        audit.request_id === c.request_id &&
+        ["ADMIN", "OPERATOR"].includes(audit.actor_role) &&
+        audit.payload?.line_id === c.line_id &&
+        audit.payload.date === c.date &&
+        audit.payload.actual_bags === c.actual_bags &&
+        audit.payload.lot_complete === true &&
+        c.lot_complete === true &&
+        audit.payload.formula_consent === c.formula_consent,
+      "La auditoría no coincide con el cierre del molino.",
+    );
+    requireValue(
+      Number.isSafeInteger(c.actual_bags) &&
+        c.actual_bags >= 0 &&
+        c.unit_weight_grams === 25000 &&
+        c.theoretical_weight_grams === line.planned_weight_grams &&
+        c.waste_grams === line.planned_weight_grams - c.actual_bags * 25000 &&
+        c.waste_grams >= 0 &&
+        (c.actual_bags > 0 || line.planned_weight_grams < 25000),
+      "Rendimiento del molino inválido.",
     );
   }
   requireValue(

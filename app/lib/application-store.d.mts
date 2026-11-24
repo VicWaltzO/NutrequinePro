@@ -9,6 +9,7 @@ export interface ApplicationStore {
   persistState: (before: AppState | null, after: AppState) => Promise<void>;
   ensureState: (identity: Identity) => Promise<AppState>;
   runCommand: (input: unknown, identity: Identity) => Promise<CommandResult>;
+  runCommandWithReplay: (input: unknown, identity: Identity) => Promise<CommandResult & { replayed?: true }>;
 }
 export interface StoreOptions {
   microSubstitutionPolicies?: import("../shared/types/domain").MicroSubstitutionPolicy[];

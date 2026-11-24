@@ -12,7 +12,7 @@ export function inventoryAdjust(context) {
     payload.weight_kg == null && snapshot.weight_policy_snapshot === "FIXED"
       ? expectedWeight
       : scaled(payload.weight_kg, 3);
-  requireValue(weight > 0, "Peso debe ser mayor que cero.");
+  requireValue(weight >= quantity, "Registre al menos un gramo por unidad en el ajuste.");
   assertUnitWeight({ ...snapshot, unit_weight_grams_snapshot: expectedWeight }, weight);
   requireValue(["IN", "OUT"].includes(payload.direction), "Dirección de ajuste inválida.");
   const sign = payload.direction === "OUT" ? -1 : 1;

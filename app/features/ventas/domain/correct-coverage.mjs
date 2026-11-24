@@ -1,5 +1,5 @@
 import { requireValue, sum } from "../../../shared/domain/core.mjs";
-import { saleSummary } from "./summary.mjs";
+import { saleCorrectionSnapshot, saleSummary } from "./summary.mjs";
 import { releaseCoverage, allocatePendingCoverage } from "./coverage.mjs";
 
 const samePresentation = (a, b) =>
@@ -71,6 +71,6 @@ export function correctReservedSale(context, sale) {
   sale.notes = payload.notes ?? sale.notes;
   sale.updated_at = clock;
   allocatePendingCoverage(context);
-  correction("SALE", sale.id, before, structuredClone({ sale, summary: saleSummary(state, sale) }), why);
+  correction("SALE", sale.id, before, saleCorrectionSnapshot(state, sale), why);
   return sale.id;
 }

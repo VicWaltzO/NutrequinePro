@@ -4,6 +4,7 @@ import {
   commercialCostCommand,
   captureCommercialCosts,
 } from "../features/inventario/domain/commercial-cost.mjs";
+import { assertPhysicalUnitWeight } from "../features/inventario/domain/stock.mjs";
 import { millCostInputs } from "../features/produccion/domain/mill-cost.mjs";
 import { millClose } from "../features/produccion/domain/mill-close.mjs";
 import { millReconcile } from "../features/produccion/domain/mill-charge.mjs";
@@ -146,6 +147,7 @@ export function executeCommand(original, command, actor, clock = new Date().toIS
     if (changedInventory) allocatePendingCoverage(context);
     assertCoverageIntegrity(state);
   }
+  assertPhysicalUnitWeight(original, state);
   captureCommercialCosts(original, context);
   for (const table of TABLES)
     for (const row of state[table])
