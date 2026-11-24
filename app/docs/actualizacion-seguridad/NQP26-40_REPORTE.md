@@ -9,7 +9,9 @@ localmente en `Actualizacion_2026-10-24_Codex`.
 
 - La rectificación de ventas conserva el mismo estado financiero final en el
   snapshot y en los campos de auditoría. La comprobación cruza el registro
-  persistido, los pagos y los movimientos.
+  persistido, los pagos y los movimientos. El diff sintético del DOM confirma
+  que la única referencia modificada, modal:sale-detail, cambia el estado del
+  campo de auditoría de PAID a PARTIAL al aumentar el importe sobre un pago previo.
 - Los movimientos de ajuste individual y el stock resultante conservan al menos
   un gramo por unidad registrada. Se admite una diferencia de gramos sin
   unidades vendibles. Se conservan los pesos variables históricos y el mensaje
